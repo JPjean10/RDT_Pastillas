@@ -1,4 +1,4 @@
-package com.example.rdt_pastillas.activity.menu_lateral.ui;
+package com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class HomeFragment extends Fragment {
+public class PastillasFragment extends Fragment {
 
     @Nullable
     @Override
@@ -50,12 +50,12 @@ public class HomeFragment extends Fragment {
         }
 
         for (PastillasModel pastilla : pastillas) {
-            scheduleAlarmForPill(requireContext(), pastilla, false);
+            programarAlarma(requireContext(), pastilla, false);
         }
         Toast.makeText(getContext(), "Alarmas programadas/actualizadas.", Toast.LENGTH_SHORT).show();
     }
 
-    public static void scheduleAlarmForPill(Context context, PastillasModel pastilla, boolean isSnooze) {
+    public static void programarAlarma(Context context, PastillasModel pastilla, boolean isSnooze) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, AlarmReceiver.class);

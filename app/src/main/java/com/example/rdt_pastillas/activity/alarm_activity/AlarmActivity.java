@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.receiver.AlarmReceiver;
-import com.example.rdt_pastillas.service.AlarmService;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.service.AlarmService;
 
 import java.util.Calendar;
 
@@ -33,19 +33,19 @@ public class AlarmActivity extends AppCompatActivity {
         Button btn_suspender = findViewById(R.id.btn_suspender);
 
         btn_desactivar.setOnClickListener(v -> {
-            stopAlarm();
+            detener_alarma();
             // No canceles la alarma principal para que suene al día siguiente.
             // Si quisieras cancelarla permanentemente, usarías el método cancelRepeatingAlarm().
             finish();
         });
 
         btn_suspender.setOnClickListener(v -> {
-            snoozeAlarm();
+            suspender();
             finish();
         });
     }
 
-    private void stopAlarm() {
+    private void detener_alarma() {
         // Detiene el servicio de sonido
         Intent serviceIntent = new Intent(this, AlarmService.class);
         stopService(serviceIntent);
@@ -57,9 +57,9 @@ public class AlarmActivity extends AppCompatActivity {
         }
     }
 
-    private void snoozeAlarm() {
+    private void suspender() {
         // Primero, detiene el sonido actual
-        stopAlarm();
+        detener_alarma();
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmReceiver.class);
@@ -75,7 +75,7 @@ public class AlarmActivity extends AppCompatActivity {
         );
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 1); // Suspender por 30 minutos
+        calendar.add(Calendar.MINUTE, 30); // Suspender por 30 minutos
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         Toast.makeText(this, "Alarma suspendida por 30 minutos", Toast.LENGTH_SHORT).show();
@@ -96,6 +96,6 @@ public class AlarmActivity extends AppCompatActivity {
         if (alarmManager != null) {
             alarmManager.cancel(pendingIntent);
         }
-        stopAlarm(); // También detiene el sonido actual
+        detener_alarma(); // También detiene el sonido actual
     }
 }

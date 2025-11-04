@@ -1,12 +1,9 @@
 package com.example.rdt_pastillas.activity.menu_lateral;
 
 import android.Manifest;
-import android.app.AlarmManager;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -28,7 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.GalleryFragment;
-import com.example.rdt_pastillas.activity.menu_lateral.ui.HomeFragment;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -68,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PastillasFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_pastilla);
             getSupportActionBar().setTitle(navigationView.getMenu().findItem(R.id.nav_pastilla).getTitle());
         }
@@ -99,14 +95,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onDrawerStateChanged(int newState) {}
         });
 
-        askNotificationPermission();
+        permiso_notificacione();
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.nav_pastilla) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PastillasFragment()).commit();
         } else if (itemId == R.id.nav_gallery) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GalleryFragment()).commit();
         } else if (itemId == R.id.nav_slideshow) {
@@ -118,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void askNotificationPermission() {
+    private void permiso_notificacione() {
         //Esto solo es necesario para el nivel de API 33 o superior.+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
@@ -136,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    // --- NUEVO MÉTODO PARA PEDIR PERMISO DE ALARMAS EXACTAS ---
+/*    // --- NUEVO MÉTODO PARA PEDIR PERMISO DE ALARMAS EXACTAS ---
     private void askForExactAlarmPermission() {
         // El permiso es necesario a partir de Android 12 (API 31)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -157,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .show();
             }
         }
-    }
+    }*/
 
     public static class SlideshowFragment extends Fragment {
 

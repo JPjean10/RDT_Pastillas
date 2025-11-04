@@ -12,23 +12,64 @@ public class ListaPastilla {
         ArrayList<PastillasModel> pastillas = new ArrayList<>();
 
 
+        //en la mañana
         pastillas.add(new PastillasModel(
                 1,
-                "Paracetamol",
-                "10:52 AM"));
+                "insulina",
+                "06:30 AM"));
         pastillas.add(new PastillasModel(
                 2,
-                "Paracetamol",
-                "10:53 AM"));
-/*
-        pastillas.add(new PastillasModel(2, "Ibuprofeno", "12:30 PM"));
-        pastillas.add(new PastillasModel(3, "Vitamina C", "09:00 AM"));
-        pastillas.add(new PastillasModel(4, "Amoxicilina", "10:00 PM"));
-        pastillas.add(new PastillasModel(5, "Omeprazol", "07:00 AM"));
-        pastillas.add(new PastillasModel(6, "Loratadina", "Cada 24 horas"));
-        pastillas.add(new PastillasModel(7, "Aspirina", "Después de comer"));
-        pastillas.add(new PastillasModel(8, "Complejo B", "En ayunas"));
-*/
+                "alprasolan",
+                "07:40 PM"));
+        pastillas.add(new PastillasModel(
+                3,
+                "carrelidol 1/2 pastillas", "07:40 PM"));
+        pastillas.add(new PastillasModel(
+                4,
+                "gabapentina",
+                "07:40 PM"));
+        pastillas.add(new PastillasModel(
+                5,
+                "meformina",
+                "07:40 AM"));
+        // en tarde
+        pastillas.add(new PastillasModel(
+                6,
+                "meformina",
+                "01:30 PM"));
+        pastillas.add(new PastillasModel(
+                7,
+                "dapaglifozina",
+                "01:30 PM"));
+        // en la noche
+        pastillas.add(new PastillasModel(
+                8,
+                "insulina",
+                "06:30 PM"));
+        pastillas.add(new PastillasModel(
+                9,
+                "aprasolan",
+                "07:40 PM"));
+        pastillas.add(new PastillasModel(
+                10,
+                "carrelidol 1/2 pastillas",
+                "07:40 PM"));
+        pastillas.add(new PastillasModel(
+                11,
+                "gabapentina",
+                "07:40 PM"));
+        pastillas.add(new PastillasModel(
+                12,
+                "almiodipilina",
+                "07:40 PM"));
+        pastillas.add(new PastillasModel(
+                13,
+                "atorrastatina",
+                "07:40 PM"));
+        pastillas.add(new PastillasModel(
+                14,
+                "meformina",
+                "07:40 PM"));
 
         return pastillas;
     }

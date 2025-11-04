@@ -15,8 +15,8 @@ import com.example.rdt_pastillas.Modelo.PastillasModel;
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.alarm_activity.AlarmActivity;
 // ¡¡IMPORTANTE!! Añadir el import del HomeFragment
-import com.example.rdt_pastillas.activity.menu_lateral.ui.HomeFragment;
-import com.example.rdt_pastillas.service.AlarmService;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.service.AlarmService;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "alarm_channel";
@@ -32,7 +32,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (pillId != -1 && pillName != null && pillHour != null) {
             PastillasModel pastilla = new PastillasModel(pillId, pillName, pillHour);
             // Llamamos al método estático en HomeFragment para programar la alarma para el día siguiente.
-            HomeFragment.scheduleAlarmForPill(context, pastilla, false); // false = no es snooze
+            PastillasFragment.programarAlarma(context, pastilla, false); // false = no es snooze
             Log.d("AlarmReceiver", "Alarma recibida y REPROGRAMADA para el próximo día.");
         } else {
             Log.e("AlarmReceiver", "No se pudo reprogramar la alarma, faltan datos en el Intent.");
