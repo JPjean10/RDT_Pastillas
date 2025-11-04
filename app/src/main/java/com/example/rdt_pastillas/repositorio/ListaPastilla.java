@@ -48,6 +48,10 @@ public class ListaPastilla {
                 "insulina",
                 "06:30 PM"));
         pastillas.add(new PastillasModel(
+                15,
+                "carrelidol 1/2 pastillas",
+                "06:30 PM"));
+        pastillas.add(new PastillasModel(
                 9,
                 "aprasolan",
                 "07:40 PM"));

@@ -120,8 +120,7 @@ public class PastillasFragment extends Fragment {
 
         return pastillasFiltradas;
     }
-    private void
-    ProgramarOActualizarAlarmas() {
+    private void ProgramarOActualizarAlarmas() {
         List<PastillasModel> pastillas = ListaPastilla.getPastillas();
         if (pastillas.isEmpty()) {
             Toast.makeText(getContext(), "No hay pastillas para programar.", Toast.LENGTH_SHORT).show();
@@ -153,7 +152,7 @@ public class PastillasFragment extends Fragment {
 
         if (isSnooze) {
             // Lógica para suspender: programar para X minutos en el futuro.
-            calendar.add(Calendar.MINUTE, 1); // Puedes cambiar a 30 min.
+            calendar.add(Calendar.MINUTE, 30); // Puedes cambiar a 30 min.
             Log.d("AlarmScheduling", "Alarma SUSPENDIDA para '" + pastilla.getNombre() + "' en 1 minuto.");
         } else {
             // Lógica para programar una alarma normal.
@@ -187,6 +186,6 @@ public class PastillasFragment extends Fragment {
         // LA LÍNEA MÁS IMPORTANTE: Usamos setExactAndAllowWhileIdle para la máxima precisión.
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
 
-        Log.d("AlarmScheduling", "Alarma programada para '" + pastilla.getNombre() + "' a las: " + calendar.getTime());
+//        Log.d("AlarmScheduling", "Alarma programada para '" + pastilla.getNombre() + "' a las: " + calendar.getTime());
     }
 }
