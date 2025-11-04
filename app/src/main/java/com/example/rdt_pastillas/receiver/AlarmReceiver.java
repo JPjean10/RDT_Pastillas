@@ -16,7 +16,7 @@ import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.alarm_activity.AlarmActivity;
 // ¡¡IMPORTANTE!! Añadir el import del HomeFragment
 import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
-import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.service.AlarmService;
+import com.example.rdt_pastillas.activity.alarm_activity.service.AlarmService;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "alarm_channel";

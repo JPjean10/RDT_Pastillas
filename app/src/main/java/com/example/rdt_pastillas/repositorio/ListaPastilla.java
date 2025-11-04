@@ -20,14 +20,15 @@ public class ListaPastilla {
         pastillas.add(new PastillasModel(
                 2,
                 "alprasolan",
-                "07:40 PM"));
+                "07:40 AM"));
         pastillas.add(new PastillasModel(
                 3,
-                "carrelidol 1/2 pastillas", "07:40 PM"));
+                "carrelidol 1/2 pastillas",
+                "07:40 AM"));
         pastillas.add(new PastillasModel(
                 4,
                 "gabapentina",
-                "07:40 PM"));
+                "07:40 AM"));
         pastillas.add(new PastillasModel(
                 5,
                 "meformina",

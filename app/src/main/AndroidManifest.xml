@@ -39,7 +39,7 @@
             </intent-filter>
         </receiver>
         <service
-            android:name=".activity.menu_lateral.ui.pastillas_fragment.service.AlarmService"
+            android:name=".activity.alarm_activity.service.AlarmService"
             android:foregroundServiceType="specialUse" />
     </application>
 

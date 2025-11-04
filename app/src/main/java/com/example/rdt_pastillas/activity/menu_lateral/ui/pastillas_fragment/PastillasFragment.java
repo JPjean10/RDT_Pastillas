@@ -15,34 +15,113 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rdt_pastillas.Modelo.PastillasModel;
 import com.example.rdt_pastillas.R;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.adapter.PastillasAdapter;
 import com.example.rdt_pastillas.receiver.AlarmReceiver;
 import com.example.rdt_pastillas.repositorio.ListaPastilla;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class PastillasFragment extends Fragment {
 
+    private RecyclerView recyclerView;
+    private PastillasAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_pastillas, container, false);
 
-        // Directamente programamos/actualizamos las alarmas basadas en la lista actual.
-        // Ya no es necesario el paso de limpieza.
-        scheduleOrUpdateAlarms();
+        // --- Configuración del RecyclerView ---
+        recyclerView = view.findViewById(R.id.recycler_view_pastillas);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // 1. Obtiene la lista completa de pastillas.
+        List<PastillasModel> todasLasPastillas = ListaPastilla.getPastillas();
+
+        // 2. Filtra la lista para obtener solo las próximas pastillas del día.
+        List<PastillasModel> pastillasProximas = filtrarProximoGrupoDePastillas(todasLasPastillas);
+
+        // 3. Crea y asigna el adaptador con la lista ya filtrada.
+        adapter = new PastillasAdapter(pastillasProximas);
+        recyclerView.setAdapter(adapter);
+
+        ProgramarOActualizarAlarmas();
 
         return view;
     }
 
-    private void scheduleOrUpdateAlarms() {
+
+    private List<PastillasModel> filtrarProximoGrupoDePastillas(List<PastillasModel> todasLasPastillas) {
+        Calendar ahora = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.US);
+        String proximaHora = null;
+
+        // --- PASO 1: Encontrar la próxima hora de alarma más cercana ---
+        // Primero ordenamos la lista por hora para facilitar la búsqueda.
+        Collections.sort(todasLasPastillas, new Comparator<PastillasModel>() {
+            @Override
+            public int compare(PastillasModel p1, PastillasModel p2) {
+                try {
+                    Date hora1 = sdf.parse(p1.getHora());
+                    Date hora2 = sdf.parse(p2.getHora());
+                    return hora1.compareTo(hora2);
+                } catch (ParseException e) {
+                    return 0;
+                }
+            }
+        });
+
+        for (PastillasModel pastilla : todasLasPastillas) {
+            try {
+                Date horaPastillaDate = sdf.parse(pastilla.getHora());
+                Calendar calendarioPastilla = Calendar.getInstance();
+                calendarioPastilla.setTime(horaPastillaDate);
+                calendarioPastilla.set(Calendar.YEAR, ahora.get(Calendar.YEAR));
+                calendarioPastilla.set(Calendar.MONTH, ahora.get(Calendar.MONTH));
+                calendarioPastilla.set(Calendar.DAY_OF_MONTH, ahora.get(Calendar.DAY_OF_MONTH));
+
+                // Si la hora de la pastilla es después de la hora actual,
+                // hemos encontrado la próxima hora de alarma.
+                if (calendarioPastilla.after(ahora)) {
+                    proximaHora = pastilla.getHora();
+                    break; // Salimos del bucle en cuanto encontramos la primera hora futura.
+                }
+
+            } catch (ParseException e) {
+                Log.e("FiltradoPastillas", "Formato de hora inválido: " + pastilla.getHora(), e);
+            }
+        }
+
+        // --- PASO 2: Recolectar todas las pastillas que coincidan con esa próxima hora ---
+        List<PastillasModel> pastillasFiltradas = new ArrayList<>();
+        if (proximaHora != null) {
+            for (PastillasModel pastilla : todasLasPastillas) {
+                if (pastilla.getHora().equals(proximaHora)) {
+                    pastillasFiltradas.add(pastilla);
+                }
+            }
+        } else {
+            // Si no se encontró ninguna hora futura, significa que todas las alarmas de hoy ya pasaron.
+            Toast.makeText(getContext(), "No hay más pastillas programadas para hoy.", Toast.LENGTH_LONG).show();
+        }
+
+        return pastillasFiltradas;
+    }
+    private void
+    ProgramarOActualizarAlarmas() {
         List<PastillasModel> pastillas = ListaPastilla.getPastillas();
         if (pastillas.isEmpty()) {
             Toast.makeText(getContext(), "No hay pastillas para programar.", Toast.LENGTH_SHORT).show();

@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.receiver.AlarmReceiver;
-import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.service.AlarmService;
+import com.example.rdt_pastillas.activity.alarm_activity.service.AlarmService;
 
 import java.util.Calendar;
 

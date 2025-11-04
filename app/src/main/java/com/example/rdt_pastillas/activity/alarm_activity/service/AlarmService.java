@@ -1,4 +1,4 @@
-package com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.service;
+package com.example.rdt_pastillas.activity.alarm_activity.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
