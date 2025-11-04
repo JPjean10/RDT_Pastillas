@@ -63,7 +63,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // AQUÍ ES DONDE SE USA EL NOMBRE DE LA PASTILLA
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_pastilla)
-                .setContentTitle("Hora de tu pastilla: " + pillName) // <-- El nombre se muestra aquí
+                .setContentTitle("Hora de tu pastilla: ") // <-- El nombre se muestra aquí
                 .setContentText("¡No olvides tomar tu medicamento!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
