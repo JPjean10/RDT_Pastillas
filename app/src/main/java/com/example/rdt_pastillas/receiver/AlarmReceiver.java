@@ -1,5 +1,6 @@
 package com.example.rdt_pastillas.receiver;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,71 +15,111 @@ import androidx.core.app.NotificationCompat;
 import com.example.rdt_pastillas.Modelo.PastillasModel;
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.alarm_activity.AlarmActivity;
-// ¡¡IMPORTANTE!! Añadir el import del HomeFragment
 import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
 import com.example.rdt_pastillas.activity.alarm_activity.service.AlarmService;
+import com.example.rdt_pastillas.repositorio.ListaPastilla;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AlarmReceiver extends BroadcastReceiver {
-    private static final String CHANNEL_ID = "alarm_channel";
+    private static final String CHANNEL_ID = "alarm_channel_group"; // Cambiamos el ID para evitar conflictos
+    public static final String NOTIFICATION = "NOTIFICATION";
+    public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // Obtenemos TODOS los datos de la pastilla
+        // Obtenemos los datos de la pastilla que disparó la alarma
         int pillId = intent.getIntExtra("PILL_ID", -1);
         String pillName = intent.getStringExtra("PILL_NAME");
-        String pillHour = intent.getStringExtra("PILL_HOUR"); // Esencial para reprogramar
+        String pillHour = intent.getStringExtra("PILL_HOUR");
+
+        // Si no hay datos, no podemos continuar.
+        if (pillId == -1 || pillName == null || pillHour == null) {
+            Log.e("AlarmReceiver", "Faltan datos en el Intent. No se puede procesar la alarma.");
+            return;
+        }
 
         // --- PASO 1: REPROGRAMAR LA ALARMA PARA EL PRÓXIMO DÍA ---
-        if (pillId != -1 && pillName != null && pillHour != null) {
-            PastillasModel pastilla = new PastillasModel(pillId, pillName, pillHour);
-            // Llamamos al método estático en HomeFragment para programar la alarma para el día siguiente.
-            PastillasFragment.programarAlarma(context, pastilla, false); // false = no es snooze
-            Log.d("AlarmReceiver", "Alarma recibida y REPROGRAMADA para el próximo día.");
-        } else {
-            Log.e("AlarmReceiver", "No se pudo reprogramar la alarma, faltan datos en el Intent.");
-        }
+        PastillasModel pastillaActual = new PastillasModel(pillId, pillName, pillHour);
+        PastillasFragment.programarAlarma(context, pastillaActual, false); // false = no es snooze
+        Log.d("AlarmReceiver", "Alarma para '" + pillName + "' reprogramada para el próximo día.");
 
-        // --- PASO 2: INICIAR SONIDO Y NOTIFICACIÓN ---
-        Intent serviceIntent = new Intent(context, AlarmService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(serviceIntent);
-        } else {
-            context.startService(serviceIntent);
-        }
+        // --- PASO 2: CREAR UN IDENTIFICADOR ÚNICO PARA EL GRUPO DE HORA ---
+        // Convertimos la hora (ej. "07:40 PM") en un número entero.
+        // Esto agrupará todas las notificaciones de la misma hora bajo un solo ID.
+        int notificationId = generarIdDesdeHora(pillHour);
 
+        // --- PASO 3: BUSCAR TODAS LAS PASTILLAS PARA ESA HORA Y AGRUPAR NOMBRES ---
+        List<PastillasModel> todasLasPastillas = ListaPastilla.getPastillas();
+        List<String> nombresPastillasGrupo = new ArrayList<>();
+        for (PastillasModel p : todasLasPastillas) {
+            if (p.getHora().equals(pillHour)) {
+                nombresPastillasGrupo.add(p.getNombre());
+            }
+        }
+        // Creamos un solo String con los nombres, separados por comas.
+        String nombresAgrupados = String.join(", ", nombresPastillasGrupo);
+
+
+        // --- PASO 4: CREAR Y CONFIGURAR LA NOTIFICACIÓN ÚNICA ---
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // El Intent que se abre al tocar la notificación. Siempre llevará al mismo sitio.
         Intent notificationIntent = new Intent(context, AlarmActivity.class);
-        // Pasamos todos los datos a la Activity para que la suspensión también funcione
-        notificationIntent.putExtras(intent.getExtras());
+        notificationIntent.putExtra("PILL_HOUR", pillHour); // Pasamos la hora para que la activity sepa qué notif. cancelar
+        notificationIntent.putExtra("NOTIFICATION_ID", notificationId); // Pasamos el ID para cancelar
+        notificationIntent.putExtra("GROUPED_NAMES", nombresAgrupados); // Pasamos los nombres agrupados
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
-                pillId,
+                notificationId, // Usamos el ID de grupo
                 notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // AQUÍ ES DONDE SE USA EL NOMBRE DE LA PASTILLA
+        // Configuramos el texto de la notificación para mostrar los nombres agrupados
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_pastilla)
-                .setContentTitle("Hora de tu pastilla: ") // <-- El nombre se muestra aquí
-                .setContentText("¡No olvides tomar tu medicamento!")
+                .setContentTitle("RDT_pastillas")
+                .setContentText("Tomar pastillas") // Muestra "Tomar: gabapentina, metformina,
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setFullScreenIntent(pendingIntent, true)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
-        // La creación del canal es mejor en MainActivity, pero si lo dejas aquí, también funciona.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Alarm Channel", NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription("Canal para las alarmas de medicamentos");
-            channel.setSound(null, null); // El sonido lo controla el servicio
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Alarmas de Medicamentos (Agrupadas)", NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("Canal para mostrar una sola notificación para alarmas a la misma hora.");
+            channel.setSound(null, null); // El sonido lo gestiona el servicio
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(pillId, builder.build());
+        Notification notification = builder.build();
+
+        // --- PASO 5: INICIAR EL SERVICIO DE SONIDO ---
+        // Le pasamos la notificación y el ID de grupo.
+        Intent serviceIntent = new Intent(context, AlarmService.class);
+        serviceIntent.putExtra(NOTIFICATION, notification);
+        serviceIntent.putExtra(NOTIFICATION_ID, notificationId);
+
+        // El servicio se iniciará (si no está activo) o se actualizará, pero no se duplicará.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(serviceIntent);
+        } else {
+            context.startService(serviceIntent);
+        }
+    }
+
+    /**
+     * Genera un ID numérico consistente a partir de un String de hora (ej. "07:40 PM").
+     * Esto asegura que "07:40 PM" siempre genere el mismo ID.
+     */
+    private int generarIdDesdeHora(String hora) {
+        // Por ejemplo, "07:40 PM" -> "0740" -> 740
+        String horaNumerica = hora.replaceAll("[^0-9]", "");
+        return Integer.parseInt(horaNumerica);
     }
 }
