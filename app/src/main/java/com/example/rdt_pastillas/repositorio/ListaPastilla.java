@@ -71,15 +71,7 @@ public class ListaPastilla {
                 14,
                 "meformina",
                 "07:40 PM"));
-
-        pastillas.add(new PastillasModel(
-                15,
-                "meformina",
-                "08:26 PM"));
-        pastillas.add(new PastillasModel(
-                16,
-                "meformina",
-                "08:26 PM"));
+        // pruevas
 
         return pastillas;
     }
