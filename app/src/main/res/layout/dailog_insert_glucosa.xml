@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialog_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@drawable/dialog_background">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Glucosa"
+        android:paddingBottom="10dp"
+        style="@style/tiulo_dialog"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="nivel glucosa"
+        app:startIconDrawable="@drawable/ic_grid_3x3_24"
+        style="@style/textfield_TextInputLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/txt_glucosa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            style="@style/textfield_TextInputEditText"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Botones al fondo -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="16dp">
+
+        <FrameLayout
+            android:id="@+id/buttonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/btnCancelar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="icono para usuario"
+                android:src="@drawable/ic_close_24"
+                app:tint="@color/reed"
+                android:layout_gravity="start"/>
+
+            <ImageView
+                android:id="@+id/btnAceptar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="icono para usuario"
+                android:src="@drawable/ic_check_24"
+                app:tint="@color/light_green"
+                android:layout_gravity="end"/>
+
+        </FrameLayout>
+    </LinearLayout>
+
+</LinearLayout>

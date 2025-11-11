@@ -4,26 +4,23 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 
 import com.example.rdt_pastillas.R;
-import com.example.rdt_pastillas.activity.menu_lateral.ui.GalleryFragment;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.PresionFragment;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.GlucosaFragment;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
 import com.google.android.material.navigation.NavigationView;
 
@@ -103,10 +100,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         if (itemId == R.id.nav_pastilla) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PastillasFragment()).commit();
-        } else if (itemId == R.id.nav_gallery) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GalleryFragment()).commit();
+        } else if (itemId == R.id.nav_glucosa) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GlucosaFragment()).commit();
         } else if (itemId == R.id.nav_slideshow) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SlideshowFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PresionFragment()).commit();
         }
 
         getSupportActionBar().setTitle(item.getTitle());
@@ -129,38 +126,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
-        }
-    }
-
-/*    // --- NUEVO MÉTODO PARA PEDIR PERMISO DE ALARMAS EXACTAS ---
-    private void askForExactAlarmPermission() {
-        // El permiso es necesario a partir de Android 12 (API 31)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            // Comprobamos si la app NO puede programar alarmas exactas
-            if (!alarmManager.canScheduleExactAlarms()) {
-                // Mostramos un diálogo explicando por qué necesitamos el permiso.
-                new AlertDialog.Builder(this)
-                        .setTitle("Permiso Necesario")
-                        .setMessage("Para asegurar que los recordatorios de tus medicamentos suenen a la hora exacta, la aplicación necesita un permiso especial. Por favor, actívalo en la siguiente pantalla.")
-                        .setPositiveButton("Ir a Ajustes", (dialog, which) -> {
-                            // Creamos un Intent para llevar al usuario a la pantalla de configuración de alarmas y recordatorios.
-                            Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                            startActivity(intent);
-                        })
-                        .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
-                        .create()
-                        .show();
-            }
-        }
-    }*/
-
-    public static class SlideshowFragment extends Fragment {
-
-        @Nullable
-        @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.fragment_slideshow, container, false);
         }
     }
 }

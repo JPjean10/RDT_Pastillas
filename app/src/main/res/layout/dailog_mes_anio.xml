@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:text="SELECCIONA AÑO Y MES"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:background="@color/purple_200"
+            />
+
+        <TextView
+            android:id="@+id/tvSelectedYear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/purple_200"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="8dp" />
+
+        <ViewFlipper
+            android:id="@+id/viewFlipper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inAnimation="@android:anim/fade_in"
+            android:outAnimation="@android:anim/fade_out">
+
+            <GridView
+                android:id="@+id/gridYears"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:horizontalSpacing="10dp"
+                android:numColumns="3"
+                android:padding="10dp" />
+
+            <ListView
+                android:id="@+id/listMonths"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="8dp"
+                android:padding="10dp" />
+        </ViewFlipper>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CANCELAR"
+                android:textColor="@color/purple_200"
+                android:background="@android:color/transparent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <Button
+                android:id="@+id/btnAccept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ACEPTAR"
+                android:textColor="@color/purple_200"
+                android:visibility="gone"
+                android:background="@android:color/transparent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</ScrollView>

@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="light_green">#74FF67</color>
+    <color name="reed">#FF676A</color>
+
+    <color name="cyan">#00FFFF</color>
+    <color name="cyan_translucent">#2000FFFF</color>
+    <color name="charcoal_gray">#36454F</color>
+    <color name="yellow">#F1FF32</color>
+    <color name="reed_oscuro">#DB0530</color>
+    <color name="grid_text_color">#FF5722</color>
 </resources>

@@ -7,9 +7,9 @@
         android:title="pastillla" />
 <!--    app:itemIconTint="@null"-->
     <item
-        android:id="@+id/nav_gallery"
-        android:icon="@drawable/ic_launcher_background"
-        android:title="Gallery" />
+        android:id="@+id/nav_glucosa"
+        android:icon="@drawable/ic_menu_glucosa"
+        android:title="glucosa" />
 
     <item
         android:id="@+id/nav_slideshow"
