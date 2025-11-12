@@ -61,7 +61,6 @@ public class GlucosaFragment extends Fragment implements
     // --- MÉTODOS DE LA INTERFAZ DEL DIÁLOGO ---
     @Override
     public void insertOnClickedDailog(int nivel_glucosa) {
-        Toast.makeText(getContext(), "Monto: " + nivel_glucosa, Toast.LENGTH_SHORT).show();
         servicio.insert(nivel_glucosa);
     }
     //________________________________________________________________________________

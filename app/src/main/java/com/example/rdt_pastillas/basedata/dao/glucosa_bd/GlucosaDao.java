@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.example.rdt_pastillas.basedata.app_database.glucosa_bd.AppDataBaseGlucosa;
 import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.basedata.interfaz.glucosa_bd.GlucosaInterfaz;
+import com.example.rdt_pastillas.basedata.servicio.SyncService.GlucosaSyncService;
 import com.example.rdt_pastillas.util.alert.AlertaError;
 import com.example.rdt_pastillas.util.alert.AlertaExitoso;
 
@@ -51,6 +52,7 @@ public class GlucosaDao {
                 // 2. Si el ID es válido (la inserción fue exitosa), guardar en el archivo .txt.
                 if (idGenerado > 0) {
                     guardarEnTxt(idGenerado, nivel_glucosa, fechaFormateada, estado);
+                    GlucosaSyncService.insertarGlucosa(nuevoGlucosa);
                     Log.d("GlucosaDao", "Registro guardado en BD con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
                             AlertaExitoso.show(context, "Registro exitoso")
@@ -80,7 +82,6 @@ public class GlucosaDao {
             return; // Salir del método si no se puede escribir.
         }
 
-/*        File dir = com.google.ai.edge.litert.Environment.getExternalStoragePublicDirectory(com.google.ai.edge.litert.Environment.DIRECTORY_DOCUMENTS);*/
         File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
