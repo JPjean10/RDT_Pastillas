@@ -43,8 +43,8 @@ public class GlucosaSyncService {
                 int responseCode = conn.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_CREATED) {
                     // Obtenemos la instancia del DAO y actualizamos el estado en la BD local
-/*                    GlucosaInterfaz dao = AppDataBaseGlucosa.getDatabase(context.getApplicationContext()).glucosa_interfaz();
-                    dao.actualizarEstado(id);*/
+                    GlucosaInterfaz dao = AppDataBaseGlucosa.getDatabase(context.getApplicationContext()).glucosa_interfaz();
+                    dao.actualizarEstado(id);
                     Log.d("GlucosaSyncService", "Sincronización exitosa con el servidor remoto");
                 }
 

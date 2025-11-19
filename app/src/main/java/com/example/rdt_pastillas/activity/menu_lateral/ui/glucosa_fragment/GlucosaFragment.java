@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,25 +20,25 @@ import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.ViewM
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.dailog.GlucosaInsertDailog;
 import com.example.rdt_pastillas.basedata.servicio.glucosa_bd.GlucosaServicio;
 import com.example.rdt_pastillas.util.dailog.AnioMesDialog;
-import java.util.Locale;
 
+import java.util.ArrayList; // Asegúrate de tener este import
+import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class GlucosaFragment extends Fragment implements
         GlucosaInsertDailog.insertOnClickedDailog {
 
-    private String fechaGuardada;
-    //variables del activity
-    EditText btn_fecha;
-    Button btn_agregar;
+    private String fechaGuardada; // Formato "yyyy/MM"
+    private EditText btn_fecha;
+    private Button btn_agregar;
 
     private GlucosaViewModel glucosaViewModel;
     private GlucosaAdapter adapter;
     private RecyclerView recyclerView;
 
-    //-------------------
-    GlucosaServicio servicio;
+    private GlucosaServicio servicio;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -49,41 +48,32 @@ public class GlucosaFragment extends Fragment implements
 
         btn_fecha = view.findViewById(R.id.btn_seleccionar_fecha);
         btn_agregar = view.findViewById(R.id.btn_agregar);
-
         recyclerView = view.findViewById(R.id.recycler_view_glucosa);
 
-        // Configurar RecyclerView
+        // 1. Configurar el RecyclerView y su adaptador
         setupRecyclerView();
 
-        // Inicializar ViewModel
+        // 2. Inicializar el ViewModel
         glucosaViewModel = new ViewModelProvider(this).get(GlucosaViewModel.class);
 
-        // Observar los datos
+        // 3. Observar los datos del ViewModel
         observarDatos();
 
-//        establecerFechaInicial();
+        // 4. DESCOMENTAR ESTA LÍNEA: Es crucial para el funcionamiento inicial
+        establecerFechaInicial();
 
-        /*feha_inicial();*/
+        // 5. Configurar listener para el botón de fecha
+        btn_fecha.setOnClickListener(v -> AbrirDailogFecha());
 
-        btn_fecha.setOnClickListener(v -> {
-            //_________________________________________________________
-            AbrirDailogFecha(btn_fecha, () -> {
-            });
-            //_________________________________________________________
-        });
-
+        // 6. Configurar listener para el botón de agregar
         btn_agregar.setOnClickListener(v -> {
             GlucosaInsertDailog dialog = new GlucosaInsertDailog(getContext(), GlucosaFragment.this);
             dialog.show();
         });
-        // =====================================================================
 
-//______________no tocar______________________________________________
         return view;
     }
-    //______________no tocar______________________________________________
-    //________________________________________________________________________________
-    // --- NUEVOS MÉTODOS ---
+
     private void setupRecyclerView() {
         adapter = new GlucosaAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -92,61 +82,62 @@ public class GlucosaFragment extends Fragment implements
 
     private void observarDatos() {
         glucosaViewModel.getListaGlucosaAgrupada().observe(getViewLifecycleOwner(), listaAgrupada -> {
-            // Cada vez que los datos cambian en la BD, este código se ejecuta.
+            // Este bloque ahora maneja todos los casos
             if (listaAgrupada != null && !listaAgrupada.isEmpty()) {
                 adapter.submitList(listaAgrupada);
             } else {
-                // Opcional: mostrar un mensaje de que no hay datos
+                // ¡AQUÍ ESTÁ LA CORRECCIÓN CLAVE!
+                // Si la lista es nula o vacía, le pasamos una lista vacía al adaptador para que se limpie.
+                adapter.submitList(new ArrayList<>());
             }
         });
     }
 
     private void establecerFechaInicial() {
-        // Formato para guardar y filtrar (ej: "2025/11")
         SimpleDateFormat formatoGuardado = new SimpleDateFormat("yyyy/MM", Locale.getDefault());
-        // Formato para mostrar al usuario (ej: "Noviembre 2025")
         SimpleDateFormat formatoMostrado = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-
         Calendar calendario = Calendar.getInstance();
 
         fechaGuardada = formatoGuardado.format(calendario.getTime());
         String fechaMostrada = formatoMostrado.format(calendario.getTime());
 
         // Capitalizar la primera letra del mes
-        fechaMostrada = fechaMostrada.substring(0, 1).toUpperCase() + fechaMostrada.substring(1);
+        if (fechaMostrada.length() > 0) {
+            fechaMostrada = fechaMostrada.substring(0, 1).toUpperCase() + fechaMostrada.substring(1);
+        }
 
         btn_fecha.setText(fechaMostrada);
 
-        // Establecer el filtro inicial en el ViewModel
+        // Llama al método del ViewModel para aplicar el filtro inicial
         glucosaViewModel.setFiltroFecha(fechaGuardada);
     }
-    // -------------------------
-    // --- MÉTODOS DE LA INTERFAZ DEL DIÁLOGO ---
+
     @Override
     public void insertOnClickedDailog(int nivel_glucosa) {
         servicio.insert(nivel_glucosa);
     }
-    //________________________________________________________________________________
-    private void AbrirDailogFecha(EditText btnFecha, Runnable metodo){
 
+    // MÉTODO SIMPLIFICADO Y CORREGIDO
+    private void AbrirDailogFecha() {
         Integer initialYear = null;
         if (fechaGuardada != null && fechaGuardada.contains("/")) {
             try {
                 initialYear = Integer.parseInt(fechaGuardada.split("/")[0]);
             } catch (NumberFormatException e) {
-                initialYear = null; // en caso de error, usamos null para que use el año actual
+                initialYear = null;
             }
         }
 
         AnioMesDialog dialog = new AnioMesDialog((fechaSeleccionada, fechaMostrada) -> {
-            this.fechaGuardada = fechaSeleccionada; // Guardar como "2023/04"
-            btnFecha.setText(fechaMostrada);
+            // 1. Actualizar la UI
+            this.fechaGuardada = fechaSeleccionada;
+            this.btn_fecha.setText(fechaMostrada);
 
+            // 2. Notificar al ViewModel el nuevo filtro
+            glucosaViewModel.setFiltroFecha(fechaSeleccionada);
 
-            metodo.run();
         }, initialYear);
-        dialog.show(getFragmentManager(), "AnioMesDialog");
+
+        dialog.show(getParentFragmentManager(), "AnioMesDialog");
     }
-    //____________________________________________________________________________________________________________
-//______________________no tocar______________________________________________
 }

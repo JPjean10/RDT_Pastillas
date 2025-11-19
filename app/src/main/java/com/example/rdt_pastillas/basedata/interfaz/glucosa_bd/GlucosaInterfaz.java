@@ -16,8 +16,9 @@ public interface GlucosaInterfaz {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertGlucosa(GlucosaEntity glucosa);
 
-    @Query("SELECT * FROM GlucosaEntity ORDER BY fecha_hora_creacion DESC")
-    LiveData<List<GlucosaEntity>> getAllGlucosaOrderByDate();
+    // En lugar de traer todo, ahora filtra por un patrón de fecha (ej: "2025/11%")
+    @Query("SELECT * FROM GlucosaEntity WHERE fecha_hora_creacion LIKE :filtroFecha || '%' ORDER BY fecha_hora_creacion DESC")
+    LiveData<List<GlucosaEntity>> getGlucosaFiltradaPorMes(String filtroFecha);
 
     @Query("UPDATE GlucosaEntity SET estado = 1 WHERE id_glucosa = :id")
     void actualizarEstado(long id);
