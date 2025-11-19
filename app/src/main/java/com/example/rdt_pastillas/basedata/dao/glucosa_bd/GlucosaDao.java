@@ -51,8 +51,8 @@ public class GlucosaDao {
 
                 // 2. Si el ID es válido (la inserción fue exitosa), guardar en el archivo .txt.
                 if (idGenerado > 0) {
-                    guardarEnTxt(idGenerado, nivel_glucosa, fechaFormateada, estado);
                     GlucosaSyncService.insertarGlucosa(context,idGenerado,nuevoGlucosa);
+                    guardarEnTxt(idGenerado, nivel_glucosa, fechaFormateada, estado);
                     Log.d("GlucosaDao", "Registro guardado en BD con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
                             AlertaExitoso.show(context, "Registro exitoso")
@@ -96,13 +96,10 @@ public class GlucosaDao {
         // El 'true' en el constructor es para añadir al final del archivo (append).
         try (FileWriter writer = new FileWriter(file, true)) {
             StringBuilder sb = new StringBuilder();
-            sb.append("ID: ").append(id).append(",\n"); // Añade el campo y un salto de línea
-            sb.append("Nivel Glucosa: ").append(nivelGlucosa).append(",\n");
-            sb.append("Fecha: ").append(fecha).append(",\n");
-            sb.append("Estado: ").append(estado).append("\n");
-
-            // Añadimos dos saltos de línea para la separación
-            sb.append("\n\n");
+            sb.append("ID: ").append(id).append(","); // Añade el campo y un salto de línea
+            sb.append("Nivel Glucosa: ").append(nivelGlucosa).append(",");
+            sb.append("Fecha: ").append(fecha).append(",");
+            sb.append("Estado: ").append(estado);
 
             String registro = sb.toString();
 

@@ -23,7 +23,7 @@ public class GlucosaDia {
     }
 
     public void addMedicion(GlucosaEntity medicion) {
-        if (mediciones.size() < 3) {
+        if (mediciones.size() < 2) {
             mediciones.add(medicion);
         }
     }

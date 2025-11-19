@@ -82,7 +82,7 @@ public class GlucosaViewModel extends AndroidViewModel {
                 mapaAgrupado.putIfAbsent(fechaKey, new ArrayList<>());
                 List<GlucosaDia> gruposDelDia = mapaAgrupado.get(fechaKey);
                 GlucosaDia grupoActual;
-                if (gruposDelDia.isEmpty() || gruposDelDia.get(gruposDelDia.size() - 1).getMedicionesCount() == 3) {
+                if (gruposDelDia.isEmpty() || gruposDelDia.get(gruposDelDia.size() - 1).getMedicionesCount() == 2) {
                     grupoActual = new GlucosaDia(fechaKey);
                     gruposDelDia.add(grupoActual);
                 } else {

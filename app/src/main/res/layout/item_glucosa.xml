@@ -78,20 +78,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 
-            <View
-                android:id="@+id/divider2"
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="4dp"
-                android:background="?android:attr/listDivider" />
-
-            <!-- Contenedor Medición 3 (Derecha) -->
-            <include
-                android:id="@+id/medicion3"
-                layout="@layout/subitem_glucosa"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
         </LinearLayout>
 
     </LinearLayout>

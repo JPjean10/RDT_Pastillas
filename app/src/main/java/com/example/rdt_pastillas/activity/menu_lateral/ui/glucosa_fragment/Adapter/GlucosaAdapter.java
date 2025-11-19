@@ -54,8 +54,8 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
 
         // Vista principal
         TextView tvFecha;    // Vistas para cada una de las 3 mediciones
-        View medicionView1, medicionView2, medicionView3;
-        View divider1, divider2;
+        View medicionView1, medicionView2;
+        View divider1;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -64,11 +64,9 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
             // Referencias a las vistas incluidas
             medicionView1 = itemView.findViewById(R.id.medicion1);
             medicionView2 = itemView.findViewById(R.id.medicion2);
-            medicionView3 = itemView.findViewById(R.id.medicion3);
 
             // Referencias a los divisores
             divider1 = itemView.findViewById(R.id.divider1);
-            divider2 = itemView.findViewById(R.id.divider2);
         }
 
         public void bind(final GlucosaDia item) {
@@ -78,9 +76,7 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
             // Limpiar y ocultar todas las vistas antes de empezar
             medicionView1.setVisibility(View.INVISIBLE);
             medicionView2.setVisibility(View.INVISIBLE);
-            medicionView3.setVisibility(View.INVISIBLE);
             divider1.setVisibility(View.GONE);
-            divider2.setVisibility(View.GONE);
 
             // Configurar la primera medición (si existe)
             if (mediciones.size() >= 1) {
@@ -91,12 +87,6 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
             if (mediciones.size() >= 2) {
                 configurarMedicionView(medicionView2, mediciones.get(1));
                 divider1.setVisibility(View.VISIBLE);
-            }
-
-            // Configurar la tercera medición (si existe)
-            if (mediciones.size() >= 3) {
-                configurarMedicionView(medicionView3, mediciones.get(2));
-                divider2.setVisibility(View.VISIBLE);
             }
         }
 
