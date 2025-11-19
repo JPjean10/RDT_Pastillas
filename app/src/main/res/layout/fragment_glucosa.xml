@@ -58,7 +58,7 @@
 
         <!-- RecyclerView para la lista, AHORA FUERA DEL OTRO LINEARLAYOUT -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewGastos"
+        android:id="@+id/recycler_view_glucosa"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="8dp"

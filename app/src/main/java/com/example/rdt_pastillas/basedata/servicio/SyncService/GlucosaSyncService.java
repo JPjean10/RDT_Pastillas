@@ -3,7 +3,9 @@ package com.example.rdt_pastillas.basedata.servicio.SyncService;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.rdt_pastillas.basedata.app_database.glucosa_bd.AppDataBaseGlucosa;
 import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
+import com.example.rdt_pastillas.basedata.interfaz.glucosa_bd.GlucosaInterfaz;
 
 import org.json.JSONObject;
 
@@ -18,7 +20,7 @@ public class GlucosaSyncService {
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public static void insertarGlucosa(GlucosaEntity entidad) {
+    public static void insertarGlucosa(Context context, long id, GlucosaEntity entidad) {
         executor.execute(() -> {
             try {
                 // Tu endpoint en el servidor (PHP, Node, Spring, etc.)
@@ -40,6 +42,9 @@ public class GlucosaSyncService {
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_CREATED) {
+                    // Obtenemos la instancia del DAO y actualizamos el estado en la BD local
+/*                    GlucosaInterfaz dao = AppDataBaseGlucosa.getDatabase(context.getApplicationContext()).glucosa_interfaz();
+                    dao.actualizarEstado(id);*/
                     Log.d("GlucosaSyncService", "Sincronización exitosa con el servidor remoto");
                 }
 

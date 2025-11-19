@@ -16,7 +16,3 @@ public class GlucosaServicio {
         mRepository.insert(nivel_glucosa);
     }
 }
-
-/*
- private GastosDao mRepository;
-*/

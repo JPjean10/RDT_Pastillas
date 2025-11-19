@@ -1,0 +1,35 @@
+package com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class GlucosaDia {
+
+    private String fecha;
+    // Usamos una lista para más flexibilidad
+    private List<GlucosaEntity> mediciones;
+
+    public GlucosaDia(String fecha) {
+        this.fecha = fecha;
+        this.mediciones = new ArrayList<>();
+    }
+
+    public String getFecha() {
+        return fecha;
+    }
+
+    public List<GlucosaEntity> getMediciones() {
+        return mediciones;
+    }
+
+    public void addMedicion(GlucosaEntity medicion) {
+        if (mediciones.size() < 3) {
+            mediciones.add(medicion);
+        }
+    }
+
+    public int getMedicionesCount() {
+        return mediciones.size();
+    }
+}
+
