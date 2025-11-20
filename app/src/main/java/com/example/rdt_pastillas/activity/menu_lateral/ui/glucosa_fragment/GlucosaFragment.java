@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,15 +19,17 @@ import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.Adapter.GlucosaAdapter;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.ViewModel.GlucosaViewModel;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.dailog.GlucosaInsertDailog;
+import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.basedata.servicio.glucosa_bd.GlucosaServicio;
 import com.example.rdt_pastillas.util.dailog.AnioMesDialog;
 
-import java.util.ArrayList; // Asegúrate de tener este import
+import java.util.ArrayList; // Asegúrate de tener este import  OnEditClickLister,
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class GlucosaFragment extends Fragment implements
+        GlucosaAdapter.EdiOnClickedAdapter,
         GlucosaInsertDailog.insertOnClickedDailog {
 
     private String fechaGuardada; // Formato "yyyy/MM"
@@ -73,9 +76,9 @@ public class GlucosaFragment extends Fragment implements
 
         return view;
     }
-
+    // MÉTODO_______________________________________________________________________________________
     private void setupRecyclerView() {
-        adapter = new GlucosaAdapter();
+        adapter = new GlucosaAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
     }
@@ -111,13 +114,13 @@ public class GlucosaFragment extends Fragment implements
         // Llama al método del ViewModel para aplicar el filtro inicial
         glucosaViewModel.setFiltroFecha(fechaGuardada);
     }
-
+   //_______________________________________________________________________________________________
+   // dailog________________________________________________________________________________________
     @Override
     public void insertOnClickedDailog(int nivel_glucosa) {
         servicio.insert(nivel_glucosa);
     }
 
-    // MÉTODO SIMPLIFICADO Y CORREGIDO
     private void AbrirDailogFecha() {
         Integer initialYear = null;
         if (fechaGuardada != null && fechaGuardada.contains("/")) {
@@ -140,4 +143,14 @@ public class GlucosaFragment extends Fragment implements
 
         dialog.show(getParentFragmentManager(), "AnioMesDialog");
     }
+    //______________________________________________________________________________________________
+    // adapter______________________________________________________________________________________
+    @Override
+    public void EdiOnClickedAdapter(GlucosaEntity medicion) {
+        String mensaje = "Último ID: " + medicion.getId_glucosa() + "nivel glucosa: " + medicion.getNivel_glucosa()  + " | Estado: " + medicion.isEstado();
+
+        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();
+    }
+    //______________________________________________________________________________________________
+
 }

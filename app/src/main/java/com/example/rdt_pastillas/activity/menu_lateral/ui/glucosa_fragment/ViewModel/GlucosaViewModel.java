@@ -1,6 +1,5 @@
 package com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.ViewModel;
 
-
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -16,6 +15,7 @@ import com.example.rdt_pastillas.basedata.interfaz.glucosa_bd.GlucosaInterfaz;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +33,7 @@ public class GlucosaViewModel extends AndroidViewModel {
         glucosaInterfaz = AppDataBaseGlucosa.getDatabase(application).glucosa_interfaz();
 
         // 1. Se usa switchMap para reaccionar a los cambios en 'filtroFecha'.
-        // Cada vez que 'filtroFecha' cambia, se ejecuta una nueva consulta a la BD.
+        // Cada vez que 'filtroFecha' cambia, se ejecuta la nueva consulta a la BD.
         LiveData<List<GlucosaEntity>> listaFiltradaDesdeBD = Transformations.switchMap(filtroFecha, fecha -> {
             if (fecha == null || fecha.isEmpty()) {
                 // Si no hay filtro, devuelve una lista vacía para evitar errores.
@@ -41,62 +41,83 @@ public class GlucosaViewModel extends AndroidViewModel {
                 emptyList.setValue(new ArrayList<>());
                 return emptyList;
             }
-            // ¡Aquí se usa tu consulta seleccionada!
+            // Llama a la consulta que ahora ordena ASC (del más antiguo al más reciente)
             return glucosaInterfaz.getGlucosaFiltradaPorMes(fecha);
         });
 
-        // 2. La lógica de agrupación se aplica sobre la lista que ya viene filtrada desde la BD.
+        // 2. La lógica de agrupación se aplica sobre la lista que ya viene en el orden de inserción (ASC).
         listaGlucosaAgrupada = Transformations.map(listaFiltradaDesdeBD, this::agruparGlucosaPorDia);
     }
 
     /**
-     * Este es el método que el Fragment llamará para pasar el string con la fecha.
+     * El Fragment llama a este método para pasar el string con la fecha.
      */
     public void setFiltroFecha(String fecha) { // Recibe "yyyy/MM"
         filtroFecha.setValue(fecha);
     }
 
     /**
-     * El Fragment observa este LiveData para obtener la lista final.
+     * El Fragment observa este LiveData para obtener la lista final para el RecyclerView.
      */
     public LiveData<List<GlucosaDia>> getListaGlucosaAgrupada() {
         return listaGlucosaAgrupada;
     }
 
     /**
-     * Agrupa una lista (ya filtrada) en objetos GlucosaDia (hasta 3 mediciones por tarjeta).
+     * Agrupa una lista (ya filtrada y en orden ASCENDENTE) en objetos GlucosaDia,
+     * con un máximo de 2 mediciones por tarjeta, y luego invierte el resultado final
+     * para la visualización.
+     * @param listaParaAgrupar La lista de mediciones, ordenada de más antiguo a más reciente.
+     * @return Una lista de objetos GlucosaDia, invertida para mostrar los más recientes arriba.
      */
     private List<GlucosaDia> agruparGlucosaPorDia(List<GlucosaEntity> listaParaAgrupar) {
-        if (listaParaAgrupar == null) {
+        if (listaParaAgrupar == null || listaParaAgrupar.isEmpty()) {
             return new ArrayList<>();
         }
-        Map<String, List<GlucosaDia>> mapaAgrupado = new LinkedHashMap<>();
-        SimpleDateFormat formatoEntrada = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.getDefault());
-        SimpleDateFormat formatoClave = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
 
+        List<GlucosaDia> listaFinal = new ArrayList<>();
+        SimpleDateFormat formatoClave = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+        SimpleDateFormat formatoEntrada = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.getDefault());
+
+        // Mapa para agrupar mediciones por día
+        Map<String, List<GlucosaEntity>> medicionesPorDia = new LinkedHashMap<>();
         for (GlucosaEntity medicion : listaParaAgrupar) {
             try {
                 Date fechaCompleta = formatoEntrada.parse(medicion.getFecha_hora_creacion());
                 String fechaKey = formatoClave.format(fechaCompleta);
-
-                mapaAgrupado.putIfAbsent(fechaKey, new ArrayList<>());
-                List<GlucosaDia> gruposDelDia = mapaAgrupado.get(fechaKey);
-                GlucosaDia grupoActual;
-                if (gruposDelDia.isEmpty() || gruposDelDia.get(gruposDelDia.size() - 1).getMedicionesCount() == 2) {
-                    grupoActual = new GlucosaDia(fechaKey);
-                    gruposDelDia.add(grupoActual);
-                } else {
-                    grupoActual = gruposDelDia.get(gruposDelDia.size() - 1);
-                }
-                grupoActual.addMedicion(medicion);
+                medicionesPorDia.putIfAbsent(fechaKey, new ArrayList<>());
+                medicionesPorDia.get(fechaKey).add(medicion);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
-        List<GlucosaDia> listaFinal = new ArrayList<>();
-        for (List<GlucosaDia> grupos : mapaAgrupado.values()) {
-            listaFinal.addAll(grupos);
+
+        // Construir las tarjetas para cada día
+        for (Map.Entry<String, List<GlucosaEntity>> entry : medicionesPorDia.entrySet()) {
+            String fechaKey = entry.getKey();
+            List<GlucosaEntity> medicionesDelDia = entry.getValue(); // Ej: [99, 96, 100]
+
+            // Iterar sobre la lista ASCENDENTE, tomándolas de 2 en 2
+            for (int i = 0; i < medicionesDelDia.size(); i += 2) {
+                GlucosaDia grupo = new GlucosaDia(fechaKey);
+
+                // Añadir el primer elemento del par (el más antiguo del par). Ej: 99
+                grupo.addMedicion(medicionesDelDia.get(i));
+
+                // Si existe un segundo elemento, añadirlo. Ej: 96
+                if (i + 1 < medicionesDelDia.size()) {
+                    grupo.addMedicion(medicionesDelDia.get(i + 1));
+                }
+                listaFinal.add(grupo);
+            }
         }
+
+        // --- PASO FINAL Y CRUCIAL ---
+        // La lista de tarjetas ahora es [Tarjeta(99, 96), Tarjeta(100)].
+        // La invertimos para que sea [Tarjeta(100), Tarjeta(99, 96)]
+        // y así el RecyclerView la muestre en el orden visual correcto (más reciente arriba).
+        Collections.reverse(listaFinal);
+
         return listaFinal;
     }
 }

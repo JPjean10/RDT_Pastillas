@@ -32,4 +32,3 @@ public class GlucosaDia {
         return mediciones.size();
     }
 }
-
