@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.Adapter.GlucosaAdapter;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.ViewModel.GlucosaViewModel;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.dailog.GlucosaEditDailog;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.dailog.GlucosaInsertDailog;
 import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.basedata.servicio.glucosa_bd.GlucosaServicio;
@@ -30,7 +31,8 @@ import java.util.Calendar;
 
 public class GlucosaFragment extends Fragment implements
         GlucosaAdapter.EdiOnClickedAdapter,
-        GlucosaInsertDailog.insertOnClickedDailog {
+        GlucosaInsertDailog.insertOnClickedDailog,
+        GlucosaEditDailog.EditOnClickedDailog {
 
     private String fechaGuardada; // Formato "yyyy/MM"
     private EditText btn_fecha;
@@ -121,6 +123,13 @@ public class GlucosaFragment extends Fragment implements
         servicio.insert(nivel_glucosa);
     }
 
+    @Override
+    public void EditOnClickedDailog(int id,int nivel_glucosa) {
+        String mensaje = "Último ID: " + id + "nivel glucosa: " + nivel_glucosa;
+
+        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();
+    }
+
     private void AbrirDailogFecha() {
         Integer initialYear = null;
         if (fechaGuardada != null && fechaGuardada.contains("/")) {
@@ -147,10 +156,11 @@ public class GlucosaFragment extends Fragment implements
     // adapter______________________________________________________________________________________
     @Override
     public void EdiOnClickedAdapter(GlucosaEntity medicion) {
-        String mensaje = "Último ID: " + medicion.getId_glucosa() + "nivel glucosa: " + medicion.getNivel_glucosa()  + " | Estado: " + medicion.isEstado();
+/*        String mensaje = "Último ID: " + medicion.getId_glucosa() + "nivel glucosa: " + medicion.getNivel_glucosa()  + " | Estado: " + medicion.isEstado();
 
-        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();*/
+        GlucosaEditDailog dialog = new GlucosaEditDailog(getContext(), medicion ,GlucosaFragment.this);
+        dialog.show();;
     }
     //______________________________________________________________________________________________
-
 }

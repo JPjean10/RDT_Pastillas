@@ -40,12 +40,12 @@ public class GlucosaDao {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.getDefault());
         // 2. Crea el String con la fecha actual formateada.
         String fechaFormateada = sdf.format(new Date());
-        // 3. Define el estado. En este caso, siempre es 'false' al insertar.   "2025/11/20 07:45 p.m"
+        // 3. Define el estado. En este caso, siempre es 'false' al insertar.
         boolean estado = false;
 
-        String ss = "2025/11/21 07:45 p.m";
+//        String ss = "2025/11/20 07:45 p.m";
 
-        GlucosaEntity nuevoGlucosa = new GlucosaEntity(nivel_glucosa,ss,estado);
+        GlucosaEntity nuevoGlucosa = new GlucosaEntity(nivel_glucosa,fechaFormateada,estado);
         databaseWriteExecutor.execute(() -> {
             try {
                 // 1. Insertar en la base de datos y obtener el ID generado.
@@ -54,7 +54,7 @@ public class GlucosaDao {
                 // 2. Si el ID es válido (la inserción fue exitosa), guardar en el archivo .txt.
                 if (idGenerado > 0) {
                     GlucosaSyncService.insertarGlucosa(context,idGenerado,nuevoGlucosa);
-                    /*guardarEnTxt(idGenerado, nivel_glucosa, fechaFormateada, estado);*/
+                    guardarEnTxt(idGenerado, nivel_glucosa, fechaFormateada, estado);
                     Log.d("GlucosaDao", "Registro guardado en BD con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
                             AlertaExitoso.show(context, "Registro exitoso")

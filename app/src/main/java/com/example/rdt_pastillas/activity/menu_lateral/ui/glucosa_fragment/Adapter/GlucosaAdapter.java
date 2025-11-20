@@ -4,14 +4,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rdt_pastillas.R;
-import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.dailog.GlucosaInsertDailog;
 import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaDia;
 import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
 
@@ -90,7 +88,7 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
             if (position == 0) {
                 ivEdit.setVisibility(View.VISIBLE);
                 if (count > 0) {
-                    final GlucosaEntity medicionMasReciente = mediciones.get(0);
+                    final GlucosaEntity medicionMasReciente = mediciones.get(mediciones.size() - 1);
 
                     // --- CORRECCIÓN 2: La llamada al listener va DENTRO del OnClickListener ---
                     ivEdit.setOnClickListener(v -> {

@@ -5,32 +5,38 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.rdt_pastillas.R;
+import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
 import com.google.android.material.textfield.TextInputEditText;
 
-public class GlucosaInsertDailog {
-
+public class GlucosaEditDailog {
     private AlertDialog dialog;
     private Context context;
+    private final GlucosaEntity glucosa;
 
-    private insertOnClickedDailog listener;
+    private EditOnClickedDailog listener;
 
 
-    public interface insertOnClickedDailog {
-        void insertOnClickedDailog(int nivel_glucosa);
+    public interface EditOnClickedDailog {
+        void EditOnClickedDailog(int id,int nivel_glucosa);
 
     }
-    public GlucosaInsertDailog(Context context, insertOnClickedDailog listener) {
+    public GlucosaEditDailog(Context context, GlucosaEntity glucosa, EditOnClickedDailog listener) {
         this.context = context;
+        this.glucosa = glucosa;
         this.listener = listener;
     }
     public void show() {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.dailog_insert_glucosa, null);
+        View view = inflater.inflate(R.layout.dailog_edit_glucosa, null);
 
         final TextInputEditText txtGlucosa = view.findViewById(R.id.txt_glucosa);
+        final TextInputEditText txtGlucosaNoEditable = view.findViewById(R.id.txt_glucosa_no_edit);
+
+        txtGlucosaNoEditable.setText(String.valueOf(glucosa.getNivel_glucosa()));
 
         ImageView btnAceptar = view.findViewById(R.id.btnAceptar);
         ImageView btnCancelar = view.findViewById(R.id.btnCancelar);
@@ -59,7 +65,7 @@ public class GlucosaInsertDailog {
 
             // Llamar al listener con los datos
             if (listener != null) {
-                listener.insertOnClickedDailog(nivel_glucosa);
+                listener.EditOnClickedDailog(glucosa.getId_glucosa(),nivel_glucosa);
             }
 
             // Cerrar el diálogo
