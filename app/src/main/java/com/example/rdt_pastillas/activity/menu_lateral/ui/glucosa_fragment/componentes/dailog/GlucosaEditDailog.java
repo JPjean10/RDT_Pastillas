@@ -21,7 +21,7 @@ public class GlucosaEditDailog {
 
 
     public interface EditOnClickedDailog {
-        void EditOnClickedDailog(int id,int nivel_glucosa);
+        void EditOnClickedDailog(GlucosaEntity glucosa,int nivel_glucosa);
 
     }
     public GlucosaEditDailog(Context context, GlucosaEntity glucosa, EditOnClickedDailog listener) {
@@ -65,7 +65,7 @@ public class GlucosaEditDailog {
 
             // Llamar al listener con los datos
             if (listener != null) {
-                listener.EditOnClickedDailog(glucosa.getId_glucosa(),nivel_glucosa);
+                listener.EditOnClickedDailog(glucosa,nivel_glucosa);
             }
 
             // Cerrar el diálogo

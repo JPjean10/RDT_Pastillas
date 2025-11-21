@@ -25,6 +25,7 @@ import com.example.rdt_pastillas.basedata.servicio.glucosa_bd.GlucosaServicio;
 import com.example.rdt_pastillas.util.dailog.AnioMesDialog;
 
 import java.util.ArrayList; // Asegúrate de tener este import  OnEditClickLister,
+import java.util.Date;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -124,10 +125,20 @@ public class GlucosaFragment extends Fragment implements
     }
 
     @Override
-    public void EditOnClickedDailog(int id,int nivel_glucosa) {
-        String mensaje = "Último ID: " + id + "nivel glucosa: " + nivel_glucosa;
+    public void EditOnClickedDailog(GlucosaEntity glucosa,int nivel_glucosa) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.getDefault());
+        // 2. Crea el String con la fecha actual formateada.
+        String fechaFormateada = sdf.format(new Date());
 
-        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();
+        GlucosaEntity glucosaParaActualizar = glucosa;
+
+        // 2. Actualiza solo los campos que cambiaron.
+        glucosaParaActualizar.setNivel_glucosa(nivel_glucosa);
+        glucosaParaActualizar.setFecha_hora_creacion(fechaFormateada);
+        glucosaParaActualizar.setEstado(false);
+
+        servicio.edit(glucosaParaActualizar);
+
     }
 
     private void AbrirDailogFecha() {

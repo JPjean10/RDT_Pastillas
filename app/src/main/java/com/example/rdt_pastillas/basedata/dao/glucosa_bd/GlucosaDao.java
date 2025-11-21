@@ -51,8 +51,8 @@ public class GlucosaDao {
                 if (idGenerado > 0) {
                     GlucosaSyncService.insertarGlucosa(context,idGenerado,nuevoGlucosa);
                     TxtServicio.InsertarGlucosaTxt(context,idGenerado, nivel_glucosa, fechaFormateada, estado);
-                    /*guardarEnTxt(idGenerado, nivel_glucosa, fechaFormateada, estado);*/
-                    Log.d("GlucosaDao", "Registro guardado en BD con ID: " + idGenerado);
+                    Log.d("GlucosaDao", "Registro guardado en BD con exito:");
+                    Log.d("GlucosaDao", "Registro guardado en BD local con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
                             AlertaExitoso.show(context, "Registro exitoso")
                     );
@@ -67,6 +67,20 @@ public class GlucosaDao {
                 new Handler(Looper.getMainLooper()).post(() ->
                         AlertaError.show(context, "Error al guardar la glucosa")
                 );
+            }
+        });
+    }
+
+    public void edit(GlucosaEntity glucosa) {
+        databaseWriteExecutor.execute(() -> {
+            try {
+                inerterfaz.editGlucosa(glucosa);
+                GlucosaSyncService.editarGlucosa(context,glucosa);
+                TxtServicio.ActualizarGlucosaTxt(glucosa);
+                Log.d("GlucosaDao", "Registro actualizado: " + "ID: " + glucosa.getId_glucosa() + " Nivel glucosa: " + glucosa.getNivel_glucosa()+ " Fecha: " + glucosa.getFecha_hora_creacion()+ " Estado: " + glucosa.isEstado());
+            } catch (Exception e) {
+                Log.e("GlucosaDao", "Error al actualizar la glucosa", e);
+                // Considera mostrar una alerta de error si es necesario.
             }
         });
     }
