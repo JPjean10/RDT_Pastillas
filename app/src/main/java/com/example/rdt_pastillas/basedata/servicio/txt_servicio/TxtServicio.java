@@ -106,6 +106,7 @@ public class TxtServicio {
                         if (lines.get(j).contains("Estado: false")) {
                             lines.set(j, lines.get(j).replace("Estado: false", "Estado: true"));
                             recordModified = true;
+                            Log.d(TAG, "actualización de estado exitoso");
                             Log.d(TAG, "Línea de estado para ID " + id + " modificada en memoria.");
                             break; // Sale del bucle interno
                         }
@@ -196,7 +197,7 @@ public class TxtServicio {
                     writer.write(System.lineSeparator());
                 }
             }
-            Log.d(TAG, "Archivo registros_glucosa.txt actualizado correctamente para ID " + glucosaActualizada.getId_glucosa());
+            Log.d(TAG, "actualización exitosa");
         } catch (IOException e) {
             Log.e(TAG, "Error al reescribir el archivo .txt actualizado.", e);
         }
