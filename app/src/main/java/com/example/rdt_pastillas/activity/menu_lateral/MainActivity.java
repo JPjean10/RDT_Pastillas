@@ -1,9 +1,13 @@
 package com.example.rdt_pastillas.activity.menu_lateral;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -28,6 +32,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private DrawerLayout drawerLayout;
 
+    private final ActivityResultLauncher<Intent> storageActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        // Este bloque se ejecuta cuando el usuario vuelve de la pantalla de configuración.
+                        // Aquí puedes añadir lógica si es necesario, como reiniciar una sincronización.
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            if (Environment.isExternalStorageManager()) {
+                                // El permiso fue concedido. ¡Genial!
+                                // Podrías reiniciar la sincronización si es necesario, pero
+                                // el SyncManager ya lo intentó al inicio de la app.                      com.google.ai.edge.litert.Environment.isExternalStorageManager()
+                                // La próxima vez que se inicie la app, funcionará.
+                            } else {
+                                // El usuario no concedió el permiso.
+                                // Puedes mostrar un mensaje o un Toast.
+                            }
+                        }
+                    });
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
         if (isGranted) {
             // Permission is granted. Continue the action or workflow in your
@@ -93,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         permiso_notificacione();
+        checkAndRequestStoragePermission();
     }
 
     @Override
@@ -111,6 +133,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    // --- ¡AÑADE ESTE MÉTODO COMPLETO DENTRO DE TU CLASE! ---
+    private void checkAndRequestStoragePermission() {
+        // Esta lógica es solo para Android 11 (API 30) y versiones superiores.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Comprueba si la app NO tiene el permiso.
+            if (!Environment.isExternalStorageManager()) {
+                try {
+                    // Crea un intent para abrir la pantalla de configuración específica de tu app.
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    // Lanza la pantalla para que el usuario conceda el permiso.
+                    storageActivityResultLauncher.launch(intent);
+                } catch (Exception e) {
+                    // En algunos dispositivos, el intent puede fallar. Intentamos con la acción genérica.
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                    storageActivityResultLauncher.launch(intent);
+                }
+            }
+        }
+    }
     private void permiso_notificacione() {
         //Esto solo es necesario para el nivel de API 33 o superior.+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

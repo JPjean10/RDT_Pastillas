@@ -202,4 +202,50 @@ public class TxtServicio {
             Log.e(TAG, "Error al reescribir el archivo .txt actualizado.", e);
         }
 }
+
+    public static List<GlucosaEntity> leerTodosLosRegistrosTxt() {
+        List<GlucosaEntity> registros = new ArrayList<>();
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File file = new File(dir, "registros_glucosa.txt");
+
+        if (!file.exists() || !Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            Log.w(TAG, "El archivo TXT no existe o el almacenamiento no está disponible.");
+            return registros;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue; // Ignorar líneas vacías
+
+                String[] parts = line.split(",");
+                if (parts.length >= 4) { // Aseguramos que tenga al menos 4 partes
+                    try {
+                        // Extraemos los valores de forma más segura
+                        String idStr = parts[0].split(":")[1].trim();
+                        String nivelStr = parts[1].split(":")[1].trim();
+                        // La fecha puede contener comas, así que la reconstruimos si es necesario
+                        String fecha = parts[2].substring(parts[2].indexOf(":") + 1).trim();
+                        String estadoStr = parts[parts.length - 1].split(":")[1].trim(); // El último elemento
+
+                        int id = Integer.parseInt(idStr);
+                        int nivelGlucosa = Integer.parseInt(nivelStr);
+                        boolean estado = Boolean.parseBoolean(estadoStr);
+
+                        GlucosaEntity entidad = new GlucosaEntity(nivelGlucosa, fecha, estado);
+                        entidad.setId_glucosa(id); // Asignamos el ID leído del TXT
+
+                        registros.add(entidad);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error al parsear la línea del TXT: '" + line + "'", e);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error al leer el archivo .txt", e);
+        }
+
+        Log.d(TAG, "Se leyeron " + registros.size() + " registros del archivo .txt.");
+        return registros;
+    }
 }

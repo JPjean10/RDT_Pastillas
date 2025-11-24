@@ -27,4 +27,17 @@ public interface GlucosaInterfaz {
     @Update
     void editGlucosa(GlucosaEntity glucosa);
 
+
+    /** 1. Cuenta todos los registros en la tabla. */
+    @Query("SELECT COUNT(*) FROM GlucosaEntity")
+    int countGlucosa();
+
+    /** 2. Inserta una lista completa de registros. Usado para poblar desde el TXT. */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(List<GlucosaEntity> glucosas);
+
+    /** 3. Obtiene todos los registros que NO han sido sincronizados con el servidor. */
+    @Query("SELECT * FROM GlucosaEntity WHERE estado = 0")
+    List<GlucosaEntity> getRegistrosNoSincronizados();
+
 }
