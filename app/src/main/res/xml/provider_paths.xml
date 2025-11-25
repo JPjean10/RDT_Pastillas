@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Define la ruta a la carpeta 'Documents' en el almacenamiento externo -->
+    <external-path
+        name="external_documents"
+        path="Documents/" />
+</paths>
