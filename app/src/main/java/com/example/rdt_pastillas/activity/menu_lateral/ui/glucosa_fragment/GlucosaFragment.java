@@ -100,7 +100,7 @@ public class GlucosaFragment extends Fragment implements
     }
 
     private void establecerFechaInicial() {
-        SimpleDateFormat formatoGuardado = new SimpleDateFormat("yyyy/MM", Locale.getDefault());
+        SimpleDateFormat formatoGuardado = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
         SimpleDateFormat formatoMostrado = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
         Calendar calendario = Calendar.getInstance();
 
@@ -114,6 +114,7 @@ public class GlucosaFragment extends Fragment implements
 
         btn_fecha.setText(fechaMostrada);
 
+
         // Llama al método del ViewModel para aplicar el filtro inicial
         glucosaViewModel.setFiltroFecha(fechaGuardada);
     }
@@ -126,7 +127,7 @@ public class GlucosaFragment extends Fragment implements
 
     @Override
     public void EditOnClickedDailog(GlucosaEntity glucosa,int nivel_glucosa) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         // 2. Crea el String con la fecha actual formateada.
         String fechaFormateada = sdf.format(new Date());
 
@@ -143,9 +144,9 @@ public class GlucosaFragment extends Fragment implements
 
     private void AbrirDailogFecha() {
         Integer initialYear = null;
-        if (fechaGuardada != null && fechaGuardada.contains("/")) {
+        if (fechaGuardada != null && fechaGuardada.contains("-")) {
             try {
-                initialYear = Integer.parseInt(fechaGuardada.split("/")[0]);
+                initialYear = Integer.parseInt(fechaGuardada.split("-")[0]);
             } catch (NumberFormatException e) {
                 initialYear = null;
             }
@@ -167,9 +168,6 @@ public class GlucosaFragment extends Fragment implements
     // adapter______________________________________________________________________________________
     @Override
     public void EdiOnClickedAdapter(GlucosaEntity medicion) {
-/*        String mensaje = "Último ID: " + medicion.getId_glucosa() + "nivel glucosa: " + medicion.getNivel_glucosa()  + " | Estado: " + medicion.isEstado();
-
-        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();*/
         GlucosaEditDailog dialog = new GlucosaEditDailog(getContext(), medicion ,GlucosaFragment.this);
         dialog.show();;
     }

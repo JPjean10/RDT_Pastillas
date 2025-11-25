@@ -6,7 +6,6 @@ import android.util.Log;
 import com.example.rdt_pastillas.basedata.app_database.glucosa_bd.AppDataBaseGlucosa;
 import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.basedata.interfaz.glucosa_bd.GlucosaInterfaz;
-import com.example.rdt_pastillas.basedata.servicio.SyncService.GlucosaSyncService;
 import com.example.rdt_pastillas.basedata.servicio.txt_servicio.TxtServicio;
 
 import java.util.List;
@@ -42,11 +41,11 @@ public class SyncManager {
                 Log.i(TAG, "BD local con datos. Saltando al paso de sincronización con MySQL.");
             }
 
-/*            // PASO 2: SINCRONIZAR REGISTROS PENDIENTES CON EL SERVIDOR MYSQL
+            // PASO 2: SINCRONIZAR REGISTROS PENDIENTES CON EL SERVIDOR MYSQL
             Log.i(TAG, "Buscando registros locales no sincronizados...");
             sincronizarPendientesConServidor();
 
-            Log.d(TAG, "FIN: Proceso de Sincronización Automática.");*/
+            Log.d(TAG, "FIN: Proceso de Sincronización Automática.");
         });
     }
 
@@ -67,7 +66,7 @@ public class SyncManager {
     /**
      * (Interno) Obtiene todos los registros con estado=false y los envía al servidor.
      */
-/*    private void sincronizarPendientesConServidor() {
+    private void sincronizarPendientesConServidor() {
         List<GlucosaEntity> registrosNoSincronizados = glucosaDao.getRegistrosNoSincronizados();
 
         if (registrosNoSincronizados.isEmpty()) {
@@ -81,7 +80,7 @@ public class SyncManager {
             Log.d(TAG, "Sincronizando registro con ID local: " + entidad.getId_glucosa());
             // Aquí puedes diferenciar entre insert y update si tuvieras más lógica,
             // pero para empezar, llamamos al método de inserción.
-            GlucosaSyncService.insertarGlucosa(context, entidad.getId_glucosa(), entidad);
+            GlucosaSyncService.RegistrosNoSincronizados(context, entidad.getId_glucosa(), entidad);
         }
-    }*/
+    }
 }

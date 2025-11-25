@@ -145,7 +145,7 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
 
         private String formatearHora(String fechaHoraCompleta) {
             try {
-                SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.getDefault());
+                SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
                 SimpleDateFormat formatoDeseado = new SimpleDateFormat("hh:mm a", Locale.getDefault());
                 Date date = formatoOriginal.parse(fechaHoraCompleta);
                 return formatoDeseado.format(date);
@@ -156,7 +156,7 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
 
         private String formatearFechaSimple(String fechaOriginal) {
             try {
-                SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+                SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 SimpleDateFormat formatoDeseado = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date date = formatoOriginal.parse(fechaOriginal);
                 return formatoDeseado.format(date);

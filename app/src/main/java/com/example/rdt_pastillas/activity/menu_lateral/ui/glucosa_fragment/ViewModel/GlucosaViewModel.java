@@ -76,8 +76,8 @@ public class GlucosaViewModel extends AndroidViewModel {
         }
 
         List<GlucosaDia> listaFinal = new ArrayList<>();
-        SimpleDateFormat formatoClave = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
-        SimpleDateFormat formatoEntrada = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.getDefault());
+        SimpleDateFormat formatoClave = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat formatoEntrada = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
         // Mapa para agrupar mediciones por día
         Map<String, List<GlucosaEntity>> medicionesPorDia = new LinkedHashMap<>();
@@ -112,10 +112,6 @@ public class GlucosaViewModel extends AndroidViewModel {
             }
         }
 
-        // --- PASO FINAL Y CRUCIAL ---
-        // La lista de tarjetas ahora es [Tarjeta(99, 96), Tarjeta(100)].
-        // La invertimos para que sea [Tarjeta(100), Tarjeta(99, 96)]
-        // y así el RecyclerView la muestre en el orden visual correcto (más reciente arriba).
         Collections.reverse(listaFinal);
 
         return listaFinal;

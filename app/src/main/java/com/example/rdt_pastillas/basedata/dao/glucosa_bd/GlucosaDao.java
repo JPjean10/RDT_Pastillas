@@ -33,13 +33,11 @@ public class GlucosaDao {
 
     public void insert(int nivel_glucosa) {
         // 1. Define el formato deseado.
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
         // 2. Crea el String con la fecha actual formateada.
         String fechaFormateada = sdf.format(new Date());
         // 3. Define el estado. En este caso, siempre es 'false' al insertar.
         boolean estado = false;
-
-//        String ss = "2025/11/20 07:45 p.m";
 
         GlucosaEntity nuevoGlucosa = new GlucosaEntity(nivel_glucosa,fechaFormateada,estado);
         databaseWriteExecutor.execute(() -> {

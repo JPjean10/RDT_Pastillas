@@ -139,7 +139,7 @@ public class AnioMesDialog extends DialogFragment {
                     String monthName = months.get(selectedMonthIndex - 1); // El índice de la lista es base 0
                     String formattedMonth = String.format(Locale.getDefault(), "%02d", selectedMonthIndex);
                     String fechaParaMostrar = String.format(Locale.getDefault(), "%d/%s", selectedYear, monthName);
-                    String fechaParaGuardar = String.format(Locale.getDefault(), "%d/%s", selectedYear, formattedMonth);
+                    String fechaParaGuardar = String.format(Locale.getDefault(), "%d-%s", selectedYear, formattedMonth);
 
                     if (listener != null) {
                         listener.onFechaSeleccionada(fechaParaGuardar, fechaParaMostrar);
