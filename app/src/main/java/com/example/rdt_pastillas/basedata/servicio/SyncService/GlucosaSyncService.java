@@ -104,14 +104,14 @@ public class GlucosaSyncService {
         });
     }
 
-    public static void RegistrosNoSincronizados (Context context, long id, GlucosaEntity entidad){
+    public static void RegistrosNoSincronizados (Context context, long id, GlucosaEntity entidad, String Method){
         executor.execute(() -> {
             try {
                 // Tu endpoint en el servidor (PHP, Node, Spring, etc.)
                 URL url = new URL("http://192.168.1.100:8080/Glucosa/Sincronizar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-                conn.setRequestMethod("POST");
+                conn.setRequestMethod(Method);
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 conn.setDoOutput(true);
 
@@ -133,7 +133,7 @@ public class GlucosaSyncService {
                     GlucosaInterfaz dao = AppDataBaseGlucosa.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(id);
                     TxtServicio.ActualizarEstadoEnTxt(id);
-                    Log.d(TAG, "Sincronización exitosa con el servidor remoto");
+                    Log.d(TAG, "Sincronización exitosa con el servidor remoto ");
                 }
 
                 conn.disconnect();
@@ -142,4 +142,5 @@ public class GlucosaSyncService {
             }
         });
     }
+
 }

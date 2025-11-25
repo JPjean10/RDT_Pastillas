@@ -43,7 +43,8 @@ public class SyncManager {
 
             // PASO 2: SINCRONIZAR REGISTROS PENDIENTES CON EL SERVIDOR MYSQL
             Log.i(TAG, "Buscando registros locales no sincronizados...");
-            sincronizarPendientesConServidor();
+            sincronizarPendientesConServidor("POST");
+            sincronizarPendientesConServidor("PUT");
 
             Log.d(TAG, "FIN: Proceso de Sincronización Automática.");
         });
@@ -66,7 +67,7 @@ public class SyncManager {
     /**
      * (Interno) Obtiene todos los registros con estado=false y los envía al servidor.
      */
-    private void sincronizarPendientesConServidor() {
+    private void sincronizarPendientesConServidor(String Method) {
         List<GlucosaEntity> registrosNoSincronizados = glucosaDao.getRegistrosNoSincronizados();
 
         if (registrosNoSincronizados.isEmpty()) {
@@ -80,7 +81,7 @@ public class SyncManager {
             Log.d(TAG, "Sincronizando registro con ID local: " + entidad.getId_glucosa());
             // Aquí puedes diferenciar entre insert y update si tuvieras más lógica,
             // pero para empezar, llamamos al método de inserción.
-            GlucosaSyncService.RegistrosNoSincronizados(context, entidad.getId_glucosa(), entidad);
+            GlucosaSyncService.RegistrosNoSincronizados(context, entidad.getId_glucosa(), entidad,Method);
         }
     }
 }
