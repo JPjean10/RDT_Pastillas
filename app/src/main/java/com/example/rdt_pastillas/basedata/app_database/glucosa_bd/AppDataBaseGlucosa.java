@@ -27,7 +27,7 @@ public abstract class AppDataBaseGlucosa extends RoomDatabase {
             synchronized (AppDataBaseGlucosa.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                                    AppDataBaseGlucosa.class, "Glucosabd")
+                                    AppDataBaseGlucosa.class, "ControlBD")
                             // Si no hay migraciones y la versión cambia, recrea la BD
                             .fallbackToDestructiveMigration()
                             .build();
