@@ -42,7 +42,7 @@ public class ApiHelper {
                     try {
                         String errorBody = response.errorBody().string();
                         JSONObject jsonObject = new JSONObject(errorBody);
-                        String mensajeError = jsonObject.optString("mensaje", "Error desconocido del servidor.");
+                        String mensajeError = jsonObject.optString("userMssg", "Error desconocido del servidor.");
                         // Llamar al callback onError
                         callback.onError(mensajeError);
                     } catch (Exception e) {

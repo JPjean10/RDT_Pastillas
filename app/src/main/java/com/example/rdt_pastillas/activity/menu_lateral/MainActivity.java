@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private DrawerLayout drawerLayout;
 
+/*
     private final ActivityResultLauncher<Intent> storageActivityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // decision.
         }
     });
+*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +115,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onDrawerStateChanged(int newState) {}
         });
 
-        permiso_notificacione();
-        checkAndRequestStoragePermission();
+/*        permiso_notificacione();*/
+/*        checkAndRequestStoragePermission();*/
     }
 
     @Override
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    // --- ¡AÑADE ESTE MÉTODO COMPLETO DENTRO DE TU CLASE! ---
+/*    // --- ¡AÑADE ESTE MÉTODO COMPLETO DENTRO DE TU CLASE! ---
     private void checkAndRequestStoragePermission() {
         // Esta lógica es solo para Android 11 (API 30) y versiones superiores.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -171,5 +173,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
-    }
+    }*/
 }

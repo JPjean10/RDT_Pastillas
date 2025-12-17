@@ -26,13 +26,13 @@ public class UsuarioServicio {
             @Override
             public void onError(String errorMessage) {
                 // La API devolvió un error (4xx o 5xx). Muestra el mensaje.
-                Toast.makeText(context, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onFailure(String failureMessage) {
                 // Hubo un problema de red. Muestra el mensaje de fallo.
-                Toast.makeText(context, "Fallo: " + failureMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(context,failureMessage, Toast.LENGTH_LONG).show();
             }
         });
 
