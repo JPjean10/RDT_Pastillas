@@ -2,6 +2,7 @@ package com.example.rdt_pastillas.bd.remote.api;
 
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.usuario_entity.UsuarioEntity;
+import com.example.rdt_pastillas.Modelo.response.LoginResponse;
 import com.example.rdt_pastillas.Modelo.response.ServerResponse;
 import com.example.rdt_pastillas.util.consts.ApiConst;
 
@@ -23,5 +24,11 @@ public interface ApiService {
 
     @PUT(ApiConst.GLUCOSA)
     Call<ServerResponse> EditarGlucosa(@Body GlucosaEntity glucosa);
+
+    @PUT(ApiConst.GLUCOSA + ApiConst.SINCRONIZAR) // Se usa PUT basado en tu última imagen
+    Call<ServerResponse> sincronizarGlucosaAc(@Body GlucosaEntity glucosa);
+
+    @POST(ApiConst.USUARIO + ApiConst.LOGIN)
+    Call<LoginResponse> loginUsuario(@Body UsuarioEntity usuario);
 
 }

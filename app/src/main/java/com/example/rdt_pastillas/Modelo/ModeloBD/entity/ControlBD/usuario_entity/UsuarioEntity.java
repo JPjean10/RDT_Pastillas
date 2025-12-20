@@ -5,15 +5,22 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.SerializedName;
+
 @Entity(tableName = "UsuarioEntity")
 public class UsuarioEntity {
 
     @PrimaryKey(autoGenerate = true)
+    @SerializedName("Id_usuario")
     private int id_usuario;
+    @SerializedName("usuario")
     private String usuario;
+    @SerializedName("contrasena")
     private String contrasena;
+    @SerializedName("nombre")
     private String nombre;
     @ColumnInfo(name = "fecha_hora_creacion")
+    @SerializedName("fechaHoraCreacion")
     String fecha_hora_creacion;
 
     @Ignore
@@ -28,6 +35,12 @@ public class UsuarioEntity {
         this.contrasena = contrasena;
         this.nombre = nombre;
         this.fecha_hora_creacion = fecha_hora_creacion;
+    }
+
+    @Ignore
+    public UsuarioEntity(String usuario, String contrasena){
+        this.usuario = usuario;
+        this.contrasena = contrasena;
     }
 
     public int getId_usuario() {

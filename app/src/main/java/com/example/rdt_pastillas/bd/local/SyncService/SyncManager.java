@@ -108,6 +108,27 @@ public class SyncManager {
                     Log.e(TAG, "Fallo de red al sincronizar ID " + entidad.getId_glucosa() + ": " + failureMessage);
                 }
             });
+            remoteDataSource.sincronizarGlucosaAc(context, entidad, new ApiCallback<ServerResponse>() {
+                @Override
+                public void onSuccess(ServerResponse response) {
+                    Log.i(TAG, "Sincronización remota exitosa para ID: " + entidad.getId_glucosa() + ". Mensaje: " + response.getMensaje());
+                    // Si la API tuvo éxito, actualizamos el estado local en un hilo de fondo
+                    TxtServicio.ActualizarEstadoEnTxt(entidad.getId_glucosa());
+                    executor.execute(() -> {
+                        interfaz.actualizarEstado(entidad.getId_glucosa());
+                    });
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    Log.e(TAG, "Error de API al sincronizar ID " + entidad.getId_glucosa() + ": " + errorMessage);
+                }
+
+                @Override
+                public void onFailure(String failureMessage) {
+                    Log.e(TAG, "Fallo de red al sincronizar ID " + entidad.getId_glucosa() + ": " + failureMessage);
+                }
+            });
         }
     }
 }

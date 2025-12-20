@@ -132,7 +132,7 @@ public class Login extends AppCompatActivity implements
                 return;
             }
 
-            servicio.login(usuario, contrasena, recordar, new UsuarioRepository.LoginCallback() {
+            servicio.login(this,usuario, contrasena, recordar, new UsuarioRepository.LoginCallback() {
                 @Override
                 public void onLoginSuccess(int userId) {
                     iniciarMainActivity();

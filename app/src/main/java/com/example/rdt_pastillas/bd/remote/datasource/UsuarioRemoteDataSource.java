@@ -3,6 +3,7 @@ package com.example.rdt_pastillas.bd.remote.datasource;
 import android.content.Context;
 
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
+import com.example.rdt_pastillas.Modelo.response.LoginResponse;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiHelper;
 import com.example.rdt_pastillas.bd.remote.retrofit.RetrofitClient;
@@ -49,4 +50,22 @@ public class UsuarioRemoteDataSource {
         // Delega la ejecución al ApiHelper genérico
         ApiHelper.execute(context, call, callback);
     }
+
+    public void sincronizarGlucosaAc(Context context, GlucosaEntity glucosa, ApiCallback<ServerResponse> callback) {
+        // Prepara la llamada específica para editar glucosa
+        Call<ServerResponse> call = apiService.sincronizarGlucosaAc(glucosa);
+
+        // Delega la ejecución al ApiHelper genérico
+        ApiHelper.execute(context, call, callback);
+    }
+
+    public void login(Context context, String usuario, String contrasena, ApiCallback<LoginResponse> callback) {
+        // Creamos un objeto entidad solo para enviar las credenciales
+        UsuarioEntity body = new UsuarioEntity(usuario, contrasena);
+
+        Call<LoginResponse> call = apiService.loginUsuario(body);
+        ApiHelper.execute(context, call, callback);
+    }
+
+
 }

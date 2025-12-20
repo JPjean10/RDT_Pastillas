@@ -47,7 +47,7 @@ public class ApiHelper {
             public void onFailure(Call<T> call, Throwable t) {
                 Log.e("ApiHelper", "Fallo en la llamada a la API: " + t.getMessage());
                 // Fallo de red: Llamar al callback onFailure
-                callback.onFailure("Fallo de conexión: " + t.getMessage());
+                callback.onFailure("Fallo de conexión");
             }
         });
     }
