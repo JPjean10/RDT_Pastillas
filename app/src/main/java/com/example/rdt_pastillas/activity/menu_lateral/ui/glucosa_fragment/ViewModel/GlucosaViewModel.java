@@ -7,10 +7,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import com.example.rdt_pastillas.basedata.app_database.glucosa_bd.AppDataBaseGlucosa;
-import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaDia;
-import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
-import com.example.rdt_pastillas.basedata.interfaz.glucosa_bd.GlucosaInterfaz;
+import com.example.rdt_pastillas.bd.local.dao.GlucosaLocalDao;
+import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaDia;
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,13 +24,13 @@ import java.util.Map;
 
 public class GlucosaViewModel extends AndroidViewModel {
 
-    private final GlucosaInterfaz glucosaInterfaz;
+    private final GlucosaLocalDao glucosaInterfaz;
     private final MutableLiveData<String> filtroFecha = new MutableLiveData<>(); // Formato "yyyy/MM"
     private final LiveData<List<GlucosaDia>> listaGlucosaAgrupada;
 
     public GlucosaViewModel(@NonNull Application application) {
         super(application);
-        glucosaInterfaz = AppDataBaseGlucosa.getDatabase(application).glucosa_interfaz();
+        glucosaInterfaz = AppDataBaseControl.getDatabase(application).glucosa_interfaz();
 
         // 1. Se usa switchMap para reaccionar a los cambios en 'filtroFecha'.
         // Cada vez que 'filtroFecha' cambia, se ejecuta la nueva consulta a la BD.

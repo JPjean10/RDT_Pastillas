@@ -5,11 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.rdt_pastillas.R;
-import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class GlucosaEditDailog {

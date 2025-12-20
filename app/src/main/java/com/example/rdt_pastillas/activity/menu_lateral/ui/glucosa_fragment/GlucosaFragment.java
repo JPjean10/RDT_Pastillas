@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,8 +19,8 @@ import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.Adapt
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.ViewModel.GlucosaViewModel;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.dailog.GlucosaEditDailog;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.dailog.GlucosaInsertDailog;
-import com.example.rdt_pastillas.basedata.entity.glucosa_bd.glucosa_entity.GlucosaEntity;
-import com.example.rdt_pastillas.basedata.servicio.glucosa_bd.GlucosaServicio;
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
+import com.example.rdt_pastillas.bd.repository.GlucosaRepository;
 import com.example.rdt_pastillas.util.dailog.AnioMesDialog;
 
 import java.util.ArrayList; // Asegúrate de tener este import  OnEditClickLister,
@@ -43,14 +42,14 @@ public class GlucosaFragment extends Fragment implements
     private GlucosaAdapter adapter;
     private RecyclerView recyclerView;
 
-    private GlucosaServicio servicio;
+    private GlucosaRepository servicio;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_glucosa, container, false);
 
-        servicio = new GlucosaServicio(requireActivity().getApplication());
+        servicio = new GlucosaRepository(requireActivity().getApplication());
 
         btn_fecha = view.findViewById(R.id.btn_seleccionar_fecha);
         btn_agregar = view.findViewById(R.id.btn_agregar);

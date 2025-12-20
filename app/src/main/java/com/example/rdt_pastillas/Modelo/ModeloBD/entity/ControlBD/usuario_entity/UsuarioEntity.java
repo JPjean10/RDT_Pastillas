@@ -1,0 +1,68 @@
+package com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.usuario_entity;
+
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "UsuarioEntity")
+public class UsuarioEntity {
+
+    @PrimaryKey(autoGenerate = true)
+    private int id_usuario;
+    private String usuario;
+    private String contrasena;
+    private String nombre;
+    @ColumnInfo(name = "fecha_hora_creacion")
+    String fecha_hora_creacion;
+
+    @Ignore
+    public UsuarioEntity(String usuario, String contrasena, String nombre){
+        this.usuario = usuario;
+        this.contrasena = contrasena;
+        this.nombre = nombre;
+    }
+
+    public UsuarioEntity(String usuario, String contrasena, String nombre, String fecha_hora_creacion) {
+        this.usuario = usuario;
+        this.contrasena = contrasena;
+        this.nombre = nombre;
+        this.fecha_hora_creacion = fecha_hora_creacion;
+    }
+
+    public int getId_usuario() {
+        return id_usuario;
+    }
+
+    public void setId_usuario(int id_usuario) {
+        this.id_usuario = id_usuario;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+
+    public String getNombre() {return nombre;}
+
+    public void setNombre(String nombre) {this.nombre = nombre;}
+
+    public String getFecha_hora_creacion() {
+        return fecha_hora_creacion;
+    }
+
+    public void setFecha_hora_creacion(String fecha_hora_creacion) {
+        this.fecha_hora_creacion = fecha_hora_creacion;
+    }
+}

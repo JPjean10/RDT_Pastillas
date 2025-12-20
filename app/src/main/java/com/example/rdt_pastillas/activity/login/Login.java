@@ -8,7 +8,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,14 +26,22 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.login.componentes.UsuarioInsertDailog;
-import com.example.rdt_pastillas.retrofit.entity.UsuarioEntity;
-import com.example.rdt_pastillas.retrofit.servicio.UsuarioServicio;
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.usuario_entity.UsuarioEntity;
+import com.example.rdt_pastillas.activity.menu_lateral.MainActivity;
+import com.example.rdt_pastillas.bd.repository.UsuarioRepository;
+import com.example.rdt_pastillas.util.alert.AlertaError;
+import com.example.rdt_pastillas.util.sesion.SessionManager;
 
 public class Login extends AppCompatActivity implements
         UsuarioInsertDailog.insertOnClickedDailog {
-    TextView btn_registrar;
+    TextView btnRegistrar;
+    private Button btnIniciarSesion;
+    private CheckBox cbRecordarSesion;
 
-    private UsuarioServicio servicio;
+    private EditText txtUsuario, txtContrasena;
+
+    private UsuarioRepository servicio;
+    private SessionManager sessionManager;
 
     // --- CÓDIGO DE PERMISOS AQUÍ ---
 
@@ -64,7 +75,28 @@ public class Login extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        servicio = new UsuarioServicio();
+        servicio = new UsuarioRepository(this.getApplication());
+        sessionManager = new SessionManager(this);
+
+
+        // --- LÓGICA DE AUTO-LOGIN ---
+        // Comprobar si ya hay una sesión guardada ANTES de mostrar nada.
+        if (sessionManager.isLoggedIn()) {
+            iniciarMainActivity();
+            return; // Detiene la ejecución de onCreate para no mostrar la pantalla de login
+        }
+
+        // Si no hay sesión, configurar la UI
+        setupLoginUI();
+    }
+
+    private void setupLoginUI() {
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_login);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            // ... (tu código de insets)
+            return insets;
+        });
 
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
@@ -75,24 +107,55 @@ public class Login extends AppCompatActivity implements
         });
 
         // --- LLAMADAS A LOS MÉTODOS DE PERMISOS ---
-        checkAndRequestStoragePermission();
         permiso_notificacione();
+        checkAndRequestStoragePermission();
 
-        btn_registrar = findViewById(R.id.btn_registrar);
+        txtUsuario = findViewById(R.id.txt_usuario);
+        txtContrasena = findViewById(R.id.txt_contrasena);
+        cbRecordarSesion = findViewById(R.id.cb_recordar_sesion);
+        btnIniciarSesion = findViewById(R.id.btn_iniciar_sesion);
+        btnRegistrar = findViewById(R.id.btn_registrar);
 
-        btn_registrar.setOnClickListener(view -> {
+        btnRegistrar.setOnClickListener(view -> {
             UsuarioInsertDailog dialog = new UsuarioInsertDailog(Login.this, Login.this);
             dialog.show();
         });
+
+
+        btnIniciarSesion.setOnClickListener(view -> {
+            String usuario = txtUsuario.getText().toString().trim();
+            String contrasena = txtContrasena.getText().toString().trim();
+            boolean recordar = cbRecordarSesion.isChecked();
+
+            if (usuario.isEmpty() || contrasena.isEmpty()) {
+                Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            servicio.login(usuario, contrasena, recordar, new UsuarioRepository.LoginCallback() {
+                @Override
+                public void onLoginSuccess(int userId) {
+                    iniciarMainActivity();
+                }
+
+                @Override
+                public void onLoginFailed(String error) {
+                    AlertaError.show(Login.this,error);
+                }
+            });
+        });
+
+        ocultarBotonRegistroSiEsNecesario();
 //______________no tocar___________________________________________________________
     }
 
     //_______________________________________________________________________________________________
 // dailog________________________________________________________________________________________
     @Override
-    public void insertOnClickedDailog(String usuario, String contrasena) {
-        UsuarioEntity usuarioEntity = new UsuarioEntity(usuario, contrasena);
+    public void insertOnClickedDailog(String usuario, String contrasena, String nombre) {
+        UsuarioEntity usuarioEntity = new UsuarioEntity(usuario, contrasena, nombre);
         servicio.insertar_usuario(this, usuarioEntity);
+        ocultarBotonRegistroSiEsNecesario();
     }
 //______________________________________________________________________________________________
 // MÉTODOS DE PERMISOS AQUÍ_____________________________________________________________________
@@ -122,6 +185,23 @@ public class Login extends AppCompatActivity implements
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
+    }
+
+    private void iniciarMainActivity() {
+        Intent intent = new Intent(Login.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void ocultarBotonRegistroSiEsNecesario() {
+        // Usamos el repositorio para contar usuarios en segundo plano
+        servicio.contarUsuarios(count -> {
+            if (count > 0) {
+                btnRegistrar.setVisibility(View.GONE);
+            } else {
+                btnRegistrar.setVisibility(View.VISIBLE);
+            }
+        });
     }
 // ________________________________________________________________________________
 //______________no tocar___________________________________________________________

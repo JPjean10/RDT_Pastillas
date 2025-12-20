@@ -17,7 +17,7 @@ public class UsuarioInsertDailog {
     private insertOnClickedDailog listener;
 
     public interface insertOnClickedDailog {
-        void insertOnClickedDailog(String usuario, String contrasena);
+        void insertOnClickedDailog(String usuario, String contrasena, String nombre);
 
     }
 
@@ -32,6 +32,8 @@ public class UsuarioInsertDailog {
 
         final TextInputEditText txtUsuario = view.findViewById(R.id.txt_usuario);
         final TextInputEditText txtContrasena = view.findViewById(R.id.txt_contrasena);
+        final TextInputEditText txtNombre = view.findViewById(R.id.txt_nombre);
+
 
         ImageView btnAceptar = view.findViewById(R.id.btnAceptar);
         ImageView btnCancelar = view.findViewById(R.id.btnCancelar);
@@ -51,6 +53,8 @@ public class UsuarioInsertDailog {
         btnAceptar.setOnClickListener(v -> {
             String usuario = txtUsuario.getText().toString().trim();
             String contrasena = txtContrasena.getText().toString().trim();
+            String nombre = txtNombre.getText().toString().trim();
+
 
             // Validación simple
             if (usuario.isEmpty()) {
@@ -62,9 +66,15 @@ public class UsuarioInsertDailog {
                 return;
             }
 
+            if (nombre.isEmpty()) {
+                txtNombre.setError("El nombre es requerido");
+                return;
+            }
+
+
             // Llamar al listener con los datos
             if (listener != null) {
-                listener.insertOnClickedDailog(usuario, contrasena);
+                listener.insertOnClickedDailog(usuario, contrasena, nombre);
             }
 
             // Cerrar el diálogo

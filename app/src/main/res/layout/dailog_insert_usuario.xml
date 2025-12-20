@@ -33,14 +33,33 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="contraseña"
+        android:hint="Contraseña"
+        app:endIconMode="password_toggle"
         app:startIconDrawable="@drawable/ic_lock_24"
         style="@style/textfield_TextInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/txt_contrasena"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:paddingStart="40dp"
+            style="@style/textfield_TextInputEditText"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="nombre"
+        app:startIconDrawable="@drawable/ic_person_24"
+        style="@style/textfield_TextInputLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/txt_nombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
