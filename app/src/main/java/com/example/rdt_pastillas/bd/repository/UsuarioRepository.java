@@ -63,35 +63,6 @@ public class UsuarioRepository {
         remote.insertar_usuario(context, usuario_entity, new ApiCallback<ServerResponse>() {
             @Override
             public void onSuccess(ServerResponse response) {
-
-                try {
-                    // 1. Asigna la fecha al objeto ORIGINAL que recibiste.
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                    String fechaFormateada = sdf.format(new Date());
-                    usuario_entity.setFecha_hora_creacion(fechaFormateada);
-
-                    // 2. Ejecuta la inserción en la base de datos local.
-                    databaseWriteExecutor.execute(() -> {
-                        try {
-                            // El método insertUsuario devuelve el 'rowId' (un long).
-                            // Si es mayor que 0, la inserción fue exitosa.
-                            long idGenerado = localDao.insertUsuario(usuario_entity);
-
-                            if (idGenerado > 0) {
-                                // ¡ÉXITO! Imprime un log para confirmarlo.
-                                Log.d(tag, "¡ÉXITO! Usuario guardado en BD local con ID: " + idGenerado);
-                            } else {
-                                // FALLO: La inserción no funcionó.
-                                Log.e(tag, "FALLO: No se pudo guardar el usuario en la BD local. ID devuelto: " + idGenerado);
-                            }
-                        } catch (Exception e) {
-                            Log.e(tag, "CRASH: Ocurrió una excepción al guardar en la BD local.", e);
-                        }
-                    });
-
-                } catch (Exception e) {
-                    Log.e(tag, "CRASH: Ocurrió una excepción antes de guardar en la BD local.", e);
-                }
                 AlertaExitoso.show(context,response.getMensaje());
                 progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
             }
