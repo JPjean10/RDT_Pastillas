@@ -48,13 +48,5 @@ public class SessionManager {
         // Limpiamos todo al cerrar sesión
         editor.clear();
         editor.commit();
-
-        // Redirigir al login si fuera necesario (opcional hacerlo aquí o en la Activity)
-        /*
-        Intent i = new Intent(context, Login.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(i);
-        */
     }
 }

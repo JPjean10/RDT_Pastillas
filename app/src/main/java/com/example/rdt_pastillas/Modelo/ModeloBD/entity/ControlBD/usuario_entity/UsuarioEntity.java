@@ -10,8 +10,8 @@ import com.google.gson.annotations.SerializedName;
 @Entity(tableName = "UsuarioEntity")
 public class UsuarioEntity {
 
-    @PrimaryKey(autoGenerate = true)
-    @SerializedName("Id_usuario")
+    @PrimaryKey
+    @SerializedName("id_usuario")
     private int id_usuario;
     @SerializedName("usuario")
     private String usuario;
@@ -23,18 +23,14 @@ public class UsuarioEntity {
     @SerializedName("fechaHoraCreacion")
     String fecha_hora_creacion;
 
+    public UsuarioEntity() {
+    }
+
     @Ignore
     public UsuarioEntity(String usuario, String contrasena, String nombre){
         this.usuario = usuario;
         this.contrasena = contrasena;
         this.nombre = nombre;
-    }
-
-    public UsuarioEntity(String usuario, String contrasena, String nombre, String fecha_hora_creacion) {
-        this.usuario = usuario;
-        this.contrasena = contrasena;
-        this.nombre = nombre;
-        this.fecha_hora_creacion = fecha_hora_creacion;
     }
 
     @Ignore

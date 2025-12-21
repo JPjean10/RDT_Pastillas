@@ -117,9 +117,6 @@ public class UsuarioRepository {
                                     // Insertamos en la BD Local en un hilo secundario
                                     databaseWriteExecutor.execute(() -> {
                                         try {
-                                            // Insertar y obtener ID local (puede ser el mismo del server o uno nuevo autogenerado)
-                                            // Nota: Si quieres mantener el ID del servidor, asegúrate que en Room 'id_usuario' no sea autogenerate=true
-                                            // o usa OnConflictStrategy.REPLACE. Aquí asumimos inserción estándar.
                                             long idLocal = localDao.insertUsuario(remoteUser);
 
                                             // Si el insert devolvió -1, quizás ya existía con otro ID, intentamos buscarlo de nuevo
