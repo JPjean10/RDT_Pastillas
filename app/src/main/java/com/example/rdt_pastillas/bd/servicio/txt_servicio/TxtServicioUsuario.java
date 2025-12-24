@@ -16,7 +16,7 @@ import java.util.List;
 
 public class TxtServicioUsuario {
 
-    private static final String TAG = "txtServicio";
+    private static final String TAG = "txtServicioUsuario";
     private static final String FILE_NAME = "registros_glucosa.txt"; // Cambiamos a .csv para más claridad
     private static final String HEADER = "ID_usuario;ID_glucosa;Nivel;fecha_hora;Estado";
 

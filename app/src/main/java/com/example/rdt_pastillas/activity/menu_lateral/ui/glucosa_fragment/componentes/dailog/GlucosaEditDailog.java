@@ -32,7 +32,7 @@ public class GlucosaEditDailog {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dailog_edit_glucosa, null);
 
-        final TextInputEditText txtGlucosa = view.findViewById(R.id.txt_glucosa);
+        final TextInputEditText txt_nivel_glucosa = view.findViewById(R.id.txt_nivel_glucosa);
         final TextInputEditText txtGlucosaNoEditable = view.findViewById(R.id.txt_glucosa_no_edit);
 
         txtGlucosaNoEditable.setText(String.valueOf(glucosa.getNivel_glucosa()));
@@ -51,11 +51,11 @@ public class GlucosaEditDailog {
 
         // Configurar el listener para el botón "Aceptar"
         btnAceptar.setOnClickListener(v -> {
-            String Edi_glucosa = txtGlucosa.getText().toString().trim();
+            String Edi_glucosa = txt_nivel_glucosa.getText().toString().trim();
 
             // Validación simple
             if (Edi_glucosa.isEmpty()) {
-                txtGlucosa.setError("El monto es requerido");
+                txt_nivel_glucosa.setError("El monto es requerido");
                 return;
             }
 

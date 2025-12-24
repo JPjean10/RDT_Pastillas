@@ -1,6 +1,7 @@
 package com.example.rdt_pastillas.bd.remote.api;
 
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.usuario_entity.UsuarioEntity;
 import com.example.rdt_pastillas.Modelo.response.LoginResponse;
 import com.example.rdt_pastillas.Modelo.response.ServerResponse;
@@ -30,5 +31,8 @@ public interface ApiService {
 
     @POST(ApiConst.USUARIO + ApiConst.LOGIN)
     Call<LoginResponse> loginUsuario(@Body UsuarioEntity usuario);
+
+    @POST(ApiConst.PRESION)
+    Call<ServerResponse> InsertarPresion(@Body PresionEntity presion);
 
 }

@@ -13,19 +13,47 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Glucosa"
+        android:text="Presión"
         android:paddingBottom="10dp"
         style="@style/tiulo_dialog"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="nivel glucosa"
+        android:hint="sys"
         app:startIconDrawable="@drawable/ic_grid_3x3_24"
         style="@style/textfield_TextInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/txt_nivel_glucosa"
+            android:id="@+id/txt_sys"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            style="@style/textfield_TextInputEditText"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="dia"
+        app:startIconDrawable="@drawable/ic_grid_3x3_24"
+        style="@style/textfield_TextInputLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/txt_dia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            style="@style/textfield_TextInputEditText"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="pul"
+        app:startIconDrawable="@drawable/ic_grid_3x3_24"
+        style="@style/textfield_TextInputLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/txt_pul"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"

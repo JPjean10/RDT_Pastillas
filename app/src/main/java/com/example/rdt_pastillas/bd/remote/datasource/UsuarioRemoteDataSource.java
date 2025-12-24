@@ -3,6 +3,7 @@ package com.example.rdt_pastillas.bd.remote.datasource;
 import android.content.Context;
 
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
 import com.example.rdt_pastillas.Modelo.response.LoginResponse;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiHelper;
@@ -66,6 +67,5 @@ public class UsuarioRemoteDataSource {
         Call<LoginResponse> call = apiService.loginUsuario(body);
         ApiHelper.execute(context, call, callback);
     }
-
 
 }

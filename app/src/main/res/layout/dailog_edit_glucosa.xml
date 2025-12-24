@@ -41,7 +41,7 @@
         style="@style/textfield_TextInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/txt_glucosa"
+            android:id="@+id/txt_nivel_glucosa"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"

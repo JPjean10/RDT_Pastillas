@@ -12,8 +12,8 @@
         android:title="glucosa" />
 
     <item
-        android:id="@+id/nav_slideshow"
-        android:icon="@drawable/ic_launcher_background"
-        android:title="Slideshow" />
+        android:id="@+id/nav_presion"
+        android:icon="@drawable/ic_menu_presion"
+        android:title="presión" />
 
 </menu>
