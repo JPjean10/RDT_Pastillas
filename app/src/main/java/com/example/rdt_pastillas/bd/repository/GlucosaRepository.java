@@ -10,7 +10,7 @@ import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity
 import com.example.rdt_pastillas.bd.remote.retrofit.Servicio.GlucosaService;
 import com.example.rdt_pastillas.bd.local.dao.GlucosaLocalDao;
 import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
-import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicio;
+import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
 import com.example.rdt_pastillas.util.alert.AlertaError;
 import com.example.rdt_pastillas.util.alert.AlertaExitoso;
 import com.example.rdt_pastillas.util.sesion.SessionManager;
@@ -53,7 +53,7 @@ public class GlucosaRepository {
                 // 2. Si el ID es válido (la inserción fue exitosa), guardar en el archivo .txt.
                 if (idGenerado > 0) {
                     GlucosaService.insertarGlucosa(context,idGenerado,sessionManager.getUserId(),nuevoGlucosa);
-                    TxtServicio.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado, nivel_glucosa, fechaFormateada, estado);
+                    TxtServicioUsuario.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado, nivel_glucosa, fechaFormateada, estado);
                     Log.d("GlucosaDao", "Registro guardado en BD con exito:");
                     Log.d("GlucosaDao", "Registro guardado en BD local con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
@@ -79,7 +79,7 @@ public class GlucosaRepository {
             try {
                 interfaz.editGlucosa(glucosa);
                 GlucosaService.editarGlucosa(context,glucosa);
-                TxtServicio.ActualizarGlucosaTxt(glucosa);
+                TxtServicioUsuario.ActualizarGlucosaTxt(glucosa);
                 Log.d("GlucosaDao", "Registro actualizado: " + "ID: " + glucosa.getId_glucosa() + " Nivel glucosa: " + glucosa.getNivel_glucosa()+ " Fecha: " + glucosa.getFecha_hora_creacion()+ " Estado: " + glucosa.isEstado());
             } catch (Exception e) {
                 Log.e("GlucosaDao", "Error al actualizar la glucosa", e);

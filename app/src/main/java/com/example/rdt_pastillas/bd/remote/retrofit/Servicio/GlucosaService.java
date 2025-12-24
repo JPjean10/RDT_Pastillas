@@ -9,7 +9,8 @@ import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.bd.remote.datasource.UsuarioRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
-import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicio;
+import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,8 +30,8 @@ public class GlucosaService {
                 AppDataBaseControl.databaseWriteExecutor.execute(() -> {
                     GlucosaLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(id);
-                    // El TxtServicio también puede ir aquí, ya que es una operación de I/O.
-                    TxtServicio.ActualizarEstadoEnTxt(id);
+                    // El TxtServicioUsuario también puede ir aquí, ya que es una operación de I/O.
+                    TxtServicioUsuario.ActualizarEstadoEnTxt(id);
                     Log.d(TAG, "Sincronización exitosa con el servidor remoto");
                 });
             }
@@ -54,8 +55,8 @@ public class GlucosaService {
                 AppDataBaseControl.databaseWriteExecutor.execute(() -> {
                     GlucosaLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(entidad.getId_glucosa());
-                    // El TxtServicio también puede ir aquí, ya que es una operación de I/O.
-                    TxtServicio.ActualizarEstadoEnTxt(entidad.getId_glucosa());
+                    // El TxtServicioUsuario también puede ir aquí, ya que es una operación de I/O.
+                    TxtServicioUsuario.ActualizarEstadoEnTxt(entidad.getId_glucosa());
 
                 });
             }

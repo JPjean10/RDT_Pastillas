@@ -25,7 +25,7 @@ public class MainApplication extends Application {
         SyncManager syncManager = new SyncManager(this);
         syncManager.iniciarSincronizacionCompleta();
 
-        programarEnvioDeCorreo();
+        /*programarEnvioDeCorreo();*/
     }
 
     private void programarEnvioDeCorreo() {

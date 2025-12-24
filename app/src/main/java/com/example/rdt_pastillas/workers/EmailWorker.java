@@ -82,7 +82,7 @@ public class EmailWorker extends Worker {
             MimeBodyPart attachmentPart = new MimeBodyPart();
             File documentsDir = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_DOCUMENTS);
-            File file = new File(documentsDir, "registros_glucosa.txt");
+            File file = new File(documentsDir, "registros_glucosa.csv");
             if (!file.exists()) {
                 Log.e(TAG, "El archivo no existe: " + file.getAbsolutePath());
                 return Result.failure();

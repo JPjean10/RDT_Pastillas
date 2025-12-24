@@ -9,8 +9,7 @@ import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.bd.remote.datasource.UsuarioRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
-import com.example.rdt_pastillas.bd.remote.retrofit.Servicio.GlucosaService;
-import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicio;
+import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -60,7 +59,7 @@ public class SyncManager {
      * (Interno) Lee registros del TXT y los inserta en Room.
      */
     private void poblarBdDesdeTxt() {
-        List<GlucosaEntity> registrosDelTxt = TxtServicio.leerTodosLosRegistrosTxt();
+        List<GlucosaEntity> registrosDelTxt = TxtServicioUsuario.leerTodosLosRegistrosTxt();
 
         if (registrosDelTxt != null && !registrosDelTxt.isEmpty()) {
             interfaz.insertAll(registrosDelTxt);
@@ -92,7 +91,7 @@ public class SyncManager {
                 public void onSuccess(ServerResponse response) {
                     Log.i(TAG, "Sincronización remota exitosa para ID: " + entidad.getId_glucosa() + ". Mensaje: " + response.getMensaje());
                     // Si la API tuvo éxito, actualizamos el estado local en un hilo de fondo
-                    TxtServicio.ActualizarEstadoEnTxt(entidad.getId_glucosa());
+                    TxtServicioUsuario.ActualizarEstadoEnTxt(entidad.getId_glucosa());
                     executor.execute(() -> {
                         interfaz.actualizarEstado(entidad.getId_glucosa());
                     });
@@ -113,7 +112,7 @@ public class SyncManager {
                 public void onSuccess(ServerResponse response) {
                     Log.i(TAG, "Sincronización remota exitosa para ID: " + entidad.getId_glucosa() + ". Mensaje: " + response.getMensaje());
                     // Si la API tuvo éxito, actualizamos el estado local en un hilo de fondo
-                    TxtServicio.ActualizarEstadoEnTxt(entidad.getId_glucosa());
+                    TxtServicioUsuario.ActualizarEstadoEnTxt(entidad.getId_glucosa());
                     executor.execute(() -> {
                         interfaz.actualizarEstado(entidad.getId_glucosa());
                     });
