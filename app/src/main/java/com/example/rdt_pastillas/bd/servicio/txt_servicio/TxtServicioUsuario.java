@@ -24,7 +24,7 @@ public class TxtServicioUsuario {
      * Inserta un registro de glucosa en el archivo txt.
      * Si el archivo no existe, crea el encabezado primero.
      */
-    public static void InsertarGlucosaTxt(Context context, long id_usuario, long id, int nivelGlucosa, String fecha_hora, boolean estado) {
+    public static void InsertarGlucosaTxt(Context context, long id_usuario, long id, GlucosaEntity entity) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "El almacenamiento externo no está disponible para escritura.");
             // Opcional: mostrar Toast
@@ -50,9 +50,9 @@ public class TxtServicioUsuario {
             // Creamos la línea de datos con el nuevo formato
             String registro = id_usuario + ";" +
                     id + ";" +
-                    nivelGlucosa + ";" +
-                    fecha_hora + ";" +
-                    estado;
+                    entity.getNivel_glucosa() + ";" +
+                    entity.getFecha_hora_creacion() + ";" +
+                    entity.isEstado();
 
             writer.append(registro);
             writer.append(System.lineSeparator()); // Añadimos siempre un salto de línea

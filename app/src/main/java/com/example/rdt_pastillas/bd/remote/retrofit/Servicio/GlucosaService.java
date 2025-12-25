@@ -7,7 +7,7 @@ import com.example.rdt_pastillas.Modelo.response.ServerResponse;
 import com.example.rdt_pastillas.bd.local.dao.GlucosaLocalDao;
 import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
-import com.example.rdt_pastillas.bd.remote.datasource.UsuarioRemoteDataSource;
+import com.example.rdt_pastillas.bd.remote.datasource.GlucosaRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
 import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
 
@@ -23,7 +23,7 @@ public class GlucosaService {
 
         GlucosaEntity nuevoGlucosa = new GlucosaEntity(id_usuario,id,entidad.getNivel_glucosa());
 
-        UsuarioRemoteDataSource remote = new UsuarioRemoteDataSource();
+        GlucosaRemoteDataSource remote = new GlucosaRemoteDataSource();
         remote.insertar_glucosa(context, nuevoGlucosa, new ApiCallback<ServerResponse>() {
             @Override
             public void onSuccess(ServerResponse response) {
@@ -46,10 +46,15 @@ public class GlucosaService {
     }
 
     public static void editarGlucosa(Context context,GlucosaEntity entidad) {
-        UsuarioRemoteDataSource remote = new UsuarioRemoteDataSource();
+
+        GlucosaEntity glucosaParaActualizar = entidad;
+
+        glucosaParaActualizar.setEstado(true);
+
+        GlucosaRemoteDataSource remote = new GlucosaRemoteDataSource();
 
         // 2. Sincronizar la edición con el servidor remoto usando Retrofit
-        remote.editar_glucosa(context, entidad, new ApiCallback<ServerResponse>() {
+        remote.editar_glucosa(context, glucosaParaActualizar, new ApiCallback<ServerResponse>() {
             @Override
             public void onSuccess(ServerResponse response) {
                 AppDataBaseControl.databaseWriteExecutor.execute(() -> {
@@ -57,7 +62,6 @@ public class GlucosaService {
                     dao.actualizarEstado(entidad.getId_glucosa());
                     // El TxtServicioUsuario también puede ir aquí, ya que es una operación de I/O.
                     TxtServicioUsuario.ActualizarEstadoEnTxt(entidad.getId_glucosa());
-
                 });
             }
 

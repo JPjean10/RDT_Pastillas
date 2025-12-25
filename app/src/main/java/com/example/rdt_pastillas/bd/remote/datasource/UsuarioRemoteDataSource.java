@@ -30,36 +30,6 @@ public class UsuarioRemoteDataSource {
         ApiHelper.execute(context, call, callback);
     }
 
-    public void insertar_glucosa(Context context, GlucosaEntity glucosa, ApiCallback<ServerResponse> callback) {
-        // 1. Prepara la llamada específica para insertar un usuario
-        Call<ServerResponse> call = apiService.InsertarGlucosa(glucosa);
-
-        // 2. Delega la ejecución y el manejo del ProgressDialog al método genérico
-        ApiHelper.execute(context, call, callback);
-    }
-
-    public void sincronizar_glucosa(Context context, GlucosaEntity glucosa, ApiCallback<ServerResponse> callback) {
-        Call<ServerResponse> call = apiService.sincronizarGlucosa(glucosa);
-
-        ApiHelper.execute(context, call, callback);
-    }
-
-    public void editar_glucosa(Context context, GlucosaEntity glucosa, ApiCallback<ServerResponse> callback) {
-        // Prepara la llamada específica para editar glucosa
-        Call<ServerResponse> call = apiService.EditarGlucosa(glucosa);
-
-        // Delega la ejecución al ApiHelper genérico
-        ApiHelper.execute(context, call, callback);
-    }
-
-    public void sincronizarGlucosaAc(Context context, GlucosaEntity glucosa, ApiCallback<ServerResponse> callback) {
-        // Prepara la llamada específica para editar glucosa
-        Call<ServerResponse> call = apiService.sincronizarGlucosaAc(glucosa);
-
-        // Delega la ejecución al ApiHelper genérico
-        ApiHelper.execute(context, call, callback);
-    }
-
     public void login(Context context, String usuario, String contrasena, ApiCallback<LoginResponse> callback) {
         // Creamos un objeto entidad solo para enviar las credenciales
         UsuarioEntity body = new UsuarioEntity(usuario, contrasena);

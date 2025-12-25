@@ -7,6 +7,7 @@ import com.example.rdt_pastillas.Modelo.response.ServerResponse;
 import com.example.rdt_pastillas.bd.local.dao.GlucosaLocalDao;
 import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
+import com.example.rdt_pastillas.bd.remote.datasource.GlucosaRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.datasource.UsuarioRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
 import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
@@ -20,14 +21,14 @@ public class SyncManager {
     private final ExecutorService executor;
     private final GlucosaLocalDao interfaz;
     private final Context context;
-    private final UsuarioRemoteDataSource remoteDataSource;
+    private final GlucosaRemoteDataSource remoteDataSource;
 
     public SyncManager(Context context) {
         this.context = context.getApplicationContext();
         AppDataBaseControl db = AppDataBaseControl.getDatabase(this.context);
         this.interfaz = db.glucosa_interfaz();
         this.executor = AppDataBaseControl.databaseWriteExecutor;
-        this.remoteDataSource = new UsuarioRemoteDataSource();
+        this.remoteDataSource = new GlucosaRemoteDataSource();
     }
 
     /**
@@ -86,7 +87,11 @@ public class SyncManager {
             Log.d(TAG, "Intentando sincronizar registro con ID local: " + entidad.getId_glucosa());
 
             // Usamos el nuevo método con Retrofit
-            remoteDataSource.sincronizar_glucosa(context, entidad, new ApiCallback<ServerResponse>() {
+
+            GlucosaEntity glucosaParaActualizar = entidad;
+
+            glucosaParaActualizar.setEstado(true);
+            remoteDataSource.insertar_glucosa(context, entidad, new ApiCallback<ServerResponse>() {
                 @Override
                 public void onSuccess(ServerResponse response) {
                     Log.i(TAG, "Sincronización remota exitosa para ID: " + entidad.getId_glucosa() + ". Mensaje: " + response.getMensaje());
@@ -107,7 +112,7 @@ public class SyncManager {
                     Log.e(TAG, "Fallo de red al sincronizar ID " + entidad.getId_glucosa() + ": " + failureMessage);
                 }
             });
-            remoteDataSource.sincronizarGlucosaAc(context, entidad, new ApiCallback<ServerResponse>() {
+            remoteDataSource.editar_glucosa(context, glucosaParaActualizar, new ApiCallback<ServerResponse>() {
                 @Override
                 public void onSuccess(ServerResponse response) {
                     Log.i(TAG, "Sincronización remota exitosa para ID: " + entidad.getId_glucosa() + ". Mensaje: " + response.getMensaje());

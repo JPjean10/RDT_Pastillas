@@ -20,14 +20,8 @@ public interface ApiService {
     @POST(ApiConst.GLUCOSA)
     Call<ServerResponse> InsertarGlucosa(@Body GlucosaEntity glucosa);
 
-    @POST(ApiConst.GLUCOSA + ApiConst.SINCRONIZAR)
-    Call<ServerResponse> sincronizarGlucosa(@Body GlucosaEntity glucosa);
-
     @PUT(ApiConst.GLUCOSA)
     Call<ServerResponse> EditarGlucosa(@Body GlucosaEntity glucosa);
-
-    @PUT(ApiConst.GLUCOSA + ApiConst.SINCRONIZAR) // Se usa PUT basado en tu última imagen
-    Call<ServerResponse> sincronizarGlucosaAc(@Body GlucosaEntity glucosa);
 
     @POST(ApiConst.USUARIO + ApiConst.LOGIN)
     Call<LoginResponse> loginUsuario(@Body UsuarioEntity usuario);

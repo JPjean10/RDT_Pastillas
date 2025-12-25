@@ -37,14 +37,8 @@ public class GlucosaRepository {
     }
 
     public void insert(int nivel_glucosa) {
-        // 1. Define el formato deseado.
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        // 2. Crea el String con la fecha actual formateada.
-        String fechaFormateada = sdf.format(new Date());
-        // 3. Define el estado. En este caso, siempre es 'false' al insertar.
-        boolean estado = false;
 
-        GlucosaEntity nuevoGlucosa = new GlucosaEntity(sessionManager.getUserId(),nivel_glucosa,fechaFormateada,estado);
+        GlucosaEntity nuevoGlucosa = new GlucosaEntity(sessionManager.getUserId(),nivel_glucosa);
         databaseWriteExecutor.execute(() -> {
             try {
                 // 1. Insertar en la base de datos y obtener el ID generado.
@@ -52,8 +46,8 @@ public class GlucosaRepository {
 
                 // 2. Si el ID es válido (la inserción fue exitosa), guardar en el archivo .txt.
                 if (idGenerado > 0) {
+                    TxtServicioUsuario.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado,nuevoGlucosa);
                     GlucosaService.insertarGlucosa(context,idGenerado,sessionManager.getUserId(),nuevoGlucosa);
-                    TxtServicioUsuario.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado, nivel_glucosa, fechaFormateada, estado);
                     Log.d("GlucosaDao", "Registro guardado en BD con exito:");
                     Log.d("GlucosaDao", "Registro guardado en BD local con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
@@ -80,7 +74,6 @@ public class GlucosaRepository {
                 interfaz.editGlucosa(glucosa);
                 GlucosaService.editarGlucosa(context,glucosa);
                 TxtServicioUsuario.ActualizarGlucosaTxt(glucosa);
-                Log.d("GlucosaDao", "Registro actualizado: " + "ID: " + glucosa.getId_glucosa() + " Nivel glucosa: " + glucosa.getNivel_glucosa()+ " Fecha: " + glucosa.getFecha_hora_creacion()+ " Estado: " + glucosa.isEstado());
             } catch (Exception e) {
                 Log.e("GlucosaDao", "Error al actualizar la glucosa", e);
                 // Considera mostrar una alerta de error si es necesario.

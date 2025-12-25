@@ -4,6 +4,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 @Entity(tableName = "GlucosaEntity")
 public class GlucosaEntity {
 
@@ -20,8 +24,18 @@ public class GlucosaEntity {
         this.id_usuario = id_usuario;
         this.id_glucosa = id_glucosa;
         this.nivel_glucosa = nivel_glucosa;
+        this.fecha_hora_creacion = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        this.estado = true;
     }
 
+    public GlucosaEntity(long id_usuario,int nivel_glucosa) {
+        this.id_usuario = id_usuario;
+        this.nivel_glucosa = nivel_glucosa;
+        this.fecha_hora_creacion = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        this.estado = false;
+    }
+
+    @Ignore
     public GlucosaEntity(long id_usuario,int nivel_glucosa, String fecha_hora_creacion, boolean estado) {
         this.id_usuario = id_usuario;
         this.nivel_glucosa = nivel_glucosa;
