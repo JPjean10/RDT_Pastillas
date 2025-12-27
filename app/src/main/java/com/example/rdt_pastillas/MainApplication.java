@@ -9,7 +9,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import com.example.rdt_pastillas.bd.local.SyncService.SyncManager;
+import com.example.rdt_pastillas.bd.SyncService.SyncManager;
 import com.example.rdt_pastillas.workers.EmailWorker;
 
 import java.util.concurrent.TimeUnit;

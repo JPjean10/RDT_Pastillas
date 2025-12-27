@@ -1,14 +1,15 @@
-package com.example.rdt_pastillas.bd.local.SyncService;
+package com.example.rdt_pastillas.bd.SyncService;
 
 import android.content.Context;
 import android.util.Log;
 
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
 import com.example.rdt_pastillas.Modelo.response.ServerResponse;
 import com.example.rdt_pastillas.bd.local.dao.GlucosaLocalDao;
+import com.example.rdt_pastillas.bd.local.dao.PresionLocalDao;
 import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.bd.remote.datasource.GlucosaRemoteDataSource;
-import com.example.rdt_pastillas.bd.remote.datasource.UsuarioRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
 import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
 
@@ -19,14 +20,16 @@ public class SyncManager {
 
     private static final String TAG = "SyncManager";
     private final ExecutorService executor;
-    private final GlucosaLocalDao interfaz;
+    private final GlucosaLocalDao IGlucosa;
+    private final PresionLocalDao IPresion;
     private final Context context;
     private final GlucosaRemoteDataSource remoteDataSource;
 
     public SyncManager(Context context) {
         this.context = context.getApplicationContext();
         AppDataBaseControl db = AppDataBaseControl.getDatabase(this.context);
-        this.interfaz = db.glucosa_interfaz();
+        this.IGlucosa = db.glucosa_interfaz();
+        this.IPresion = db.presion_interfaz();
         this.executor = AppDataBaseControl.databaseWriteExecutor;
         this.remoteDataSource = new GlucosaRemoteDataSource();
     }
@@ -40,7 +43,7 @@ public class SyncManager {
             Log.d(TAG, "INICIO: Proceso de Sincronización Automática.");
 
             // PASO 1: VERIFICAR SI LA BD LOCAL ESTÁ VACÍA
-            if (interfaz.countGlucosa() == 0) {
+            if (IGlucosa.countGlucosa() == 0) {
                 Log.i(TAG, "BD local vacía. Intentando poblar desde archivo .txt...");
                 poblarBdDesdeTxt();
             } else {
@@ -63,7 +66,7 @@ public class SyncManager {
         List<GlucosaEntity> registrosDelTxt = TxtServicioUsuario.leerTodosLosRegistrosTxt();
 
         if (registrosDelTxt != null && !registrosDelTxt.isEmpty()) {
-            interfaz.insertAll(registrosDelTxt);
+            IGlucosa.insertAll(registrosDelTxt);
             Log.i(TAG, "ÉXITO: Se insertaron " + registrosDelTxt.size() + " registros desde el .txt a la BD local.");
         } else {
             Log.w(TAG, "AVISO: No se encontraron registros en el archivo .txt para poblar la BD.");
@@ -74,16 +77,18 @@ public class SyncManager {
      * (Interno) Obtiene todos los registros con estado=false y los envía al servidor.
      */
     private void sincronizarPendientesConServidor() {
-        List<GlucosaEntity> registrosNoSincronizados = interfaz.getRegistrosNoSincronizados();
+        List<GlucosaEntity> registrosNoSyncGlucosa = IGlucosa.getRegistrosNoSincronizados();
+        List<PresionEntity> registrosNoSyncPresion = IPresion.getRegistrosNoSincronizados();
 
-        if (registrosNoSincronizados.isEmpty()) {
+
+        if (registrosNoSyncGlucosa.isEmpty() ) {
             Log.i(TAG, "ÉXITO: No hay registros pendientes de sincronizar con MySQL.");
             return;
         }
 
-        Log.i(TAG, "Se encontraron " + registrosNoSincronizados.size() + " registros para sincronizar.");
+        Log.i(TAG, "Se encontraron " + registrosNoSyncGlucosa.size() + " registros para sincronizar.");
 
-        for (final GlucosaEntity entidad : registrosNoSincronizados) {
+        for (final GlucosaEntity entidad : registrosNoSyncGlucosa) {
             Log.d(TAG, "Intentando sincronizar registro con ID local: " + entidad.getId_glucosa());
 
             // Usamos el nuevo método con Retrofit
@@ -98,7 +103,7 @@ public class SyncManager {
                     // Si la API tuvo éxito, actualizamos el estado local en un hilo de fondo
                     TxtServicioUsuario.ActualizarEstadoEnTxt(entidad.getId_glucosa());
                     executor.execute(() -> {
-                        interfaz.actualizarEstado(entidad.getId_glucosa());
+                        IGlucosa.actualizarEstado(entidad.getId_glucosa());
                     });
                 }
 
@@ -119,7 +124,7 @@ public class SyncManager {
                     // Si la API tuvo éxito, actualizamos el estado local en un hilo de fondo
                     TxtServicioUsuario.ActualizarEstadoEnTxt(entidad.getId_glucosa());
                     executor.execute(() -> {
-                        interfaz.actualizarEstado(entidad.getId_glucosa());
+                        IGlucosa.actualizarEstado(entidad.getId_glucosa());
                     });
                 }
 

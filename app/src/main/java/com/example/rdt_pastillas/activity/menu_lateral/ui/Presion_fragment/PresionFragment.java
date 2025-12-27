@@ -16,17 +16,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.Adapter.PresionAdapter;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.componentes.PresionEditDailog;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.componentes.PresionInsertDailog;
 import com.example.rdt_pastillas.bd.repository.PresionRepository;
 import com.example.rdt_pastillas.util.dailog.AnioMesDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class PresionFragment extends Fragment implements
         PresionAdapter.OnItemClickListener,
-        PresionInsertDailog.insertOnClickedDailog {
+        PresionInsertDailog.insertOnClickedDailog,
+        PresionEditDailog.EditOnClickedDailog {
 
     private String fechaGuardada; // Formato "yyyy/MM"
     private EditText btn_fecha;
@@ -120,12 +123,29 @@ public class PresionFragment extends Fragment implements
     public void insertOnClickedDailog(int sys, int dia, int pul) {
         servicio.insert(sys,dia,pul);
     }
-
     @Override
-    public void onEditClick(PresionEntity presion) {
-        Toast.makeText(getContext(), "Editar ID: " + presion.getId_presion(), Toast.LENGTH_SHORT).show();
+    public void EditOnClickedDailog(PresionEntity presion, int sys, int dia, int pul) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        // 2. Crea el String con la fecha actual formateada.
+        String fechaFormateada = sdf.format(new Date());
+
+        PresionEntity presionParaActualizar = presion;
+
+        // 2. Actualiza solo los campos que cambiaron.
+        presionParaActualizar.setSys(sys);
+        presionParaActualizar.setDia(dia);
+        presionParaActualizar.setPul(pul);
+        presionParaActualizar.setFecha_hora_creacion(fechaFormateada);
+        presionParaActualizar.setEstado(false);
+
+        servicio.edit(presionParaActualizar);
     }
     //______________________________________________________________________________________________
     // adapter______________________________________________________________________________________
+    @Override
+    public void onEditClick(PresionEntity presion) {
+       PresionEditDailog dialog = new PresionEditDailog(getContext(), presion, PresionFragment.this);
+        dialog.show();
+    }
     //______________________________________________________________________________________________
 }
