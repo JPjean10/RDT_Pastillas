@@ -28,7 +28,7 @@ public class PresionInsertDailog {
 
     public void show() {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.dailog_insert_presion, null);
+        View view = inflater.inflate(R.layout.dailog_presion, null);
 
         final TextInputEditText txt_sys = view.findViewById(R.id.txt_sys);
         final TextInputEditText txt_dia = view.findViewById(R.id.txt_dia);

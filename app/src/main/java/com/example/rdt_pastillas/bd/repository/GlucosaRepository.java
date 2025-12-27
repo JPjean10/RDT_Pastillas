@@ -67,7 +67,6 @@ public class GlucosaRepository {
             }
         });
     }
-
     public void edit(GlucosaEntity glucosa) {
         databaseWriteExecutor.execute(() -> {
             try {

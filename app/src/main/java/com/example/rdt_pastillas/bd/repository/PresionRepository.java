@@ -63,4 +63,19 @@ public class PresionRepository {
         });
     }
 
+    public androidx.lifecycle.LiveData<java.util.List<PresionEntity>> obtenerPresionPorMes(String filtroFecha) {
+        return interfaz.getPresionFiltradaPorMes(filtroFecha);
+    }
+
+    public void edit(PresionEntity presion) {
+        databaseWriteExecutor.execute(() -> {
+            try {
+                interfaz.editPresion(presion);
+            } catch (Exception e) {
+                Log.e(TAG, "Error al actualizar la presión", e);
+                // Considera mostrar una alerta de error si es necesario.
+            }
+        });
+    }
+
 }

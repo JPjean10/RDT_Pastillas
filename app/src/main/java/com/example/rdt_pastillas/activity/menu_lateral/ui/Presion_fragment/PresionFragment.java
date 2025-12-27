@@ -6,13 +6,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
 import com.example.rdt_pastillas.R;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.Adapter.PresionAdapter;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.componentes.PresionInsertDailog;
 import com.example.rdt_pastillas.bd.repository.PresionRepository;
 import com.example.rdt_pastillas.util.dailog.AnioMesDialog;
@@ -22,6 +25,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class PresionFragment extends Fragment implements
+        PresionAdapter.OnItemClickListener,
         PresionInsertDailog.insertOnClickedDailog {
 
     private String fechaGuardada; // Formato "yyyy/MM"
@@ -29,6 +33,7 @@ public class PresionFragment extends Fragment implements
     private Button btn_agregar;
     private RecyclerView recyclerView;
     private PresionRepository servicio;
+    private PresionAdapter adapter;
 
 
     @Nullable
@@ -40,7 +45,7 @@ public class PresionFragment extends Fragment implements
 
         btn_fecha = view.findViewById(R.id.btn_seleccionar_fecha);
         btn_agregar = view.findViewById(R.id.btn_agregar);
-        recyclerView = view.findViewById(R.id.recycler_view_glucosa);
+        recyclerView = view.findViewById(R.id.recycler_view_presion);
 
         establecerFechaInicial();
 
@@ -50,6 +55,11 @@ public class PresionFragment extends Fragment implements
             PresionInsertDailog dialog = new PresionInsertDailog(getContext(), PresionFragment.this);
             dialog.show();
         });
+
+        adapter = new PresionAdapter();
+        recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+        adapter.setOnItemClickListener(this);
 
         return view;
     }
@@ -70,7 +80,18 @@ public class PresionFragment extends Fragment implements
         btn_fecha.setText(fechaMostrada);
 
         // Llama al método del ViewModel para aplicar el filtro inicial
+        cargarDatos(fechaGuardada);
     }
+
+    private void cargarDatos(String fechaFiltro) {
+        // Observamos el LiveData del repositorio
+        // Nota: El formato en BD es "yyyy-MM-dd...", así que filtramos por "yyyy-MM"
+        // Asegúrate de que tu DAO usa LIKE :filtro || '%' correctamente
+        servicio.obtenerPresionPorMes(fechaFiltro).observe(getViewLifecycleOwner(), lista -> {
+            adapter.setListaPresion(lista);
+        });
+    }
+
     //_______________________________________________________________________________________________
     // dailog________________________________________________________________________________________
     private void AbrirDailogFecha() {
@@ -89,7 +110,7 @@ public class PresionFragment extends Fragment implements
             this.btn_fecha.setText(fechaMostrada);
 
             // 2. Notificar al ViewModel el nuevo filtro
-
+            cargarDatos(fechaGuardada);
         }, initialYear);
 
         dialog.show(getParentFragmentManager(), "AnioMesDialog");
@@ -98,6 +119,11 @@ public class PresionFragment extends Fragment implements
     @Override
     public void insertOnClickedDailog(int sys, int dia, int pul) {
         servicio.insert(sys,dia,pul);
+    }
+
+    @Override
+    public void onEditClick(PresionEntity presion) {
+        Toast.makeText(getContext(), "Editar ID: " + presion.getId_presion(), Toast.LENGTH_SHORT).show();
     }
     //______________________________________________________________________________________________
     // adapter______________________________________________________________________________________

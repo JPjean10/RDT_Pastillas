@@ -1,4 +1,4 @@
-package com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.dailog;
+package com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes;
 
 import android.content.Context;
 import android.view.LayoutInflater;

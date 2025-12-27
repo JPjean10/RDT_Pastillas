@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Fecha -->
+        <TextView
+            android:id="@+id/tv_fecha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2025/10/27 08:30"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- SYS -->
+        <TextView
+            android:id="@+id/tv_sys_valor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="120"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toStartOf="@+id/divider1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_fecha" />
+
+        <TextView
+            android:id="@+id/tv_sys_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SYS / mmhg"
+            android:textColor="#666666"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_sys_valor"
+            app:layout_constraintStart_toStartOf="@+id/tv_sys_valor"
+            app:layout_constraintTop_toBottomOf="@+id/tv_sys_valor" />
+
+        <!-- Divisor 1 -->
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="#CCCCCC"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_sys_label"
+            app:layout_constraintEnd_toStartOf="@+id/tv_dia_valor"
+            app:layout_constraintStart_toEndOf="@+id/tv_sys_valor"
+            app:layout_constraintTop_toTopOf="@+id/tv_sys_valor" />
+
+        <!-- DIA -->
+        <TextView
+            android:id="@+id/tv_dia_valor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="90"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toStartOf="@+id/divider2"
+            app:layout_constraintStart_toEndOf="@+id/divider1"
+            app:layout_constraintTop_toBottomOf="@+id/tv_fecha" />
+
+        <TextView
+            android:id="@+id/tv_dia_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DIA / mmhg"
+            android:textColor="#666666"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_dia_valor"
+            app:layout_constraintStart_toStartOf="@+id/tv_dia_valor"
+            app:layout_constraintTop_toBottomOf="@+id/tv_dia_valor" />
+
+        <!-- Divisor 2 -->
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="#CCCCCC"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_dia_label"
+            app:layout_constraintEnd_toStartOf="@+id/tv_pul_valor"
+            app:layout_constraintStart_toEndOf="@+id/tv_dia_valor"
+            app:layout_constraintTop_toTopOf="@+id/tv_dia_valor" />
+
+        <!-- PUL -->
+        <TextView
+            android:id="@+id/tv_pul_valor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="70"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/divider2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_fecha" />
+
+        <TextView
+            android:id="@+id/tv_pul_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PUL / min"
+            android:textColor="#666666"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_pul_valor"
+            app:layout_constraintStart_toStartOf="@+id/tv_pul_valor"
+            app:layout_constraintTop_toBottomOf="@+id/tv_pul_valor" />
+
+        <!-- Botón Editar -->
+        <ImageView
+            android:id="@+id/btn_editar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="Editar"
+            android:src="@drawable/ic_edit_24"
+            app:tint="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_sys_label" />
+
+        <!-- Icono Estado (Nube tachada) -->
+        <ImageView
+            android:id="@+id/img_estado"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="Estado Sincronización"
+            android:src="@drawable/ic_cloud_off_24"
+            app:tint="#FF0000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_pul_label" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
