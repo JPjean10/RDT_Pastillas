@@ -34,4 +34,12 @@ public class GlucosaRemoteDataSource {
         ApiHelper.execute(context, call, callback);
     }
 
+    public void sincronizar_glucosa(Context context, GlucosaEntity glucosa, ApiCallback<ServerResponse> callback) {
+        // 1. Prepara la llamada específica para insertar un usuario
+        Call<ServerResponse> call = apiService.SincronizarGlucosa(glucosa);
+
+        // 2. Delega la ejecución y el manejo del ProgressDialog al método genérico
+        ApiHelper.execute(context, call, callback);
+    }
+
 }

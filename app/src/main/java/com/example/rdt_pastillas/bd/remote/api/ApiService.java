@@ -17,16 +17,21 @@ public interface ApiService {
     @POST(ApiConst.USUARIO)
     Call<ServerResponse> InsertarUsuario(@Body UsuarioEntity usuario);
 
+    @POST(ApiConst.USUARIO + ApiConst.LOGIN)
+    Call<LoginResponse> loginUsuario(@Body UsuarioEntity usuario);
+
     @POST(ApiConst.GLUCOSA)
     Call<ServerResponse> InsertarGlucosa(@Body GlucosaEntity glucosa);
 
     @PUT(ApiConst.GLUCOSA)
     Call<ServerResponse> EditarGlucosa(@Body GlucosaEntity glucosa);
 
-    @POST(ApiConst.USUARIO + ApiConst.LOGIN)
-    Call<LoginResponse> loginUsuario(@Body UsuarioEntity usuario);
-
     @POST(ApiConst.PRESION)
     Call<ServerResponse> InsertarPresion(@Body PresionEntity presion);
 
+    @PUT(ApiConst.PRESION)
+    Call<ServerResponse> EditarPresion(@Body PresionEntity presion);
+
+    @POST(ApiConst.GLUCOSA + ApiConst.SINCRONIZAR)
+    Call<ServerResponse> SincronizarGlucosa(@Body GlucosaEntity glucosa);
 }

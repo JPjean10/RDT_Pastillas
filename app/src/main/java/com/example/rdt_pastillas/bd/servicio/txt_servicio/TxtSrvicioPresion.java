@@ -109,6 +109,54 @@ public class TxtSrvicioPresion {
         }
     }
 
+    public static void ActualizarPresionTxt(PresionEntity entidad) {
+        if (!isExternalStorageWritable()) {
+            Log.e(TAG, "Almacenamiento no disponible.");
+            return;
+        }
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FILE_NAME);
+        if (!file.exists()) {
+            Log.e(TAG, "El archivo " + FILE_NAME + " no existe. No se puede actualizar.");
+            return;
+        }
+
+        List<String> lines = leerLineasDeArchivo(file);
+        if (lines == null) return;
+
+        boolean recordModified = false;
+        for (int i = 0; i < lines.size(); i++) {
+            String currentLine = lines.get(i);
+            String[] parts = currentLine.split(";", -1);
+
+            if (parts.length == 7 && !currentLine.startsWith("ID_usuario")) {
+                try {
+                    long currentId = Long.parseLong(parts[1]);
+                    if (currentId == entidad.getId_presion()) {
+                        String linea = entidad.getId_usuario() + ";" +
+                                entidad.getId_presion() + ";" +
+                                entidad.getSys() + ";" +
+                                entidad.getDia() + ";" +
+                                entidad.getPul() + ";" +
+                                entidad.getFecha_hora_creacion() + ";" +
+                                entidad.isEstado();
+                        lines.set(i, linea);
+                        recordModified = true;
+                        Log.d(TAG, "Registro actualizado en memoria para ID_presion " + entidad.getId_presion());
+                        break;
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignorar línea
+                }
+            }
+        }
+        if (recordModified) {
+            escribirLineasEnArchivo(file, lines);
+            Log.d(TAG, "Archivo CSV actualizado para ID_presion " + entidad.getId_presion());
+        } else {
+            Log.w(TAG, "No se encontró el registro con ID_presion " + entidad.getId_presion() + " para actualizar.");
+        }
+    }
+
     private static boolean isExternalStorageWritable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }

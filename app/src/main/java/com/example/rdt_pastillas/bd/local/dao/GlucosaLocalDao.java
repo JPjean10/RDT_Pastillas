@@ -36,7 +36,7 @@ public interface GlucosaLocalDao {
     void insertAll(List<GlucosaEntity> glucosas);
 
     /** 3. Obtiene todos los registros que NO han sido sincronizados con el servidor. */
-    @Query("SELECT * FROM GlucosaEntity")
+    @Query("SELECT * FROM GlucosaEntity WHERE estado = 0")
     List<GlucosaEntity> getRegistrosNoSincronizados();
 
 }

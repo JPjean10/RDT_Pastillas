@@ -71,8 +71,8 @@ public class GlucosaRepository {
         databaseWriteExecutor.execute(() -> {
             try {
                 interfaz.editGlucosa(glucosa);
-                GlucosaService.editarGlucosa(context,glucosa);
                 TxtServicioUsuario.ActualizarGlucosaTxt(glucosa);
+                GlucosaService.editarGlucosa(context,glucosa);
             } catch (Exception e) {
                 Log.e("GlucosaDao", "Error al actualizar la glucosa", e);
                 // Considera mostrar una alerta de error si es necesario.

@@ -27,6 +27,6 @@ public interface PresionLocalDao {
     void editPresion(PresionEntity presion);
 
     /** 3. Obtiene todos los registros que NO han sido sincronizados con el servidor. */
-    @Query("SELECT * FROM PresionEntity")
+    @Query("SELECT * FROM PresionEntity WHERE estado = 0")
     List<PresionEntity> getRegistrosNoSincronizados();
 }

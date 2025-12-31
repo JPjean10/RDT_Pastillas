@@ -44,4 +44,33 @@ public class PresionServicio {
             }
         });
     }
+
+    public static void editarPresion(Context context, PresionEntity entidad) {
+        PresionEntity presionParaActualizar = entidad;
+
+        presionParaActualizar.setEstado(true);
+
+        PresionRemoteDataSource remote = new PresionRemoteDataSource();
+
+        remote.editar_presion(context, presionParaActualizar, new ApiCallback<ServerResponse>() {
+            @Override
+            public void onSuccess(ServerResponse response) {
+                AppDataBaseControl.databaseWriteExecutor.execute(() -> {
+                    PresionLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).presion_interfaz();
+                    dao.actualizarEstado(entidad.getId_presion());
+                    // El TxtServicioUsuario también puede ir aquí, ya que es una operación de I/O.
+                    TxtSrvicioPresion.ActualizarEstadoEnTxt(entidad.getId_presion());
+                });
+                }
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("PresionRepository", "Error de API al editar presión: " + errorMessage);
+            }
+
+            @Override
+            public void onFailure(String failureMessage) {
+                Log.e("PresionRepository", "Fallo de red al editar presión: " + failureMessage);
+            }
+        });
+    }
 }

@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
 import com.example.rdt_pastillas.bd.local.dao.PresionLocalDao;
 import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
@@ -15,6 +17,7 @@ import com.example.rdt_pastillas.util.alert.AlertaError;
 import com.example.rdt_pastillas.util.alert.AlertaExitoso;
 import com.example.rdt_pastillas.util.sesion.SessionManager;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class PresionRepository {
@@ -63,7 +66,7 @@ public class PresionRepository {
         });
     }
 
-    public androidx.lifecycle.LiveData<java.util.List<PresionEntity>> obtenerPresionPorMes(String filtroFecha) {
+    public LiveData<List<PresionEntity>> obtenerPresionPorMes(String filtroFecha) {
         return interfaz.getPresionFiltradaPorMes(filtroFecha);
     }
 
@@ -71,6 +74,8 @@ public class PresionRepository {
         databaseWriteExecutor.execute(() -> {
             try {
                 interfaz.editPresion(presion);
+                TxtSrvicioPresion.ActualizarPresionTxt(presion);
+                PresionServicio.editarPresion(context,presion);
             } catch (Exception e) {
                 Log.e(TAG, "Error al actualizar la presión", e);
                 // Considera mostrar una alerta de error si es necesario.
