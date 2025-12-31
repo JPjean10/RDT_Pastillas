@@ -34,4 +34,7 @@ public interface ApiService {
 
     @POST(ApiConst.GLUCOSA + ApiConst.SINCRONIZAR)
     Call<ServerResponse> SincronizarGlucosa(@Body GlucosaEntity glucosa);
+
+    @POST(ApiConst.PRESION + ApiConst.SINCRONIZAR)
+    Call<ServerResponse> SincronizarPresion(@Body PresionEntity presion);
 }

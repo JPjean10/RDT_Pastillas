@@ -9,7 +9,7 @@ import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.bd.remote.datasource.GlucosaRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
-import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
+import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioGlucosa;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,8 +30,8 @@ public class GlucosaService {
                 AppDataBaseControl.databaseWriteExecutor.execute(() -> {
                     GlucosaLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(id);
-                    // El TxtServicioUsuario también puede ir aquí, ya que es una operación de I/O.
-                    TxtServicioUsuario.ActualizarEstadoEnTxt(id);
+                    // El TxtServicioGlucosa también puede ir aquí, ya que es una operación de I/O.
+                    TxtServicioGlucosa.ActualizarEstadoEnTxt(id);
                     Log.d(TAG, "Sincronización exitosa con el servidor remoto");
                 });
             }
@@ -60,8 +60,8 @@ public class GlucosaService {
                 AppDataBaseControl.databaseWriteExecutor.execute(() -> {
                     GlucosaLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(entidad.getId_glucosa());
-                    // El TxtServicioUsuario también puede ir aquí, ya que es una operación de I/O.
-                    TxtServicioUsuario.ActualizarEstadoEnTxt(entidad.getId_glucosa());
+                    // El TxtServicioGlucosa también puede ir aquí, ya que es una operación de I/O.
+                    TxtServicioGlucosa.ActualizarEstadoEnTxt(entidad.getId_glucosa());
                 });
             }
 

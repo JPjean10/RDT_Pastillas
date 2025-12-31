@@ -12,7 +12,7 @@ import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity
 import com.example.rdt_pastillas.bd.remote.datasource.GlucosaRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.datasource.PresionRemoteDataSource;
 import com.example.rdt_pastillas.bd.remote.retrofit.ApiCallback;
-import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
+import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioGlucosa;
 import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtSrvicioPresion;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class SyncManager {
      * (Interno) Lee registros del TXT y los inserta en Room.
      */
     private void poblarBdDesdeTxt() {
-        List<GlucosaEntity> registrosDelTxt = TxtServicioUsuario.leerTodosLosRegistrosTxt();
+        List<GlucosaEntity> registrosDelTxt = TxtServicioGlucosa.leerTodosLosRegistrosTxt();
 
         if (registrosDelTxt != null && !registrosDelTxt.isEmpty()) {
             IGlucosa.insertAll(registrosDelTxt);
@@ -83,12 +83,6 @@ public class SyncManager {
     private void sincronizarPendientesConServidor() {
         List<GlucosaEntity> registrosNoSyncGlucosa = IGlucosa.getRegistrosNoSincronizados();
         List<PresionEntity> registrosNoSyncPresion = IPresion.getRegistrosNoSincronizados();
-
-
-        if (registrosNoSyncGlucosa.isEmpty()) {
-            Log.i(TAG, "ÉXITO: No hay registros pendientes de sincronizar con MySQL.");
-            return;
-        }
 
         Log.i(TAG, "Se encontraron " + registrosNoSyncGlucosa.size() + " registros para sincronizar.");
 
@@ -106,7 +100,7 @@ public class SyncManager {
                     @Override
                     public void onSuccess(ServerResponse response) {
 
-                        TxtServicioUsuario.ActualizarEstadoEnTxt(glucosa_entity.getId_glucosa());
+                        TxtServicioGlucosa.ActualizarEstadoEnTxt(glucosa_entity.getId_glucosa());
 
                         // Si el servidor confirma, actualizamos el estado local a TRUE
                         executor.execute(() -> {IGlucosa.actualizarEstado(glucosa_entity.getId_glucosa());});
@@ -127,61 +121,37 @@ public class SyncManager {
             }
         }
 
-        if (registrosNoSyncPresion.isEmpty()) {
-            Log.i(TAG, "ÉXITO: No hay registros pendientes de sincronizar con MySQL.");
-            return;
-        }
+// --- SINCRONIZACIÓN DE PRESIÓN ---
+        if (!registrosNoSyncPresion.isEmpty()) {
+            Log.i(TAG, "Se encontraron " + registrosNoSyncPresion.size() + " registros de PRESIÓN para sincronizar.");
+            for (final PresionEntity presion_entity : registrosNoSyncPresion) {
+                Log.d(TAG, "Sincronizando Presión ID: " + presion_entity.getId_presion());
 
-        for (final PresionEntity presion_entity : registrosNoSyncPresion) {
-            Log.d(TAG, "Intentando sincronizar registro con ID local: " + presion_entity.getId_presion());
+                presion_entity.setEstado(true);
 
-            // Usamos el nuevo método con Retrofit
+                remoteDataSourcePresion.sincronizar_presion(context, presion_entity, new ApiCallback<ServerResponse>() {
+                    @Override
+                    public void onSuccess(ServerResponse response) {
+                        Log.i(TAG, "Éxito remoto para Presión ID: " + presion_entity.getId_presion() + ". Mensaje: " + response.getMensaje());
 
-            PresionEntity PresionParaActualizar = presion_entity;
+                        // Si el servidor confirma, actualizamos el estado local a TRUE
+                        executor.execute(() -> {
+                            IPresion.actualizarEstado(presion_entity.getId_presion());
+                            TxtSrvicioPresion.ActualizarEstadoEnTxt(presion_entity.getId_presion());
+                        });
+                    }
 
-            PresionParaActualizar.setEstado(true);
-            remoteDataSourcePresion.insertar_presion(context,presion_entity, new ApiCallback<ServerResponse>() {
-                @Override
-                public void onSuccess(ServerResponse response) {
-                    Log.i(TAG, "Sincronización remota exitosa para ID: " + presion_entity.getId_presion() + ". Mensaje: " + response.getMensaje());
-                    // Si la API tuvo éxito, actualizamos el estado local en un hilo de fondo
-                    TxtSrvicioPresion.ActualizarEstadoEnTxt(presion_entity.getId_presion());
-                    executor.execute(() -> {
-                        IPresion.actualizarEstado(presion_entity.getId_presion());
-                    });
-                }
+                    @Override
+                    public void onError(String errorMessage) {
+                        Log.e(TAG, "Error de API al sincronizar Presión ID " + presion_entity.getId_presion() + ": " + errorMessage);
+                    }
 
-                @Override
-                public void onError(String errorMessage) {
-                    Log.e(TAG, "Error de API al sincronizar ID " + presion_entity.getId_presion() + ": " + errorMessage);
-                }
-
-                @Override
-                public void onFailure(String failureMessage) {
-                    Log.e(TAG, "Fallo de red al sincronizar ID " + presion_entity.getId_presion() + ": " + failureMessage);
-                }
-            });
-            remoteDataSourcePresion.editar_presion(context, PresionParaActualizar, new ApiCallback<ServerResponse>() {
-                @Override
-                public void onSuccess(ServerResponse response) {
-                    Log.i(TAG, "Sincronización remota exitosa para ID: " + presion_entity.getId_presion() + ". Mensaje: " + response.getMensaje());
-                    // Si la API tuvo éxito, actualizamos el estado local en un hilo de fondo
-                    TxtSrvicioPresion.ActualizarEstadoEnTxt(presion_entity.getId_presion());
-                    executor.execute(() -> {
-                        IPresion.actualizarEstado(presion_entity.getId_presion());
-                    });
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-                    Log.e(TAG, "Error de API al sincronizar ID " + presion_entity.getId_presion() + ": " + errorMessage);
-                }
-
-                @Override
-                public void onFailure(String failureMessage) {
-                    Log.e(TAG, "Fallo de red al sincronizar ID " + presion_entity.getId_presion() + ": " + failureMessage);
-                }
-            });
+                    @Override
+                    public void onFailure(String failureMessage) {
+                        Log.e(TAG, "Fallo de red al sincronizar Presión ID " + presion_entity.getId_presion() + ": " + failureMessage);
+                    }
+                });
+            }
         }
     }
 }

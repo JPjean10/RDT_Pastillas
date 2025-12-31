@@ -34,4 +34,12 @@ public class PresionRemoteDataSource {
         ApiHelper.execute(context, call, callback);
     }
 
+    public void sincronizar_presion(Context context, PresionEntity presion, ApiCallback<ServerResponse> callback) {
+        // 1. Prepara la llamada específica para insertar un usuario
+        Call<ServerResponse> call = apiService.SincronizarPresion(presion);
+
+        // 2. Delega la ejecución y el manejo del ProgressDialog al método genérico
+        ApiHelper.execute(context, call, callback);
+    }
+
 }

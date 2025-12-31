@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TxtServicioUsuario {
+public class TxtServicioGlucosa {
 
     private static final String TAG = "txtServicioUsuario";
     private static final String FILE_NAME = "registros_glucosa.txt"; // Cambiamos a .csv para más claridad

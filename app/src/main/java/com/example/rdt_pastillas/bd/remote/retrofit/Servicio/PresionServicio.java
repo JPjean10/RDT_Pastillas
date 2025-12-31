@@ -30,7 +30,7 @@ public class PresionServicio {
                 AppDataBaseControl.databaseWriteExecutor.execute(() -> {
                     PresionLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).presion_interfaz();
                     dao.actualizarEstado(id);
-                    // El TxtServicioUsuario también puede ir aquí, ya que es una operación de I/O.
+                    // El TxtServicioGlucosa también puede ir aquí, ya que es una operación de I/O.
                     TxtSrvicioPresion.ActualizarEstadoEnTxt(id);
                     Log.d(TAG, "Sincronización exitosa con el servidor remoto");
                 });
@@ -58,7 +58,7 @@ public class PresionServicio {
                 AppDataBaseControl.databaseWriteExecutor.execute(() -> {
                     PresionLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).presion_interfaz();
                     dao.actualizarEstado(entidad.getId_presion());
-                    // El TxtServicioUsuario también puede ir aquí, ya que es una operación de I/O.
+                    // El TxtServicioGlucosa también puede ir aquí, ya que es una operación de I/O.
                     TxtSrvicioPresion.ActualizarEstadoEnTxt(entidad.getId_presion());
                 });
                 }

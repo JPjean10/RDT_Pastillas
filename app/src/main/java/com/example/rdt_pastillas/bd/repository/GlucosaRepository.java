@@ -10,14 +10,11 @@ import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity
 import com.example.rdt_pastillas.bd.remote.retrofit.Servicio.GlucosaService;
 import com.example.rdt_pastillas.bd.local.dao.GlucosaLocalDao;
 import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
-import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioUsuario;
+import com.example.rdt_pastillas.bd.servicio.txt_servicio.TxtServicioGlucosa;
 import com.example.rdt_pastillas.util.alert.AlertaError;
 import com.example.rdt_pastillas.util.alert.AlertaExitoso;
 import com.example.rdt_pastillas.util.sesion.SessionManager;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
 public class GlucosaRepository {
@@ -46,7 +43,7 @@ public class GlucosaRepository {
 
                 // 2. Si el ID es válido (la inserción fue exitosa), guardar en el archivo .txt.
                 if (idGenerado > 0) {
-                    TxtServicioUsuario.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado,nuevoGlucosa);
+                    TxtServicioGlucosa.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado,nuevoGlucosa);
                     GlucosaService.insertarGlucosa(context,idGenerado,sessionManager.getUserId(),nuevoGlucosa);
                     Log.d("GlucosaDao", "Registro guardado en BD con exito:");
                     Log.d("GlucosaDao", "Registro guardado en BD local con ID: " + idGenerado);
@@ -71,7 +68,7 @@ public class GlucosaRepository {
         databaseWriteExecutor.execute(() -> {
             try {
                 interfaz.editGlucosa(glucosa);
-                TxtServicioUsuario.ActualizarGlucosaTxt(glucosa);
+                TxtServicioGlucosa.ActualizarGlucosaTxt(glucosa);
                 GlucosaService.editarGlucosa(context,glucosa);
             } catch (Exception e) {
                 Log.e("GlucosaDao", "Error al actualizar la glucosa", e);
