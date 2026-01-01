@@ -6,29 +6,20 @@ import java.util.List;
 public class GlucosaDia {
 
     private String fecha;
-    // Usamos una lista para más flexibilidad
     private List<GlucosaEntity> mediciones;
 
-    public GlucosaDia(String fecha) {
+    // Solo necesitas este constructor
+    public GlucosaDia(String fecha, List<GlucosaEntity> mediciones) {
         this.fecha = fecha;
-        this.mediciones = new ArrayList<>();
+        this.mediciones = mediciones;
     }
 
+    // --- Métodos Getters ---
     public String getFecha() {
         return fecha;
     }
 
     public List<GlucosaEntity> getMediciones() {
         return mediciones;
-    }
-
-    public void addMedicion(GlucosaEntity medicion) {
-        if (mediciones.size() < 2) {
-            mediciones.add(medicion);
-        }
-    }
-
-    public int getMedicionesCount() {
-        return mediciones.size();
     }
 }

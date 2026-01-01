@@ -47,13 +47,8 @@ public class SyncManager {
         executor.execute(() -> {
             Log.d(TAG, "INICIO: Proceso de Sincronización Automática.");
 
-            // PASO 1: VERIFICAR SI LA BD LOCAL ESTÁ VACÍA
-            if (IGlucosa.countGlucosa() == 0) {
-                Log.i(TAG, "BD local vacía. Intentando poblar desde archivo .txt...");
-                poblarBdDesdeTxt();
-            } else {
-                Log.i(TAG, "BD local con datos. Saltando al paso de sincronización con MySQL.");
-            }
+            // PASO 1: Poblar desde txt si las tablas están vacías
+            poblarBdDesdeTxt();
 
             // PASO 2: SINCRONIZAR REGISTROS PENDIENTES CON EL SERVIDOR MYSQL
             Log.i(TAG, "Buscando registros locales no sincronizados...");
@@ -67,13 +62,29 @@ public class SyncManager {
      * (Interno) Lee registros del TXT y los inserta en Room.
      */
     private void poblarBdDesdeTxt() {
-        List<GlucosaEntity> registrosDelTxt = TxtServicioGlucosa.leerTodosLosRegistrosTxt();
-
-        if (registrosDelTxt != null && !registrosDelTxt.isEmpty()) {
-            IGlucosa.insertAll(registrosDelTxt);
-            Log.i(TAG, "ÉXITO: Se insertaron " + registrosDelTxt.size() + " registros desde el .txt a la BD local.");
+        // --- POBLAR GLUCOSA ---
+/*        if (IGlucosa.countGlucosa() == 0) {
+            List<GlucosaEntity> registrosGlucosa = TxtServicioGlucosa.leerTodosLosRegistrosTxt();
+            if (registrosGlucosa != null && !registrosGlucosa.isEmpty()) {
+                IGlucosa.insertAll(registrosGlucosa);
+            } else {
+                Log.w(TAG, "AVISO: No se encontraron registros en el archivo de glucosa.");
+            }
         } else {
-            Log.w(TAG, "AVISO: No se encontraron registros en el archivo .txt para poblar la BD.");
+            Log.i(TAG, "La tabla de Glucosa ya tiene datos, no se importa desde txt.");
+        }*/
+
+
+        // --- POBLAR PRESIÓN (LA PARTE NUEVA) ---
+        if (IPresion.countPresion() == 0) {
+            List<PresionEntity> registrosPresion = TxtSrvicioPresion.leerTodosLosRegistrosTxt();
+            if (registrosPresion != null && !registrosPresion.isEmpty()) {
+                IPresion.insertAll(registrosPresion);
+            } else {
+                Log.w(TAG, "AVISO: No se encontraron registros en el archivo de presión.");
+            }
+        } else {
+            Log.i(TAG, "La tabla de Presión ya tiene datos, no se importa desde txt.");
         }
     }
 
@@ -100,7 +111,7 @@ public class SyncManager {
                     @Override
                     public void onSuccess(ServerResponse response) {
 
-                        TxtServicioGlucosa.ActualizarEstadoEnTxt(glucosa_entity.getId_glucosa());
+/*                        TxtServicioGlucosa.ActualizarEstadoEnTxt(glucosa_entity.getId_glucosa());*/
 
                         // Si el servidor confirma, actualizamos el estado local a TRUE
                         executor.execute(() -> {IGlucosa.actualizarEstado(glucosa_entity.getId_glucosa());});

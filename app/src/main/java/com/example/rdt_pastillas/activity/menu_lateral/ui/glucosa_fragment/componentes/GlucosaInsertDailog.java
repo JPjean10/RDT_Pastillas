@@ -3,6 +3,7 @@ package com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.comp
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -19,7 +20,7 @@ public class GlucosaInsertDailog {
 
 
     public interface insertOnClickedDailog {
-        void insertOnClickedDailog(int nivel_glucosa);
+        void insertOnClickedDailog(int nivel_glucosa, boolean enAyunas);
 
     }
     public GlucosaInsertDailog(Context context, insertOnClickedDailog listener) {
@@ -31,6 +32,7 @@ public class GlucosaInsertDailog {
         View view = inflater.inflate(R.layout.dailog_insert_glucosa, null);
 
         final TextInputEditText txt_nivel_glucosa = view.findViewById(R.id.txt_nivel_glucosa);
+        final CheckBox cbEnAyunas = view.findViewById(R.id.cb_en_ayunas);
 
         ImageView btnAceptar = view.findViewById(R.id.btnAceptar);
         ImageView btnCancelar = view.findViewById(R.id.btnCancelar);
@@ -56,10 +58,12 @@ public class GlucosaInsertDailog {
 
             int nivel_glucosa_int = Integer.parseInt(nivel_glucosa);
 
+            boolean EnAyunas = cbEnAyunas.isChecked();
+
 
             // Llamar al listener con los datos
             if (listener != null) {
-                listener.insertOnClickedDailog(nivel_glucosa_int);
+                listener.insertOnClickedDailog(nivel_glucosa_int,EnAyunas);
             }
 
             // Cerrar el diálogo

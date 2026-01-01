@@ -40,6 +40,16 @@ public class PresionEntity {
         this.estado = true;
     }
 
+    @Ignore
+    public PresionEntity(long id_usuario, int sys, int dia, int pul, String fecha_hora_creacion, boolean estado) {
+        this.id_usuario = id_usuario;
+        this.sys = sys;
+        this.dia = dia;
+        this.pul = pul;
+        this.fecha_hora_creacion = fecha_hora_creacion;
+        this.estado = estado;
+    }
+
     public long getId_usuario() { return id_usuario; }
     public void setId_usuario(long id_usuario) { this.id_usuario = id_usuario; }
     public long getId_presion() { return id_presion; }

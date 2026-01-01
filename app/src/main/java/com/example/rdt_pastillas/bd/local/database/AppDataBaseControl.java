@@ -16,7 +16,7 @@ import com.example.rdt_pastillas.bd.local.dao.UsuarioLocalDao;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {GlucosaEntity.class, PresionEntity.class, UsuarioEntity.class}, version = 3, exportSchema = false)
+@Database(entities = {GlucosaEntity.class, PresionEntity.class, UsuarioEntity.class}, version = 4, exportSchema = false)
 public abstract class AppDataBaseControl extends RoomDatabase {
     public abstract GlucosaLocalDao glucosa_interfaz();
     public abstract UsuarioLocalDao usuario_interfaz();

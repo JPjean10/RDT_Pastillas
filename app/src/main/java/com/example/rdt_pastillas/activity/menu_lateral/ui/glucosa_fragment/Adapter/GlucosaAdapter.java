@@ -3,6 +3,8 @@ package com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.Adap
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,14 +21,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+
 public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHolder> {
 
     private List<GlucosaDia> listaDias = new ArrayList<>();
     private EdiOnClickedAdapter listener;
 
-
+    // --- Interfaz para los clics ---
     public interface EdiOnClickedAdapter {
-        void EdiOnClickedAdapter(GlucosaEntity medicion);
+        void onEditClicked(GlucosaEntity medicion);
     }
 
     public GlucosaAdapter(EdiOnClickedAdapter listener) {
@@ -36,7 +39,6 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Asegúrate de que el layout inflado sea 'item_glucosa.xml' que tiene 2 o 3 slots.
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_glucosa, parent, false);
         return new ViewHolder(view);
@@ -45,8 +47,7 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GlucosaDia item = listaDias.get(position);
-        // Pasamos la posición actual al ViewHolder para la lógica del icono de editar
-        holder.bind(item, position, listener);
+        holder.bind(item, listener);
     }
 
     @Override
@@ -60,98 +61,112 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
         notifyDataSetChanged();
     }
 
+
+    // --- CLASE VIEWHOLDER ---
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvFecha;
-        ImageView ivEdit; // Referencia al icono de editar
-        View medicionView1, medicionView2; // Asumiendo 2 slots según tu último XML
+        ImageView ivEdit;
+        ImageButton btnToggleAyunas;
+        View medicionView1, medicionView2;
         View divider1;
+
+        private boolean mostrarAyunas = false; // Estado de visibilidad, local para cada ViewHolder
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvFecha = itemView.findViewById(R.id.tv_fecha);
-            ivEdit = itemView.findViewById(R.id.iv_edit); // Obtener la referencia del icono
+            ivEdit = itemView.findViewById(R.id.iv_edit);
+            btnToggleAyunas = itemView.findViewById(R.id.btn_toggle_ayunas);
 
             medicionView1 = itemView.findViewById(R.id.medicion1);
             medicionView2 = itemView.findViewById(R.id.medicion2);
             divider1 = itemView.findViewById(R.id.divider1);
         }
 
-        // MÉTODO BIND CORREGIDO PARA MOSTRAR EL ICONO DE EDITAR
-        public void bind(final GlucosaDia item, int position,EdiOnClickedAdapter listener) {
+        public void bind(final GlucosaDia item, EdiOnClickedAdapter listener) {
             tvFecha.setText(formatearFechaSimple(item.getFecha()));
             List<GlucosaEntity> mediciones = item.getMediciones();
-            int count = mediciones.size();
 
-            // --- LÓGICA PARA MOSTRAR/OCULTAR EL ICONO DE EDITAR ---
-            // Como la lista viene ordenada DESC, el item más reciente está en la posición 0.
-            if (position == 0) {
-                ivEdit.setVisibility(View.VISIBLE);
-                if (count > 0) {
-                    final GlucosaEntity medicionMasReciente = mediciones.get(mediciones.size() - 1);
-
-                    // --- CORRECCIÓN 2: La llamada al listener va DENTRO del OnClickListener ---
-                    ivEdit.setOnClickListener(v -> {
-                        if (listener != null) {
-                            // Llama al método con el nombre corregido
-//                            listene.onEditClicked(medicionMasReciente);
-                            listener.EdiOnClickedAdapter(medicionMasReciente);
-                        }
-                    });
-                }
-            } else {
+            // --- Lógica del botón de Edición ---
+            // Solo se muestra si hay mediciones ese día
+            if (mediciones.isEmpty()) {
                 ivEdit.setVisibility(View.INVISIBLE);
-                ivEdit.setOnClickListener(null); // Buena práctica: limpiar el listener
+                ivEdit.setOnClickListener(null);
+            } else {
+                ivEdit.setVisibility(View.VISIBLE);
+                final GlucosaEntity medicionMasReciente = mediciones.get(mediciones.size() - 1);
+                ivEdit.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onEditClicked(medicionMasReciente);
+                    }
+                });
             }
-            // --------------------------------------------------------
 
-            // Limpiar vistas antes de configurar
+            // --- Lógica del botón de Visibilidad ---
+            btnToggleAyunas.setOnClickListener(v -> {
+                mostrarAyunas = !mostrarAyunas; // Cambia el estado de visibilidad
+                // Vuelve a aplicar la configuración a las vistas para reflejar el cambio
+                actualizarVistasMediciones(mediciones, mostrarAyunas);
+                // Cambia el ícono del botón
+                btnToggleAyunas.setImageResource(
+                        mostrarAyunas ? R.drawable.ic_ocultar : R.drawable.ic_mostrar
+                );
+            });
+
+            // Configuración inicial de las vistas
+            actualizarVistasMediciones(mediciones, mostrarAyunas);
+        }
+
+        private void actualizarVistasMediciones(List<GlucosaEntity> mediciones, boolean mostrarAyunas) {
+            // Ocultar todo por defecto
             medicionView1.setVisibility(View.INVISIBLE);
             medicionView2.setVisibility(View.INVISIBLE);
             divider1.setVisibility(View.GONE);
 
-            // Lógica para 1 o 2 mediciones
-            switch (count) {
-                case 1:
-                    // Si solo hay uno, lo mostramos en el primer slot
-                    configurarMedicionView(medicionView1, mediciones.get(0));
-                    break;
-                case 2:
-                    // Si hay dos, llenamos los dos slots
-                    // El más antiguo (get(1)) a la izquierda y el más nuevo (get(0)) a la derecha
-                    configurarMedicionView(medicionView1, mediciones.get(1));
-                    configurarMedicionView(medicionView2, mediciones.get(0));
-                    divider1.setVisibility(View.VISIBLE);
-                    break;
-                // Si necesitaras 3, aquí iría el case 3
+            // Configurar la primera medición si existe
+            if (mediciones.size() >= 1) {
+                configurarMedicionView(medicionView1, mediciones.get(0), mostrarAyunas);
+            }
+
+            // Configurar la segunda medición si existe
+            if (mediciones.size() >= 2) {
+                configurarMedicionView(medicionView2, mediciones.get(1), mostrarAyunas);
+                divider1.setVisibility(View.VISIBLE);
             }
         }
 
-        private void configurarMedicionView(View medicionView, GlucosaEntity medicion) {
+        private void configurarMedicionView(View medicionView, GlucosaEntity medicion, boolean mostrarAyunas) {
             medicionView.setVisibility(View.VISIBLE);
             TextView tvGlucosa = medicionView.findViewById(R.id.tv_glucosa);
             TextView tvHora = medicionView.findViewById(R.id.tv_hora);
             ImageView ivSync = medicionView.findViewById(R.id.iv_sync);
+            CheckBox cbEnAyunas = medicionView.findViewById(R.id.cb_en_ayunas);
 
             tvGlucosa.setText(String.valueOf(medicion.getNivel_glucosa()));
             tvHora.setText(formatearHora(medicion.getFecha_hora_creacion()));
 
-            if (medicion.isEstado()) {
-                ivSync.setImageResource(R.drawable.ic_cloud_24);
+            // Estado de sincronización
+            ivSync.setImageResource(medicion.isEstado() ? R.drawable.ic_cloud_24 : R.drawable.ic_cloud_off_24);
+
+            // Lógica de visibilidad y estado del CheckBox
+            cbEnAyunas.setVisibility(mostrarAyunas ? View.VISIBLE : View.GONE);
+            if (medicion.getEn_ayunas() != null) {
+                cbEnAyunas.setChecked(medicion.getEn_ayunas());
             } else {
-                ivSync.setImageResource(R.drawable.ic_cloud_off_24);
+                cbEnAyunas.setChecked(false);
             }
+            cbEnAyunas.setEnabled(false); // No se puede editar desde la lista
         }
 
+        // --- Métodos para formatear fecha y hora (sin cambios) ---
         private String formatearHora(String fechaHoraCompleta) {
             try {
-                SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+                SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 SimpleDateFormat formatoDeseado = new SimpleDateFormat("hh:mm a", Locale.getDefault());
                 Date date = formatoOriginal.parse(fechaHoraCompleta);
-                return formatoDeseado.format(date);
-            } catch (Exception e) {
-                return ""; // Evitar devolver texto basura si hay error
-            }
+                return (date != null) ? formatoDeseado.format(date) : "";
+            } catch (Exception e) { return ""; }
         }
 
         private String formatearFechaSimple(String fechaOriginal) {
@@ -159,10 +174,8 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
                 SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 SimpleDateFormat formatoDeseado = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date date = formatoOriginal.parse(fechaOriginal);
-                return formatoDeseado.format(date);
-            } catch (Exception e) {
-                return fechaOriginal; // Devolver la original si falla el parseo
-            }
+                return (date != null) ? formatoDeseado.format(date) : fechaOriginal;
+            } catch (Exception e) { return fechaOriginal; }
         }
     }
 }

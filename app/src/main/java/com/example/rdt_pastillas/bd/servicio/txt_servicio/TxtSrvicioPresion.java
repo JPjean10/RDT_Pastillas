@@ -157,6 +157,54 @@ public class TxtSrvicioPresion {
         }
     }
 
+    public static List<PresionEntity> leerTodosLosRegistrosTxt() {
+        List<PresionEntity> registros = new ArrayList<>();
+        if (!isExternalStorageReadable()) {
+            Log.w(TAG, "El almacenamiento no está disponible para lectura.");
+            return registros;
+        }
+
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FILE_NAME);
+        if (!file.exists()) {
+            return registros;
+        }
+
+        List<String> lines = leerLineasDeArchivo(file);
+        if (lines == null) return registros;
+
+        for (String line : lines) {
+            // Ignorar el encabezado y líneas vacías
+            if (line.trim().isEmpty() || line.startsWith("ID_usuario")) {
+                continue;
+            }
+
+            String[] parts = line.split(";", -1);
+            if (parts.length == 7) {
+                try {
+                    long id_usuario = Long.parseLong(parts[0]);
+                    long id_presion = Long.parseLong(parts[1]);
+                    int sys = Integer.parseInt(parts[2]);
+                    int dia = Integer.parseInt(parts[3]);
+                    int pul = Integer.parseInt(parts[4]);
+                    String fecha = parts[5];
+                    boolean estado = Boolean.parseBoolean(parts[6]);
+
+                    // Usa el constructor que NO genera fecha automáticamente
+                    // para respetar la fecha guardada en el CSV.
+                    // Necesitarás un constructor que acepte todos estos parámetros.
+                    PresionEntity entidad = new PresionEntity(id_usuario, sys, dia, pul,fecha , estado);
+                    entidad.setId_presion(id_presion);
+                    registros.add(entidad);
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, "Error al parsear la línea de presión del CSV: '" + line + "'", e);
+                }
+            }
+        }
+
+        Log.d(TAG, "Se leyeron " + registros.size() + " registros de presión del archivo " + FILE_NAME);
+        return registros;
+    }
+
     private static boolean isExternalStorageWritable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }

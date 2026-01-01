@@ -31,7 +31,7 @@ public class GlucosaService {
                     GlucosaLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(id);
                     // El TxtServicioGlucosa también puede ir aquí, ya que es una operación de I/O.
-                    TxtServicioGlucosa.ActualizarEstadoEnTxt(id);
+/*                    TxtServicioGlucosa.ActualizarEstadoEnTxt(id);*/
                     Log.d(TAG, "Sincronización exitosa con el servidor remoto");
                 });
             }
@@ -61,7 +61,7 @@ public class GlucosaService {
                     GlucosaLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(entidad.getId_glucosa());
                     // El TxtServicioGlucosa también puede ir aquí, ya que es una operación de I/O.
-                    TxtServicioGlucosa.ActualizarEstadoEnTxt(entidad.getId_glucosa());
+/*                    TxtServicioGlucosa.ActualizarEstadoEnTxt(entidad.getId_glucosa());*/
                 });
             }
 

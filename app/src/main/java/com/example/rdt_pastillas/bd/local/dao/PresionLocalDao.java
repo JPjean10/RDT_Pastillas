@@ -29,4 +29,12 @@ public interface PresionLocalDao {
     /** 3. Obtiene todos los registros que NO han sido sincronizados con el servidor. */
     @Query("SELECT * FROM PresionEntity WHERE estado = 0")
     List<PresionEntity> getRegistrosNoSincronizados();
+
+    /** 1. Cuenta todos los registros en la tabla. */
+    @Query("SELECT COUNT(*) FROM PresionEntity")
+    int countPresion();
+
+    /** 2. Inserta una lista completa de registros. */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(List<PresionEntity> presiones);
 }

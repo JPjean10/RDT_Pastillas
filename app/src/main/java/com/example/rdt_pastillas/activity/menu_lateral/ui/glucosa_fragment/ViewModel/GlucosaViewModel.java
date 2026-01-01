@@ -67,53 +67,35 @@ public class GlucosaViewModel extends AndroidViewModel {
      * Agrupa una lista (ya filtrada y en orden ASCENDENTE) en objetos GlucosaDia,
      * con un máximo de 2 mediciones por tarjeta, y luego invierte el resultado final
      * para la visualización.
-     * @param listaParaAgrupar La lista de mediciones, ordenada de más antiguo a más reciente.
+     * @param mediciones La lista de mediciones, ordenada de más antiguo a más reciente.
      * @return Una lista de objetos GlucosaDia, invertida para mostrar los más recientes arriba.
      */
-    private List<GlucosaDia> agruparGlucosaPorDia(List<GlucosaEntity> listaParaAgrupar) {
-        if (listaParaAgrupar == null || listaParaAgrupar.isEmpty()) {
+    private List<GlucosaDia> agruparGlucosaPorDia(List<GlucosaEntity> mediciones) {
+        if (mediciones == null || mediciones.isEmpty()) {
             return new ArrayList<>();
         }
 
-        List<GlucosaDia> listaFinal = new ArrayList<>();
-        SimpleDateFormat formatoClave = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        SimpleDateFormat formatoEntrada = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-
-        // Mapa para agrupar mediciones por día
+        // Usamos LinkedHashMap para mantener el orden de inserción (por fecha)
         Map<String, List<GlucosaEntity>> medicionesPorDia = new LinkedHashMap<>();
-        for (GlucosaEntity medicion : listaParaAgrupar) {
-            try {
-                Date fechaCompleta = formatoEntrada.parse(medicion.getFecha_hora_creacion());
-                String fechaKey = formatoClave.format(fechaCompleta);
-                medicionesPorDia.putIfAbsent(fechaKey, new ArrayList<>());
-                medicionesPorDia.get(fechaKey).add(medicion);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+
+        // 1. Agrupar todas las mediciones por su día (extrayendo "yyyy-MM-dd" del string)
+        for (GlucosaEntity medicion : mediciones) {
+            String fechaKey = medicion.getFecha_hora_creacion().substring(0, 10);
+            medicionesPorDia.computeIfAbsent(fechaKey, k -> new ArrayList<>()).add(medicion);
         }
 
-        // Construir las tarjetas para cada día
+        List<GlucosaDia> listaAgrupada = new ArrayList<>();
+
+        // 2. Convertir el mapa en una lista de objetos GlucosaDia
         for (Map.Entry<String, List<GlucosaEntity>> entry : medicionesPorDia.entrySet()) {
-            String fechaKey = entry.getKey();
-            List<GlucosaEntity> medicionesDelDia = entry.getValue(); // Ej: [99, 96, 100]
-
-            // Iterar sobre la lista ASCENDENTE, tomándolas de 2 en 2
-            for (int i = 0; i < medicionesDelDia.size(); i += 2) {
-                GlucosaDia grupo = new GlucosaDia(fechaKey);
-
-                // Añadir el primer elemento del par (el más antiguo del par). Ej: 99
-                grupo.addMedicion(medicionesDelDia.get(i));
-
-                // Si existe un segundo elemento, añadirlo. Ej: 96
-                if (i + 1 < medicionesDelDia.size()) {
-                    grupo.addMedicion(medicionesDelDia.get(i + 1));
-                }
-                listaFinal.add(grupo);
-            }
+            // El orden de las mediciones dentro del día ya es ASC (viene así de la BD)
+            GlucosaDia dia = new GlucosaDia(entry.getKey(), entry.getValue());
+            listaAgrupada.add(dia);
         }
 
-        Collections.reverse(listaFinal);
+        // 3. Invertir la lista final para que los días más recientes aparezcan arriba
+        Collections.reverse(listaAgrupada);
 
-        return listaFinal;
+        return listaAgrupada;
     }
 }

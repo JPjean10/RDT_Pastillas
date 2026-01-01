@@ -16,11 +16,12 @@ public class GlucosaEntity {
     private long id_glucosa;
     private int nivel_glucosa;
     private String fecha_hora_creacion;
+    private Boolean en_ayunas;
     private boolean estado;
 
 
     @Ignore
-    public GlucosaEntity(long id_usuario,long id_glucosa,int nivel_glucosa) {
+    public GlucosaEntity(long id_usuario, long id_glucosa, int nivel_glucosa) {
         this.id_usuario = id_usuario;
         this.id_glucosa = id_glucosa;
         this.nivel_glucosa = nivel_glucosa;
@@ -28,26 +29,33 @@ public class GlucosaEntity {
         this.estado = true;
     }
 
-    public GlucosaEntity(long id_usuario,int nivel_glucosa) {
+    public GlucosaEntity(long id_usuario, int nivel_glucosa, Boolean en_ayunas) {
         this.id_usuario = id_usuario;
         this.nivel_glucosa = nivel_glucosa;
         this.fecha_hora_creacion = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        this.en_ayunas = en_ayunas;
         this.estado = false;
     }
 
     @Ignore
-    public GlucosaEntity(long id_usuario,int nivel_glucosa, String fecha_hora_creacion, boolean estado) {
+    public GlucosaEntity(long id_usuario, int nivel_glucosa, String fecha_hora_creacion, boolean estado) {
         this.id_usuario = id_usuario;
         this.nivel_glucosa = nivel_glucosa;
         this.fecha_hora_creacion = fecha_hora_creacion;
         this.estado = estado;
     }
 
-    public long getId_glucosa() {return id_glucosa;}
+    public long getId_glucosa() {
+        return id_glucosa;
+    }
 
-    public long getId_usuario() {return id_usuario;}
+    public long getId_usuario() {
+        return id_usuario;
+    }
 
-    public void setId_usuario(long id_usuario) {this.id_usuario = id_usuario;}
+    public void setId_usuario(long id_usuario) {
+        this.id_usuario = id_usuario;
+    }
 
     public void setId_glucosa(long id_glucosa) {
         this.id_glucosa = id_glucosa;
@@ -63,6 +71,14 @@ public class GlucosaEntity {
 
     public String getFecha_hora_creacion() {
         return fecha_hora_creacion;
+    }
+
+    public Boolean getEn_ayunas() {
+        return en_ayunas;
+    }
+
+    public void setEn_ayunas(Boolean en_ayunas) {
+        this.en_ayunas = en_ayunas;
     }
 
     public void setFecha_hora_creacion(String fecha_hora_creacion) {

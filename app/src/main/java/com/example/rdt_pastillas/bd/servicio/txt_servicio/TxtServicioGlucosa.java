@@ -24,7 +24,7 @@ public class TxtServicioGlucosa {
      * Inserta un registro de glucosa en el archivo txt.
      * Si el archivo no existe, crea el encabezado primero.
      */
-    public static void InsertarGlucosaTxt(Context context, long id_usuario, long id, GlucosaEntity entity) {
+/*    public static void InsertarGlucosaTxt(Context context, long id_usuario, long id, GlucosaEntity entity) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "El almacenamiento externo no está disponible para escritura.");
             // Opcional: mostrar Toast
@@ -63,12 +63,12 @@ public class TxtServicioGlucosa {
             Log.e(TAG, "Error al escribir en el archivo .csv", e);
             // Opcional: mostrar Toast
         }
-    }
+    }*/
 
     /**
      * Actualiza el estado de un registro de 'false' a 'true' en el archivo txt.
      */
-    public static void ActualizarEstadoEnTxt(long id) {
+/*    public static void ActualizarEstadoEnTxt(long id) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "Almacenamiento no disponible.");
             return;
@@ -112,13 +112,13 @@ public class TxtServicioGlucosa {
         } else {
             Log.w(TAG, "No se encontró el registro con ID_glucosa " + id + " en el archivo.");
         }
-    }
+    }*/
 
 
     /**
      * Actualiza una línea completa en el archivo CSV basada en una GlucosaEntity.
      */
-    public static void ActualizarGlucosaTxt(GlucosaEntity glucosaActualizada) {
+/*    public static void ActualizarGlucosaTxt(GlucosaEntity glucosaActualizada) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "Almacenamiento no disponible.");
             return;
@@ -164,12 +164,12 @@ public class TxtServicioGlucosa {
         } else {
             Log.w(TAG, "No se encontró el registro con ID_glucosa " + glucosaActualizada.getId_glucosa() + " para actualizar.");
         }
-    }
+    }*/
 
     /**
      * Lee todos los registros del archivo txt y los convierte en una lista de GlucosaEntity.
      */
-    public static List<GlucosaEntity> leerTodosLosRegistrosTxt() {
+/*    public static List<GlucosaEntity> leerTodosLosRegistrosTxt() {
         List<GlucosaEntity> registros = new ArrayList<>();
         if (!isExternalStorageReadable()) {
             Log.w(TAG, "El almacenamiento no está disponible para lectura.");
@@ -210,7 +210,7 @@ public class TxtServicioGlucosa {
 
         Log.d(TAG, "Se leyeron " + registros.size() + " registros del archivo " + FILE_NAME);
         return registros;
-    }
+    }*/
 
 
     // --- MÉTODOS DE AYUDA ---

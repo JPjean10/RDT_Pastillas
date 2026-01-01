@@ -1,6 +1,7 @@
 package com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,8 +121,10 @@ public class GlucosaFragment extends Fragment implements
    //_______________________________________________________________________________________________
    // dailog________________________________________________________________________________________
     @Override
-    public void insertOnClickedDailog(int nivel_glucosa) {
-        servicio.insert(nivel_glucosa);
+    public void insertOnClickedDailog(int nivel_glucosa, boolean enAyunas) {
+        Log.d("GlucosaFragment", "Nivel: " + nivel_glucosa + ", En Ayunas: " + enAyunas);
+
+        servicio.insert(nivel_glucosa, enAyunas);
     }
 
     @Override
@@ -166,9 +169,9 @@ public class GlucosaFragment extends Fragment implements
     //______________________________________________________________________________________________
     // adapter______________________________________________________________________________________
     @Override
-    public void EdiOnClickedAdapter(GlucosaEntity medicion) {
-        GlucosaEditDailog dialog = new GlucosaEditDailog(getContext(), medicion ,GlucosaFragment.this);
-        dialog.show();;
+    public void onEditClicked(GlucosaEntity medicion) { // <--- Asegúrate que el nombre coincida
+        GlucosaEditDailog dialog = new GlucosaEditDailog(getContext(), medicion, GlucosaFragment.this);
+        dialog.show();
     }
     //______________________________________________________________________________________________
 }
