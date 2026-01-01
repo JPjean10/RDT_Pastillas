@@ -21,39 +21,6 @@ import com.google.android.material.navigation.NavigationView;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
-
-/*
-    private final ActivityResultLauncher<Intent> storageActivityResultLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        // Este bloque se ejecuta cuando el usuario vuelve de la pantalla de configuración.
-                        // Aquí puedes añadir lógica si es necesario, como reiniciar una sincronización.
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            if (Environment.isExternalStorageManager()) {
-                                // El permiso fue concedido. ¡Genial!
-                                // Podrías reiniciar la sincronización si es necesario, pero
-                                // el SyncManager ya lo intentó al inicio de la app.                      com.google.ai.edge.litert.Environment.isExternalStorageManager()
-                                // La próxima vez que se inicie la app, funcionará.
-                            } else {
-                                // El usuario no concedió el permiso.
-                                // Puedes mostrar un mensaje o un Toast.
-                            }
-                        }
-                    });
-    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-        if (isGranted) {
-            // Permission is granted. Continue the action or workflow in your
-            // app.
-        } else {
-            // Explain to the user that the feature is unavailable because the
-            // feature requires a permission that the user has denied. At the
-            // same time, respect the user's decision. Don't link to system
-            // settings in an effort to convince the user to change their
-            // decision.
-        }
-    });
-*/
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,9 +71,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onDrawerStateChanged(int newState) {}
         });
-
-/*        permiso_notificacione();*/
-/*        checkAndRequestStoragePermission();*/
     }
 
     @Override
@@ -125,43 +89,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-/*    // --- ¡AÑADE ESTE MÉTODO COMPLETO DENTRO DE TU CLASE! ---
-    private void checkAndRequestStoragePermission() {
-        // Esta lógica es solo para Android 11 (API 30) y versiones superiores.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Comprueba si la app NO tiene el permiso.
-            if (!Environment.isExternalStorageManager()) {
-                try {
-                    // Crea un intent para abrir la pantalla de configuración específica de tu app.
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                    intent.setData(uri);
-                    // Lanza la pantalla para que el usuario conceda el permiso.
-                    storageActivityResultLauncher.launch(intent);
-                } catch (Exception e) {
-                    // En algunos dispositivos, el intent puede fallar. Intentamos con la acción genérica.
-                    Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                    storageActivityResultLauncher.launch(intent);
-                }
-            }
-        }
-    }
-    private void permiso_notificacione() {
-        //Esto solo es necesario para el nivel de API 33 o superior.+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                // El SDK de FCM (y tu aplicación) puede publicar notificaciones+.
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                // TODO: mostrar una interfaz de usuario educativa que explique al usuario las funciones que estarán habilitadas
-                // Al otorgarles el permiso POST_NOTIFICATION. Esta interfaz de usuario debería proporcionar al usuario
-                // con dos opciones: "Aceptar" y "No, gracias". Si el usuario selecciona "Aceptar", solicite directamente el permiso..
-                // Si el usuario selecciona "No, gracias", permítale continuar sin notificaciones.
-            } else {
-                // Directly ask for the permission
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            }
-        }
-    }*/
 }
