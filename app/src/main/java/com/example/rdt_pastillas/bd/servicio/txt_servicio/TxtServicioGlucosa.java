@@ -18,13 +18,13 @@ public class TxtServicioGlucosa {
 
     private static final String TAG = "txtServicioUsuario";
     private static final String FILE_NAME = "registros_glucosa.txt"; // Cambiamos a .csv para más claridad
-    private static final String HEADER = "ID_usuario;ID_glucosa;Nivel;fecha_hora;Estado";
+    private static final String HEADER = "ID_usuario;ID_glucosa;Nivel;fecha_hora;en_ayunas;Estado";
 
     /**
      * Inserta un registro de glucosa en el archivo txt.
      * Si el archivo no existe, crea el encabezado primero.
      */
-/*    public static void InsertarGlucosaTxt(Context context, long id_usuario, long id, GlucosaEntity entity) {
+    public static void InsertarGlucosaTxt(Context context, long id_usuario, long id, GlucosaEntity entity) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "El almacenamiento externo no está disponible para escritura.");
             // Opcional: mostrar Toast
@@ -52,6 +52,7 @@ public class TxtServicioGlucosa {
                     id + ";" +
                     entity.getNivel_glucosa() + ";" +
                     entity.getFecha_hora_creacion() + ";" +
+                    entity.getEn_ayunas() + ";" +
                     entity.isEstado();
 
             writer.append(registro);
@@ -63,12 +64,12 @@ public class TxtServicioGlucosa {
             Log.e(TAG, "Error al escribir en el archivo .csv", e);
             // Opcional: mostrar Toast
         }
-    }*/
+    }
 
     /**
      * Actualiza el estado de un registro de 'false' a 'true' en el archivo txt.
      */
-/*    public static void ActualizarEstadoEnTxt(long id) {
+    public static void ActualizarEstadoEnTxt(long id) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "Almacenamiento no disponible.");
             return;
@@ -89,12 +90,12 @@ public class TxtServicioGlucosa {
             String[] parts = currentLine.split(";", -1); // -1 para no descartar valores vacíos
 
             // Verificamos que sea una línea de datos y que la ID_glucosa coincida
-            if (parts.length == 5 && !currentLine.startsWith("ID_usuario")) {
+            if (parts.length == 6 && !currentLine.startsWith("ID_usuario")) {
                 try {
                     long currentId = Long.parseLong(parts[1]);
                     if (currentId == id) {
                         // Reconstruimos la línea cambiando el último campo (estado) a 'true'
-                        parts[4] = "true";
+                        parts[5] = "true";
                         lines.set(i, String.join(";", parts));
                         recordModified = true;
                         Log.d(TAG, "Línea para ID_glucosa " + id + " modificada en memoria.");
@@ -112,13 +113,13 @@ public class TxtServicioGlucosa {
         } else {
             Log.w(TAG, "No se encontró el registro con ID_glucosa " + id + " en el archivo.");
         }
-    }*/
+    }
 
 
     /**
      * Actualiza una línea completa en el archivo CSV basada en una GlucosaEntity.
      */
-/*    public static void ActualizarGlucosaTxt(GlucosaEntity glucosaActualizada) {
+    public static void ActualizarGlucosaTxt(GlucosaEntity glucosaActualizada) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "Almacenamiento no disponible.");
             return;
@@ -138,7 +139,7 @@ public class TxtServicioGlucosa {
             String currentLine = lines.get(i);
             String[] parts = currentLine.split(";", -1);
 
-            if (parts.length == 5 && !currentLine.startsWith("ID_usuario")) {
+            if (parts.length == 6 && !currentLine.startsWith("ID_usuario")) {
                 try {
                     long currentId = Long.parseLong(parts[1]);
                     if (currentId == glucosaActualizada.getId_glucosa()) {
@@ -146,6 +147,7 @@ public class TxtServicioGlucosa {
                                 glucosaActualizada.getId_glucosa() + ";" +
                                 glucosaActualizada.getNivel_glucosa() + ";" +
                                 glucosaActualizada.getFecha_hora_creacion() + ";" +
+                                glucosaActualizada.getEn_ayunas() + ";" +
                                 glucosaActualizada.isEstado();
                         lines.set(i, lineaActualizada);
                         recordModified = true;
@@ -164,12 +166,12 @@ public class TxtServicioGlucosa {
         } else {
             Log.w(TAG, "No se encontró el registro con ID_glucosa " + glucosaActualizada.getId_glucosa() + " para actualizar.");
         }
-    }*/
+    }
 
     /**
      * Lee todos los registros del archivo txt y los convierte en una lista de GlucosaEntity.
      */
-/*    public static List<GlucosaEntity> leerTodosLosRegistrosTxt() {
+    public static List<GlucosaEntity> leerTodosLosRegistrosTxt() {
         List<GlucosaEntity> registros = new ArrayList<>();
         if (!isExternalStorageReadable()) {
             Log.w(TAG, "El almacenamiento no está disponible para lectura.");
@@ -191,15 +193,17 @@ public class TxtServicioGlucosa {
             }
 
             String[] parts = line.split(";", -1);
-            if (parts.length == 5) {
+            if (parts.length == 6) {
                 try {
                     long id_usuario = Long.parseLong(parts[0]);
                     long id_glucosa = Long.parseLong(parts[1]);
                     int nivelGlucosa = Integer.parseInt(parts[2]);
                     String fecha = parts[3];
-                    boolean estado = Boolean.parseBoolean(parts[4]);
+                    boolean enAyunas = Boolean.parseBoolean(parts[4]);
 
-                    GlucosaEntity entidad = new GlucosaEntity(id_usuario, nivelGlucosa, fecha, estado);
+                    boolean estado = Boolean.parseBoolean(parts[5]);
+
+                    GlucosaEntity entidad = new GlucosaEntity(id_usuario, nivelGlucosa, fecha,enAyunas, estado);
                     entidad.setId_glucosa(id_glucosa);
                     registros.add(entidad);
                 } catch (NumberFormatException e) {
@@ -210,7 +214,7 @@ public class TxtServicioGlucosa {
 
         Log.d(TAG, "Se leyeron " + registros.size() + " registros del archivo " + FILE_NAME);
         return registros;
-    }*/
+    }
 
 
     // --- MÉTODOS DE AYUDA ---

@@ -21,7 +21,7 @@ public class GlucosaService {
 
     public static void insertarGlucosa(Context context, long id, int id_usuario ,GlucosaEntity entidad) {
 
-        GlucosaEntity nuevoGlucosa = new GlucosaEntity(id_usuario,id,entidad.getNivel_glucosa());
+        GlucosaEntity nuevoGlucosa = new GlucosaEntity(id_usuario,id,entidad.getNivel_glucosa(),entidad.getEn_ayunas());
 
         GlucosaRemoteDataSource remote = new GlucosaRemoteDataSource();
         remote.insertar_glucosa(context, nuevoGlucosa, new ApiCallback<ServerResponse>() {
@@ -31,7 +31,7 @@ public class GlucosaService {
                     GlucosaLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(id);
                     // El TxtServicioGlucosa también puede ir aquí, ya que es una operación de I/O.
-/*                    TxtServicioGlucosa.ActualizarEstadoEnTxt(id);*/
+                    TxtServicioGlucosa.ActualizarEstadoEnTxt(id);
                     Log.d(TAG, "Sincronización exitosa con el servidor remoto");
                 });
             }

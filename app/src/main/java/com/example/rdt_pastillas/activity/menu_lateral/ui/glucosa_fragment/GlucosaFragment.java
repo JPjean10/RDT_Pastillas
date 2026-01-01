@@ -128,7 +128,7 @@ public class GlucosaFragment extends Fragment implements
     }
 
     @Override
-    public void EditOnClickedDailog(GlucosaEntity glucosa,int nivel_glucosa) {
+    public void EditOnClickedDailog(GlucosaEntity glucosa,int nivel_glucosa, boolean enAyunas) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         // 2. Crea el String con la fecha actual formateada.
         String fechaFormateada = sdf.format(new Date());
@@ -137,6 +137,7 @@ public class GlucosaFragment extends Fragment implements
 
         // 2. Actualiza solo los campos que cambiaron.
         glucosaParaActualizar.setNivel_glucosa(nivel_glucosa);
+        glucosaParaActualizar.setEn_ayunas(enAyunas);
         glucosaParaActualizar.setFecha_hora_creacion(fechaFormateada);
         glucosaParaActualizar.setEstado(false);
 

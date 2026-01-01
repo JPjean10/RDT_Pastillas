@@ -75,27 +75,44 @@ public class GlucosaViewModel extends AndroidViewModel {
             return new ArrayList<>();
         }
 
-        // Usamos LinkedHashMap para mantener el orden de inserción (por fecha)
         Map<String, List<GlucosaEntity>> medicionesPorDia = new LinkedHashMap<>();
 
-        // 1. Agrupar todas las mediciones por su día (extrayendo "yyyy-MM-dd" del string)
+        // 1. Agrupar todas las mediciones por su día (igual que antes)
         for (GlucosaEntity medicion : mediciones) {
             String fechaKey = medicion.getFecha_hora_creacion().substring(0, 10);
             medicionesPorDia.computeIfAbsent(fechaKey, k -> new ArrayList<>()).add(medicion);
         }
 
-        List<GlucosaDia> listaAgrupada = new ArrayList<>();
+        List<GlucosaDia> listaFinal = new ArrayList<>();
 
-        // 2. Convertir el mapa en una lista de objetos GlucosaDia
+        // 2. --- LÓGICA DE SUB-AGRUPACIÓN (LA CORRECCIÓN) ---
+        // Para cada día, crear tarjetas de 2 en 2.
         for (Map.Entry<String, List<GlucosaEntity>> entry : medicionesPorDia.entrySet()) {
-            // El orden de las mediciones dentro del día ya es ASC (viene así de la BD)
-            GlucosaDia dia = new GlucosaDia(entry.getKey(), entry.getValue());
-            listaAgrupada.add(dia);
+            String fechaKey = entry.getKey();
+            List<GlucosaEntity> medicionesDelDia = entry.getValue(); // Ej: [med1, med2, med3, med4]
+
+            // Iterar sobre las mediciones de ese día, avanzando de 2 en 2
+            for (int i = 0; i < medicionesDelDia.size(); i += 2) {
+                // Crear una lista temporal para la nueva tarjeta
+                List<GlucosaEntity> grupoDeDos = new ArrayList<>();
+
+                // Añadir la primera medición del par (siempre existirá)
+                grupoDeDos.add(medicionesDelDia.get(i));
+
+                // Si existe un segundo elemento en el par, añadirlo
+                if (i + 1 < medicionesDelDia.size()) {
+                    grupoDeDos.add(medicionesDelDia.get(i + 1));
+                }
+
+                // Crear el objeto GlucosaDia con este grupo de 1 o 2 mediciones
+                GlucosaDia nuevaTarjeta = new GlucosaDia(fechaKey, grupoDeDos);
+                listaFinal.add(nuevaTarjeta);
+            }
         }
 
-        // 3. Invertir la lista final para que los días más recientes aparezcan arriba
-        Collections.reverse(listaAgrupada);
+        // 3. Invertir la lista final para que las tarjetas más recientes aparezcan arriba
+        Collections.reverse(listaFinal);
 
-        return listaAgrupada;
+        return listaFinal;
     }
 }

@@ -43,8 +43,8 @@ public class GlucosaRepository {
 
                 // 2. Si el ID es válido (la inserción fue exitosa), guardar en el archivo .txt.
                 if (idGenerado > 0) {
-/*                    TxtServicioGlucosa.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado,nuevoGlucosa);
-                    GlucosaService.insertarGlucosa(context,idGenerado,sessionManager.getUserId(),nuevoGlucosa);*/
+                    TxtServicioGlucosa.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado,nuevoGlucosa);
+                    GlucosaService.insertarGlucosa(context,idGenerado,sessionManager.getUserId(),nuevoGlucosa);
                     Log.d("GlucosaDao", "Registro guardado en BD con exito:");
                     Log.d("GlucosaDao", "Registro guardado en BD local con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
@@ -67,9 +67,9 @@ public class GlucosaRepository {
     public void edit(GlucosaEntity glucosa) {
         databaseWriteExecutor.execute(() -> {
             try {
-/*                interfaz.editGlucosa(glucosa);
+                interfaz.editGlucosa(glucosa);
                 TxtServicioGlucosa.ActualizarGlucosaTxt(glucosa);
-                GlucosaService.editarGlucosa(context,glucosa);*/
+                GlucosaService.editarGlucosa(context,glucosa);
             } catch (Exception e) {
                 Log.e("GlucosaDao", "Error al actualizar la glucosa", e);
                 // Considera mostrar una alerta de error si es necesario.

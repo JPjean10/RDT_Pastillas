@@ -47,7 +47,13 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GlucosaDia item = listaDias.get(position);
-        holder.bind(item, listener);
+
+        // Verificamos si la posición actual es la primera en la lista de datos.
+        // Como la lista está invertida, la primera en los datos (pos 0) es la que se muestra al final.
+        boolean esUltimaTarjeta = (position == 0);
+
+        // Pasamos esta información al método bind.
+        holder.bind(item, listener, esUltimaTarjeta);
     }
 
     @Override
@@ -84,16 +90,14 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
             divider1 = itemView.findViewById(R.id.divider1);
         }
 
-        public void bind(final GlucosaDia item, EdiOnClickedAdapter listener) {
+        // --- CORRECCIÓN EN LA FIRMA DEL MÉTODO BIND ---
+        public void bind(final GlucosaDia item, EdiOnClickedAdapter listener, boolean esUltimaTarjeta) {
             tvFecha.setText(formatearFechaSimple(item.getFecha()));
             List<GlucosaEntity> mediciones = item.getMediciones();
 
             // --- Lógica del botón de Edición ---
-            // Solo se muestra si hay mediciones ese día
-            if (mediciones.isEmpty()) {
-                ivEdit.setVisibility(View.INVISIBLE);
-                ivEdit.setOnClickListener(null);
-            } else {
+            // La visibilidad ahora depende del nuevo booleano 'esUltimaTarjeta'.
+            if (esUltimaTarjeta && !mediciones.isEmpty()) {
                 ivEdit.setVisibility(View.VISIBLE);
                 final GlucosaEntity medicionMasReciente = mediciones.get(mediciones.size() - 1);
                 ivEdit.setOnClickListener(v -> {
@@ -101,7 +105,12 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
                         listener.onEditClicked(medicionMasReciente);
                     }
                 });
+            } else {
+                // Si no es la última tarjeta, se oculta el botón.
+                ivEdit.setVisibility(View.INVISIBLE);
+                ivEdit.setOnClickListener(null);
             }
+
 
             // --- Lógica del botón de Visibilidad ---
             btnToggleAyunas.setOnClickListener(v -> {

@@ -3,6 +3,7 @@ package com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.comp
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,7 +21,7 @@ public class GlucosaEditDailog {
 
 
     public interface EditOnClickedDailog {
-        void EditOnClickedDailog(GlucosaEntity glucosa,int nivel_glucosa);
+        void EditOnClickedDailog(GlucosaEntity glucosa,int nivel_glucosa, boolean enAyunas);
 
     }
     public GlucosaEditDailog(Context context, GlucosaEntity glucosa, EditOnClickedDailog listener) {
@@ -33,9 +34,13 @@ public class GlucosaEditDailog {
         View view = inflater.inflate(R.layout.dailog_edit_glucosa, null);
 
         final TextInputEditText txt_nivel_glucosa = view.findViewById(R.id.txt_nivel_glucosa);
+        final CheckBox cbEnAyunas = view.findViewById(R.id.cb_en_ayunas);
         final TextInputEditText txtGlucosaNoEditable = view.findViewById(R.id.txt_glucosa_no_edit);
 
+
         txtGlucosaNoEditable.setText(String.valueOf(glucosa.getNivel_glucosa()));
+        cbEnAyunas.setChecked(glucosa.getEn_ayunas());
+
 
         ImageView btnAceptar = view.findViewById(R.id.btnAceptar);
         ImageView btnCancelar = view.findViewById(R.id.btnCancelar);
@@ -61,10 +66,12 @@ public class GlucosaEditDailog {
 
             int nivel_glucosa = Integer.parseInt(Edi_glucosa);
 
+            boolean EnAyunas = cbEnAyunas.isChecked();
+
 
             // Llamar al listener con los datos
             if (listener != null) {
-                listener.EditOnClickedDailog(glucosa,nivel_glucosa);
+                listener.EditOnClickedDailog(glucosa,nivel_glucosa,EnAyunas);
             }
 
             // Cerrar el diálogo

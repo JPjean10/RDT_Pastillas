@@ -21,11 +21,12 @@ public class GlucosaEntity {
 
 
     @Ignore
-    public GlucosaEntity(long id_usuario, long id_glucosa, int nivel_glucosa) {
+    public GlucosaEntity(long id_usuario, long id_glucosa, int nivel_glucosa,Boolean en_ayunas) {
         this.id_usuario = id_usuario;
         this.id_glucosa = id_glucosa;
         this.nivel_glucosa = nivel_glucosa;
         this.fecha_hora_creacion = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        this.en_ayunas = en_ayunas;
         this.estado = true;
     }
 
@@ -38,7 +39,7 @@ public class GlucosaEntity {
     }
 
     @Ignore
-    public GlucosaEntity(long id_usuario, int nivel_glucosa, String fecha_hora_creacion, boolean estado) {
+    public GlucosaEntity(long id_usuario, int nivel_glucosa, String fecha_hora_creacion,Boolean en_ayunas, boolean estado) {
         this.id_usuario = id_usuario;
         this.nivel_glucosa = nivel_glucosa;
         this.fecha_hora_creacion = fecha_hora_creacion;

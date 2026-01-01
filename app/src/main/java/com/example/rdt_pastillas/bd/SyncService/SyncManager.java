@@ -63,7 +63,7 @@ public class SyncManager {
      */
     private void poblarBdDesdeTxt() {
         // --- POBLAR GLUCOSA ---
-/*        if (IGlucosa.countGlucosa() == 0) {
+        if (IGlucosa.countGlucosa() == 0) {
             List<GlucosaEntity> registrosGlucosa = TxtServicioGlucosa.leerTodosLosRegistrosTxt();
             if (registrosGlucosa != null && !registrosGlucosa.isEmpty()) {
                 IGlucosa.insertAll(registrosGlucosa);
@@ -72,7 +72,7 @@ public class SyncManager {
             }
         } else {
             Log.i(TAG, "La tabla de Glucosa ya tiene datos, no se importa desde txt.");
-        }*/
+        }
 
 
         // --- POBLAR PRESIÓN (LA PARTE NUEVA) ---
@@ -111,7 +111,7 @@ public class SyncManager {
                     @Override
                     public void onSuccess(ServerResponse response) {
 
-/*                        TxtServicioGlucosa.ActualizarEstadoEnTxt(glucosa_entity.getId_glucosa());*/
+                        TxtServicioGlucosa.ActualizarEstadoEnTxt(glucosa_entity.getId_glucosa());
 
                         // Si el servidor confirma, actualizamos el estado local a TRUE
                         executor.execute(() -> {IGlucosa.actualizarEstado(glucosa_entity.getId_glucosa());});

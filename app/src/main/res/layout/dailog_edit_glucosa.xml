@@ -48,6 +48,15 @@
             style="@style/textfield_TextInputEditText"/>
     </com.google.android.material.textfield.TextInputLayout>
 
+    <CheckBox
+        android:id="@+id/cb_en_ayunas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:text="en ayunas"
+        style="@style/Widget.AppCompat.CompoundButton.CheckBox" />
+
     <!-- Botones al fondo -->
     <LinearLayout
         android:layout_width="match_parent"
