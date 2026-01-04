@@ -6,26 +6,38 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="@color/white"
     tools:context=".activity.alarm_activity.AlarmActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tomar pastilla"
-        android:textSize="24sp"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="32dp"
+        style="@style/tiulo"/>
+
+    <TextView
+        android:id="@+id/txt_nombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tomar pastilla"
+        android:layout_marginBottom="32dp"
+        style="@style/tiulo"/>
 
     <Button
         android:id="@+id/btn_desactivar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Desactivar"
-        android:layout_marginBottom="16dp"/>
+        app:cornerRadius="8dp"
+        android:layout_marginBottom="16dp"
+        style="@style/boton"/>
 
     <Button
         android:id="@+id/btn_suspender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Suspender 30 min"/>
+        android:text="Suspender 30 min"
+        style="@style/boton"/>
 
 </LinearLayout>

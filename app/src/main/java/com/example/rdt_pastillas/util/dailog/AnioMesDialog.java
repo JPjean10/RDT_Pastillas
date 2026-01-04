@@ -45,11 +45,6 @@ public class AnioMesDialog extends DialogFragment {
         this.initialYear = initialYear;
     }
 
-    public AnioMesDialog(OnFechaSeleccionadaListener listener) {
-        this(listener, null); // Constructor para cuando no hay initialYear
-    }
-
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -65,17 +60,17 @@ public class AnioMesDialog extends DialogFragment {
         TextView tvSelectedYear = view.findViewById(R.id.tvSelectedYear);
 
         Calendar calendarInstance = Calendar.getInstance();
-        int currentSystemYear = calendarInstance.get(Calendar.YEAR);
 
         List<Integer> years = new ArrayList<>();
-        for (int i = currentSystemYear; i <= currentSystemYear + 10; i++) {
+        int startYear = 2024; // <-- AÑO DE INICIO FIJO
+        for (int i = startYear; i <= startYear + 10; i++) {
             years.add(i);
         }
 
         if (initialYear != null) {
             selectedYear = initialYear;
         } else {
-            selectedYear = currentSystemYear;
+            selectedYear = calendarInstance.get(Calendar.YEAR);
         }
 
         // Adaptadores

@@ -8,14 +8,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="@color/white"
     tools:context=".activity.login.Login">
 
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
-        android:backgroundTint="@color/white"
-        app:cardElevation="20dp">
+        android:backgroundTint="@color/Light_gray"
+        app:cardCornerRadius="17.5dp"
+        app:cardElevation="25dp">
 
         <LinearLayout
             android:layout_width="291dp"
@@ -77,7 +79,6 @@
                 android:layout_height="wrap_content"
                 android:text="Iniciar Sesión"
                 app:icon="@drawable/ic_login_24"
-                app:cornerRadius="8dp"
                 style="@style/boton"/>
 
         <LinearLayout
@@ -99,11 +100,10 @@
                 android:id="@+id/cb_recordar_sesion"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
                 android:layout_weight="1"
-                android:layout_marginTop="8dp"
+                android:layout_gravity="end"
                 android:text="auto login"
-                style="@style/Widget.AppCompat.CompoundButton.CheckBox" />
+                style="@style/MyCheckBox" />
 
         </LinearLayout>
         </LinearLayout>

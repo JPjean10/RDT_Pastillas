@@ -6,28 +6,49 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.rdt_pastillas.Modelo.PastillasModel;
 import com.example.rdt_pastillas.R;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
 import com.example.rdt_pastillas.receiver.AlarmReceiver;
 import com.example.rdt_pastillas.activity.alarm_activity.service.AlarmService;
+import com.example.rdt_pastillas.repositorio.ListaPastilla;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class AlarmActivity extends AppCompatActivity {
 
+
     private int pillId;
+    private String pillName;
+    private String pillHour;
+    private int notificationId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
 
-        // Recuperar el ID de la pastilla del intent
+
         pillId = getIntent().getIntExtra("PILL_ID", -1);
+        notificationId = getIntent().getIntExtra("NOTIFICATION_ID", 0);
+        String nombresAgrupados = getIntent().getStringExtra("GROUPED_NAMES");
+        pillName = getIntent().getStringExtra("PILL_NAME");
+        pillHour = getIntent().getStringExtra("PILL_HOUR");
+
+        // Opcional: Mostrar en pantalla qué pastillas toca tomar
+        TextView txtNombres = findViewById(R.id.txt_nombre); // Asegúrate de tener este ID en tu XML o quita estas líneas
+        if (txtNombres != null && nombresAgrupados != null) {
+            txtNombres.setText(nombresAgrupados);
+        }
 
         Button btn_desactivar = findViewById(R.id.btn_desactivar);
         Button btn_suspender = findViewById(R.id.btn_suspender);
@@ -58,44 +79,32 @@ public class AlarmActivity extends AppCompatActivity {
     }
 
     private void suspender() {
-        // Primero, detiene el sonido actual
+        // 1. Detener el sonido
         detener_alarma();
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        // Mantener los extras para la próxima notificación
-        intent.putExtras(getIntent().getExtras());
+        Log.d("DEBUG_SNOOZE", "Recibido ->id: " + pillId + " | Nombre: " + pillName + " | Hora: " + pillHour);
 
-        // El PendingIntent debe ser el mismo que el original para que la alarma se reprograme
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                this,
-                pillId, // Usar el ID de la pastilla
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 30); // Suspender por 30 minutos
-
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-        Toast.makeText(this, "Alarma suspendida por 30 minutos", Toast.LENGTH_SHORT).show();
-    }
-
-    // Este método es por si necesitas un botón para cancelar TODAS las futuras repeticiones.
-    private void cancelRepeatingAlarm() {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlarmReceiver.class);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                this,
-                pillId,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
-        if (alarmManager != null) {
-            alarmManager.cancel(pendingIntent);
+        if (pillHour == null || pillHour.isEmpty()) {
+            Toast.makeText(this, "Error: No se pudo identificar la hora de la alarma", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
-        detener_alarma(); // También detiene el sonido actual
+
+        // 3. Buscar todas las pastillas de esa hora
+        List<PastillasModel> todasLasPastillas = ListaPastilla.getPastillas();
+        List<PastillasModel> grupoSuspender = new ArrayList<>();
+
+        for (PastillasModel p : todasLasPastillas) {
+            if (p.getHora().equals(pillHour)) {
+                grupoSuspender.add(p);
+            }
+        }
+
+        // 4. Reprogramar cada una para dentro de 1 minuto (Snooze)
+        for (PastillasModel p : grupoSuspender) {
+            PastillasFragment.programarAlarma(this, p, true);
+        }
+        Toast.makeText(this, "Alarma pospuesta 30 minutos", Toast.LENGTH_SHORT).show();
+
     }
 }

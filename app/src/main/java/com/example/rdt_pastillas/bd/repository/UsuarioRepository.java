@@ -53,7 +53,7 @@ public class UsuarioRepository {
     public interface UserCountCallback {
         void onResult(int count);
     }
-    public void insertar_usuario(Context context, UsuarioEntity usuario_entity){
+    public void insertar_usuario(Context context, UsuarioEntity usuario_entity, Runnable onSuccess){
         // 1. Crear y mostrar el ProgressDialog
         ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Cargando...");
@@ -63,6 +63,7 @@ public class UsuarioRepository {
         remote.insertar_usuario(context, usuario_entity, new ApiCallback<ServerResponse>() {
             @Override
             public void onSuccess(ServerResponse response) {
+                onSuccess.run();
                 AlertaExitoso.show(context,response.getMensaje());
                 progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
             }
@@ -101,7 +102,6 @@ public class UsuarioRepository {
                     callback.onLoginSuccess(user.getId_usuario());
                     progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
                 } else {
-                    // --- B. NO ENCONTRADO LOCALMENTE -> IR AL SERVIDOR ---
                     new Handler(Looper.getMainLooper()).post(() -> {
 
                         remote.login(context, usuario, contrasena, new ApiCallback<com.example.rdt_pastillas.Modelo.response.LoginResponse>() {
@@ -147,7 +147,7 @@ public class UsuarioRepository {
                                     });
 
                                 } else {
-                                    callback.onLoginFailed(response.getUserMsg() != null ? response.getUserMsg() : "Usuario no encontrado en servidor.");
+                                    callback.onLoginFailed(response.getUserMsg() != null ? response.getUserMsg() : "Usuario no encontrado .");
                                     progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
                                 }
                             }
@@ -160,20 +160,13 @@ public class UsuarioRepository {
 
                             @Override
                             public void onFailure(String failureMessage) {
-                                callback.onLoginFailed(failureMessage);
+                                AlertaError.show(context,"Es nesesario loquear con internet la primera vez o usuario invalido");
                                 progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
                             }
                         });
                     });
                 }
             });
-        });
-    }
-
-    public void contarUsuarios(UserCountCallback callback) {
-        databaseWriteExecutor.execute(() -> {
-            int count = localDao.countUsers();
-            new Handler(Looper.getMainLooper()).post(() -> callback.onResult(count));
         });
     }
 }

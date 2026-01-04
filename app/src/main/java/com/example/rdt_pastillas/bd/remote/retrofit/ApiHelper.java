@@ -38,7 +38,7 @@ public class ApiHelper {
                         callback.onError(mensajeError);
                     } catch (Exception e) {
                         Log.e("ApiHelper", "Excepción al leer el error: " + e.getMessage());
-                        callback.onError("Error al procesar la respuesta del servidor.");
+                        callback.onError("Error al procesar la solicitud.");
                     }
                 }
             }

@@ -141,6 +141,8 @@ public class PastillasFragment extends Fragment {
         intent.putExtra("PILL_NAME", pastilla.getNombre());
         intent.putExtra("PILL_HOUR", pastilla.getHora()); // Crucial para que el Receiver pueda reprogramar
 
+        Log.d("AlarmScheduling", "Alarma SUSPENDIDA para '" + pastilla.getNombre() + "' a las: " + pastilla.getHora() + " (Snooze)");
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
                 pastilla.getId(),
@@ -152,7 +154,7 @@ public class PastillasFragment extends Fragment {
 
         if (isSnooze) {
             // Lógica para suspender: programar para X minutos en el futuro.
-            calendar.add(Calendar.MINUTE, 30); // Puedes cambiar a 30 min.
+            calendar.add(Calendar.MINUTE, 1); // Puedes cambiar a 30 min.
             Log.d("AlarmScheduling", "Alarma SUSPENDIDA para '" + pastilla.getNombre() + "' en 1 minuto.");
         } else {
             // Lógica para programar una alarma normal.
@@ -186,6 +188,6 @@ public class PastillasFragment extends Fragment {
         // LA LÍNEA MÁS IMPORTANTE: Usamos setExactAndAllowWhileIdle para la máxima precisión.
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
 
-//        Log.d("AlarmScheduling", "Alarma programada para '" + pastilla.getNombre() + "' a las: " + calendar.getTime());
+Log.d("AlarmScheduling", "Alarma programada para '" + pastilla.getNombre() + "' a las: " + calendar.getTime());
     }
 }

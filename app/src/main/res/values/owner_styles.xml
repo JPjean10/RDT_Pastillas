@@ -108,5 +108,10 @@
     </style>
 
 
+    <!-- Estilo nuevo para el CheckBox -->
+    <style name="MyCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
 </resources>
 

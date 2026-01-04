@@ -67,16 +67,20 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // El Intent que se abre al tocar la notificación. Siempre llevará al mismo sitio.
         Intent notificationIntent = new Intent(context, AlarmActivity.class);
-        notificationIntent.putExtra("PILL_HOUR", pillHour); // Pasamos la hora para que la activity sepa qué notif. cancelar
-        notificationIntent.putExtra("NOTIFICATION_ID", notificationId); // Pasamos el ID para cancelar
-        notificationIntent.putExtra("GROUPED_NAMES", nombresAgrupados); // Pasamos los nombres agrupados
+        notificationIntent.putExtra("PILL_HOUR", pillHour);
+        notificationIntent.putExtra("PILL_ID", pillId);
+        notificationIntent.putExtra("PILL_NAME", pillName);
+        notificationIntent.putExtra("NOTIFICATION_ID", notificationId);
+        notificationIntent.putExtra("GROUPED_NAMES", nombresAgrupados);
+
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
-                notificationId, // Usamos el ID de grupo
+                notificationId,
                 notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                // CAMBIA 'FLAG_UPDATE_CURRENT' POR 'FLAG_CANCEL_CURRENT'
+                PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
         // Configuramos el texto de la notificación para mostrar los nombres agrupados
@@ -118,8 +122,11 @@ public class AlarmReceiver extends BroadcastReceiver {
      * Esto asegura que "07:40 PM" siempre genere el mismo ID.
      */
     private int generarIdDesdeHora(String hora) {
-        // Por ejemplo, "07:40 PM" -> "0740" -> 740
         String horaNumerica = hora.replaceAll("[^0-9]", "");
-        return Integer.parseInt(horaNumerica);
+        try {
+            return Integer.parseInt(horaNumerica);
+        } catch (NumberFormatException e) {
+            return 12345;
+        }
     }
 }

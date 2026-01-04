@@ -10,12 +10,14 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.alarm_activity.AlarmActivity;
+import com.example.rdt_pastillas.receiver.AlarmReceiver;
 
 public class AlarmService extends Service {
     private MediaPlayer mediaPlayer;
@@ -53,19 +55,46 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Asegurarnos de que el canal existe
         createNotificationChannel();
 
-        Intent notificationIntent = new Intent(this, AlarmActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        // 1. INTENTAR OBTENER LA NOTIFICACIÓN QUE VIENE DEL RECEIVER
+        // Esta es la parte crucial. AlarmReceiver ya creó una notificación que tiene
+        // el Intent con los extras (PILL_HOUR, PILL_NAME). Debemos usar esa misma.
+        Notification notification = null;
+        int notificationId = 1;
 
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Alarma de Pastilla Activa")
-                .setContentText("Tomando tu medicamento.")
-                .setSmallIcon(R.drawable.logo_pastilla)
-                .setContentIntent(pendingIntent)
-                .build();
+        if (intent != null) {
+            notification = intent.getParcelableExtra(AlarmReceiver.NOTIFICATION);
+            notificationId = intent.getIntExtra(AlarmReceiver.NOTIFICATION_ID, 1);
+        }
 
-        startForeground(1, notification);
+        // 2. SI NO LLEGA (FALLBACK), CREAMOS UNA DE EMERGENCIA
+        // Esto solo ocurre si algo falla gravemente o si inicias el servicio manualmente.
+        if (notification == null) {
+            Log.w("AlarmService", "La notificación llegó nula, creando una genérica de respaldo.");
+
+            Intent notificationIntent = new Intent(this, AlarmActivity.class);
+            // Nota: Esta notificación de respaldo NO tendrá los datos de la pastilla,
+            // pero evitará que el servicio se caiga.
+            PendingIntent pendingIntent = PendingIntent.getActivity(
+                    this,
+                    0,
+                    notificationIntent,
+                    PendingIntent.FLAG_IMMUTABLE
+            );
+
+            notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentTitle("Alarma de Pastilla Activa")
+                    .setContentText("Tomando tu medicamento.")
+                    .setSmallIcon(R.drawable.logo_pastilla)
+                    .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .build();
+        }
+
+        // 3. INICIAR EL SERVICIO EN PRIMER PLANO CON LA NOTIFICACIÓN CORRECTA
+        startForeground(notificationId, notification);
 
         // Iniciar la reproducción cuando esté listo
         mediaPlayer.setOnPreparedListener(mp -> {
@@ -97,7 +126,9 @@ public class AlarmService extends Service {
                     NotificationManager.IMPORTANCE_LOW // Menos intrusivo que el canal de la notificación principal
             );
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
+            if (manager != null) {
+                manager.createNotificationChannel(serviceChannel);
+            }
         }
     }
 }

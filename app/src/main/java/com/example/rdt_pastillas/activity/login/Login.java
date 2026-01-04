@@ -29,6 +29,7 @@ import com.example.rdt_pastillas.activity.login.componentes.UsuarioInsertDailog;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.usuario_entity.UsuarioEntity;
 import com.example.rdt_pastillas.activity.menu_lateral.MainActivity;
 import com.example.rdt_pastillas.bd.repository.UsuarioRepository;
+import com.example.rdt_pastillas.util.alert.AlertaAvertencia;
 import com.example.rdt_pastillas.util.alert.AlertaError;
 import com.example.rdt_pastillas.util.sesion.SessionManager;
 
@@ -42,7 +43,9 @@ public class Login extends AppCompatActivity implements
 
     private UsuarioRepository servicio;
     private SessionManager sessionManager;
-
+    private static final String PREF_NAME = "ocultar_boton";
+    private static final String KEY_OCULTAR = "btnRegistrar";
+    private boolean ocultarRegistro = false;
     // --- CÓDIGO DE PERMISOS AQUÍ ---
 
     // 1. Launcher para el permiso de almacenamiento
@@ -116,6 +119,12 @@ public class Login extends AppCompatActivity implements
         btnIniciarSesion = findViewById(R.id.btn_iniciar_sesion);
         btnRegistrar = findViewById(R.id.btn_registrar);
 
+        // 🔹 LEER SharedPreferences AL INICIAR
+        ocultarRegistro = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+                .getBoolean(KEY_OCULTAR, false);
+
+        ocultarBotonRegistroSiEsNecesario();
+
         btnRegistrar.setOnClickListener(view -> {
             UsuarioInsertDailog dialog = new UsuarioInsertDailog(Login.this, Login.this);
             dialog.show();
@@ -128,7 +137,7 @@ public class Login extends AppCompatActivity implements
             boolean recordar = cbRecordarSesion.isChecked();
 
             if (usuario.isEmpty() || contrasena.isEmpty()) {
-                Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
+                AlertaAvertencia.show(this, "Por favor, complete todos los campos");
                 return;
             }
 
@@ -154,8 +163,16 @@ public class Login extends AppCompatActivity implements
     @Override
     public void insertOnClickedDailog(String usuario, String contrasena, String nombre) {
         UsuarioEntity usuarioEntity = new UsuarioEntity(usuario, contrasena, nombre);
-        servicio.insertar_usuario(this, usuarioEntity);
-        ocultarBotonRegistroSiEsNecesario();
+        servicio.insertar_usuario(this, usuarioEntity, () -> {
+            // 🔹 Guardar bandera
+            getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(KEY_OCULTAR, true)
+                    .apply();
+
+            ocultarRegistro = true;
+            ocultarBotonRegistroSiEsNecesario();
+        });
     }
 //______________________________________________________________________________________________
 // MÉTODOS DE PERMISOS AQUÍ_____________________________________________________________________
@@ -194,14 +211,7 @@ public class Login extends AppCompatActivity implements
     }
 
     private void ocultarBotonRegistroSiEsNecesario() {
-        // Usamos el repositorio para contar usuarios en segundo plano
-        servicio.contarUsuarios(count -> {
-            if (count > 0) {
-                btnRegistrar.setVisibility(View.GONE);
-            } else {
-                btnRegistrar.setVisibility(View.VISIBLE);
-            }
-        });
+        btnRegistrar.setVisibility(ocultarRegistro ? View.GONE : View.VISIBLE);
     }
 // ________________________________________________________________________________
 //______________no tocar___________________________________________________________
