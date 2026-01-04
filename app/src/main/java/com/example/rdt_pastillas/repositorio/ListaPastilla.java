@@ -75,12 +75,12 @@ public class ListaPastilla {
         pastillas.add(new PastillasModel(
                 6,
                 "insulina",
-                "04:26 PM"));
+                "04:42 PM"));
 
         pastillas.add(new PastillasModel(
                 7,
                 "gabanpentina",
-                "04:26 PM"));
+                "04:42 PM"));
 
         return pastillas;
     }

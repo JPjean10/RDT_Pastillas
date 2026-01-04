@@ -1,8 +1,6 @@
 package com.example.rdt_pastillas.activity.alarm_activity;
 
-import android.app.AlarmManager;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,12 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.rdt_pastillas.Modelo.PastillasModel;
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
-import com.example.rdt_pastillas.receiver.AlarmReceiver;
 import com.example.rdt_pastillas.activity.alarm_activity.service.AlarmService;
 import com.example.rdt_pastillas.repositorio.ListaPastilla;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class AlarmActivity extends AppCompatActivity {
@@ -47,7 +43,11 @@ public class AlarmActivity extends AppCompatActivity {
         // Opcional: Mostrar en pantalla qué pastillas toca tomar
         TextView txtNombres = findViewById(R.id.txt_nombre); // Asegúrate de tener este ID en tu XML o quita estas líneas
         if (txtNombres != null && nombresAgrupados != null) {
-            txtNombres.setText(nombresAgrupados);
+            String listaVertical = nombresAgrupados.replace(", ", "\n");
+
+            txtNombres.setText(listaVertical);
+        } else {
+            if(txtNombres != null) txtNombres.setText(pillName);
         }
 
         Button btn_desactivar = findViewById(R.id.btn_desactivar);
