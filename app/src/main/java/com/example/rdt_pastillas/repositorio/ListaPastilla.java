@@ -12,7 +12,7 @@ public class ListaPastilla {
         ArrayList<PastillasModel> pastillas = new ArrayList<>();
 
 
-/*        //en la mañana
+        //en la mañana
         pastillas.add(new PastillasModel(
                 1,
                 "insulina",
@@ -70,7 +70,7 @@ public class ListaPastilla {
         pastillas.add(new PastillasModel(
                 14,
                 "meformina",
-                "07:40 PM"));*/
+                "07:40 PM"));
         // pruevas
 
         return pastillas;

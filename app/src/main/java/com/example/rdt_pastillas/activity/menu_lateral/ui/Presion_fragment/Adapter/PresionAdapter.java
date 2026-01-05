@@ -90,6 +90,13 @@ public class PresionAdapter extends RecyclerView.Adapter<PresionAdapter.PresionV
                 listener.onEditClick(presion);
             }
         });
+
+        // CAMBIO AQUÍ: Mostrar solo en la primera posición (índice 0)
+        if (position == 0) {
+            holder.btnEditar.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnEditar.setVisibility(View.GONE);
+        }
     }
 
     @Override

@@ -19,7 +19,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2025/10/27 08:30"
-            android:textColor="#333333"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -32,9 +31,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="120"
-            android:textColor="#000000"
             android:textSize="32sp"
             android:textStyle="normal"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toStartOf="@+id/divider1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_fecha" />
@@ -44,8 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SYS / mmhg"
-            android:textColor="#666666"
             android:textSize="12sp"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toEndOf="@+id/tv_sys_valor"
             app:layout_constraintStart_toStartOf="@+id/tv_sys_valor"
             app:layout_constraintTop_toBottomOf="@+id/tv_sys_valor" />
@@ -68,9 +67,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="90"
-            android:textColor="#000000"
             android:textSize="32sp"
             android:textStyle="normal"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toStartOf="@+id/divider2"
             app:layout_constraintStart_toEndOf="@+id/divider1"
             app:layout_constraintTop_toBottomOf="@+id/tv_fecha" />
@@ -80,8 +79,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="DIA / mmhg"
-            android:textColor="#666666"
             android:textSize="12sp"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toEndOf="@+id/tv_dia_valor"
             app:layout_constraintStart_toStartOf="@+id/tv_dia_valor"
             app:layout_constraintTop_toBottomOf="@+id/tv_dia_valor" />
@@ -104,9 +103,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="70"
-            android:textColor="#000000"
             android:textSize="32sp"
             android:textStyle="normal"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/divider2"
             app:layout_constraintTop_toBottomOf="@+id/tv_fecha" />
@@ -116,8 +115,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="PUL / min"
-            android:textColor="#666666"
             android:textSize="12sp"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toEndOf="@+id/tv_pul_valor"
             app:layout_constraintStart_toStartOf="@+id/tv_pul_valor"
             app:layout_constraintTop_toBottomOf="@+id/tv_pul_valor" />
@@ -130,7 +129,6 @@
             android:layout_marginTop="8dp"
             android:contentDescription="Editar"
             android:src="@drawable/ic_edit_24"
-            app:tint="#000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_sys_label" />

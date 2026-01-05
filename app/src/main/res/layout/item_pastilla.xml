@@ -36,7 +36,8 @@
             android:layout_height="wrap_content"
             android:text="08:00 AM"
             android:textSize="16sp"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:textColor="@android:color/black"/>
     </RelativeLayout>
 
 </LinearLayout>

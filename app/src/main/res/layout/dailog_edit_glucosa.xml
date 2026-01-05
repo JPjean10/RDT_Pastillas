@@ -25,22 +25,6 @@
         style="@style/textfield_TextInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/txt_glucosa_no_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:enabled="false"
-            style="@style/textfield_TextInputEditText"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="nivel glucosa"
-        app:startIconDrawable="@drawable/ic_grid_3x3_24"
-        style="@style/textfield_TextInputLayout">
-
-        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/txt_nivel_glucosa"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,7 +39,7 @@
         android:layout_weight="1"
         android:layout_marginTop="8dp"
         android:text="en ayunas"
-        style="@style/Widget.AppCompat.CompoundButton.CheckBox" />
+        style="@style/MyCheckBox" />
 
     <!-- Botones al fondo -->
     <LinearLayout

@@ -35,10 +35,6 @@ public class GlucosaEditDailog {
 
         final TextInputEditText txt_nivel_glucosa = view.findViewById(R.id.txt_nivel_glucosa);
         final CheckBox cbEnAyunas = view.findViewById(R.id.cb_en_ayunas);
-        final TextInputEditText txtGlucosaNoEditable = view.findViewById(R.id.txt_glucosa_no_edit);
-
-
-        txtGlucosaNoEditable.setText(String.valueOf(glucosa.getNivel_glucosa()));
         cbEnAyunas.setChecked(glucosa.getEn_ayunas());
 
 
