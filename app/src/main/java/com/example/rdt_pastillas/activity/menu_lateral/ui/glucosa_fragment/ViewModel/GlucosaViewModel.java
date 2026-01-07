@@ -12,20 +12,17 @@ import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaDia;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class GlucosaViewModel extends AndroidViewModel {
 
     private final GlucosaLocalDao glucosaInterfaz;
-    private final MutableLiveData<String> filtroFecha = new MutableLiveData<>(); // Formato "yyyy/MM"
+    private long id_usuario;
+    private MutableLiveData<String> filtroFecha = new MutableLiveData<>(); // Formato "yyyy/MM"
     private final LiveData<List<GlucosaDia>> listaGlucosaAgrupada;
 
     public GlucosaViewModel(@NonNull Application application) {
@@ -42,11 +39,15 @@ public class GlucosaViewModel extends AndroidViewModel {
                 return emptyList;
             }
             // Llama a la consulta que ahora ordena ASC (del más antiguo al más reciente)
-            return glucosaInterfaz.getGlucosaFiltradaPorMes(fecha);
+            return glucosaInterfaz.getGlucosaFiltradaPorMes(id_usuario,fecha);
         });
 
         // 2. La lógica de agrupación se aplica sobre la lista que ya viene en el orden de inserción (ASC).
         listaGlucosaAgrupada = Transformations.map(listaFiltradaDesdeBD, this::agruparGlucosaPorDia);
+    }
+
+    public void setUsuario(long id_usuario) {
+        this.id_usuario = id_usuario;
     }
 
     /**

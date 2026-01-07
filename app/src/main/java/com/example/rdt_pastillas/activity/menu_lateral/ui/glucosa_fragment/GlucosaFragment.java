@@ -23,6 +23,7 @@ import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.compo
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.bd.repository.GlucosaRepository;
 import com.example.rdt_pastillas.util.dailog.AnioMesDialog;
+import com.example.rdt_pastillas.util.sesion.SessionManager;
 
 import java.util.ArrayList; // Asegúrate de tener este import  OnEditClickLister,
 import java.util.Date;
@@ -45,12 +46,16 @@ public class GlucosaFragment extends Fragment implements
 
     private GlucosaRepository servicio;
 
+    SessionManager sessionManager;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_glucosa, container, false);
 
         servicio = new GlucosaRepository(requireActivity().getApplication());
+        sessionManager = new SessionManager(requireContext());
+
 
         btn_fecha = view.findViewById(R.id.btn_seleccionar_fecha);
         btn_agregar = view.findViewById(R.id.btn_agregar);
@@ -113,7 +118,7 @@ public class GlucosaFragment extends Fragment implements
         }
 
         btn_fecha.setText(fechaMostrada);
-
+        glucosaViewModel.setUsuario(sessionManager.getUserId());
 
         // Llama al método del ViewModel para aplicar el filtro inicial
         glucosaViewModel.setFiltroFecha(fechaGuardada);
@@ -162,6 +167,7 @@ public class GlucosaFragment extends Fragment implements
 
             // 2. Notificar al ViewModel el nuevo filtro
             glucosaViewModel.setFiltroFecha(fechaSeleccionada);
+            glucosaViewModel.setUsuario(sessionManager.getUserId());
 
         }, initialYear);
 

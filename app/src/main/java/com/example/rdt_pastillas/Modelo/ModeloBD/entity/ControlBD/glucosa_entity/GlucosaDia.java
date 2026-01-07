@@ -1,6 +1,5 @@
 package com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GlucosaDia {

@@ -17,8 +17,8 @@ public interface GlucosaLocalDao {
     long insertGlucosa(GlucosaEntity glucosa);
 
     // En lugar de traer todo, ahora filtra por un patrón de fecha (ej: "2025/11%")
-    @Query("SELECT * FROM GlucosaEntity WHERE fecha_hora_creacion LIKE :filtroFecha || '%' ORDER BY fecha_hora_creacion ASC")
-    LiveData<List<GlucosaEntity>> getGlucosaFiltradaPorMes(String filtroFecha);
+    @Query("SELECT * FROM GlucosaEntity WHERE id_usuario = :idUsuario AND fecha_hora_creacion LIKE :filtroFecha || '%' ORDER BY fecha_hora_creacion ASC")
+    LiveData<List<GlucosaEntity>> getGlucosaFiltradaPorMes(long idUsuario, String filtroFecha);
 
     @Query("UPDATE GlucosaEntity SET estado = 1 WHERE id_glucosa = :id")
     void actualizarEstado(long id);
