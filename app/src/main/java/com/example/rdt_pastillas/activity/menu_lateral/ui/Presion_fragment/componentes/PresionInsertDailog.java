@@ -55,8 +55,16 @@ public class PresionInsertDailog {
 
 
             // Validación simple
-            if (sys.isEmpty()) {
-                txt_sys.setError("El monto es requerido");
+            if (sys.isEmpty() || dia.isEmpty() || pul.isEmpty()) {
+                if (sys.isEmpty()) {
+                    txt_sys.setError("El monto es requerido");
+                }
+                if (dia.isEmpty()) {
+                    txt_dia.setError("El monto es requerido");
+                }
+                if (pul.isEmpty()) {
+                    txt_pul.setError("El monto es requerido");
+                }
                 return;
             }
 
