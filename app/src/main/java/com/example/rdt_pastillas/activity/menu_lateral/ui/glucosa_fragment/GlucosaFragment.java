@@ -138,15 +138,15 @@ public class GlucosaFragment extends Fragment implements
         // 2. Crea el String con la fecha actual formateada.
         String fechaFormateada = sdf.format(new Date());
 
-        GlucosaEntity glucosaParaActualizar = glucosa;
+    //    GlucosaEntity glucosaParaActualizar = glucosa;
 
         // 2. Actualiza solo los campos que cambiaron.
-        glucosaParaActualizar.setNivel_glucosa(nivel_glucosa);
-        glucosaParaActualizar.setEn_ayunas(enAyunas);
-        glucosaParaActualizar.setFecha_hora_creacion(fechaFormateada);
-        glucosaParaActualizar.setEstado(false);
+        glucosa.setNivel_glucosa(nivel_glucosa);
+        glucosa.setEn_ayunas(enAyunas);
+        glucosa.setFecha_hora_creacion(fechaFormateada);
+        glucosa.setEstado(false);
 
-        servicio.edit(glucosaParaActualizar);
+        servicio.edit(glucosa);
 
     }
 

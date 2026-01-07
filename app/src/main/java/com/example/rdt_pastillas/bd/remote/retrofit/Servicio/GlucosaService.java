@@ -57,11 +57,10 @@ public class GlucosaService {
         remote.editar_glucosa(context, glucosaParaActualizar, new ApiCallback<ServerResponse>() {
             @Override
             public void onSuccess(ServerResponse response) {
+                TxtServicioGlucosa.ActualizarEstadoEnTxt(entidad.getId_glucosa());
                 AppDataBaseControl.databaseWriteExecutor.execute(() -> {
                     GlucosaLocalDao dao = AppDataBaseControl.getDatabase(context.getApplicationContext()).glucosa_interfaz();
                     dao.actualizarEstado(entidad.getId_glucosa());
-                    // El TxtServicioGlucosa también puede ir aquí, ya que es una operación de I/O.
-/*                    TxtServicioGlucosa.ActualizarEstadoEnTxt(entidad.getId_glucosa());*/
                 });
             }
 
