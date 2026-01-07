@@ -132,16 +132,16 @@ public class PresionFragment extends Fragment implements
         // 2. Crea el String con la fecha actual formateada.
         String fechaFormateada = sdf.format(new Date());
 
-        PresionEntity presionParaActualizar = presion;
+        //PresionEntity presionParaActualizar = presion;
 
         // 2. Actualiza solo los campos que cambiaron.
-        presionParaActualizar.setSys(sys);
-        presionParaActualizar.setDia(dia);
-        presionParaActualizar.setPul(pul);
-        presionParaActualizar.setFecha_hora_creacion(fechaFormateada);
-        presionParaActualizar.setEstado(false);
+        presion.setSys(sys);
+        presion.setDia(dia);
+        presion.setPul(pul);
+        presion.setFecha_hora_creacion(fechaFormateada);
+        presion.setEstado(false);
 
-        servicio.edit(presionParaActualizar);
+        servicio.edit(presion);
     }
     //______________________________________________________________________________________________
     // adapter______________________________________________________________________________________

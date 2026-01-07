@@ -16,14 +16,27 @@ import java.util.List;
 
 public class TxtSrvicioPresion {
 
-    private static final String TAG = "txtServicioPresion";
-    private static final String FILE_NAME = "registros_presion.txt"; // Cambiamos a .csv para más claridad
+    private static final String TAG = "TxtSrvicioPresion";
+
+    // Cambiamos FILE_NAME estático por un prefijo para identificar los archivos de presión
+    private static final String FILE_PREFIX = "registros_presion_";
+    private static final String FILE_EXTENSION = ".txt";
     private static final String HEADER = "ID_usuario;ID_presion;sys;dia;pul;fecha_hora;Estado";
 
+    /**
+     * Genera el nombre del archivo basado en el ID del usuario.
+     * Ejemplo: registros_presion_user_5.txt
+     */
+    private static String getFileNameForUser(long idUsuario) {
+        return FILE_PREFIX + idUsuario + FILE_EXTENSION;
+    }
+
+    /**
+     * Inserta un registro de presión en el archivo txt específico del usuario.
+     */
     public static void InsertarPresionTxt(Context context, long id_usuario, long id, PresionEntity entidad) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "El almacenamiento externo no está disponible para escritura.");
-            // Opcional: mostrar Toast
             return;
         }
 
@@ -33,17 +46,19 @@ public class TxtSrvicioPresion {
             return;
         }
 
-        File file = new File(dir, FILE_NAME);
+        // Nombre dinámico según el usuario
+        String fileName = getFileNameForUser(id_usuario);
+        File file = new File(dir, fileName);
         boolean fileExists = file.exists();
 
         try (FileWriter writer = new FileWriter(file, true)) { // 'true' para añadir al final (append)
-            // Si el archivo es nuevo, escribimos el encabezado primero
+            // Si el archivo es nuevo, escribimos el encabezado
             if (!fileExists || file.length() == 0) {
                 writer.append(HEADER);
                 writer.append(System.lineSeparator());
             }
 
-            // Creamos la línea de datos con el nuevo formato
+            // Creamos la línea de datos
             String registro = id_usuario + ";" +
                     id + ";" +
                     entidad.getSys() + ";" +
@@ -53,70 +68,92 @@ public class TxtSrvicioPresion {
                     entidad.isEstado();
 
             writer.append(registro);
-            writer.append(System.lineSeparator()); // Añadimos siempre un salto de línea
+            writer.append(System.lineSeparator());
             writer.flush();
 
             Log.d(TAG, "Registro con ID " + id + " añadido a " + file.getAbsolutePath());
         } catch (IOException e) {
-            Log.e(TAG, "Error al escribir en el archivo .csv", e);
-            // Opcional: mostrar Toast
+            Log.e(TAG, "Error al escribir en el archivo " + fileName, e);
         }
     }
 
-    public static void ActualizarEstadoEnTxt(long id) {
+    /**
+     * Actualiza el estado de un registro de 'false' a 'true'.
+     * Como solo recibimos el ID del registro (y no el del usuario), buscamos en TODOS los archivos de presión.
+     */
+    public static void ActualizarEstadoEnTxt(long idPresion) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "Almacenamiento no disponible.");
             return;
         }
 
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FILE_NAME);
-        if (!file.exists()) {
-            Log.e(TAG, "El archivo " + FILE_NAME + " no existe. No se puede actualizar.");
-            return;
-        }
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        if (!dir.exists()) return;
 
+        // Filtrar solo archivos que sean de presión
+        File[] files = dir.listFiles((d, name) -> name.startsWith(FILE_PREFIX) && name.endsWith(FILE_EXTENSION));
+
+        if (files == null) return;
+
+        for (File file : files) {
+            // Intentamos actualizar en este archivo. Si devuelve true, es que lo encontró y actualizó.
+            if (procesarActualizacionArchivo(file, idPresion)) {
+                Log.d(TAG, "Registro de presión ID " + idPresion + " actualizado en archivo: " + file.getName());
+                return; // Terminamos porque el ID es único
+            }
+        }
+        Log.w(TAG, "No se encontró el registro con ID_presion " + idPresion + " en ningún archivo.");
+    }
+
+    // Método auxiliar para buscar y actualizar en un archivo específico
+    private static boolean procesarActualizacionArchivo(File file, long idPresion) {
         List<String> lines = leerLineasDeArchivo(file);
-        if (lines == null) return;
+        if (lines == null) return false;
 
         boolean recordModified = false;
         for (int i = 0; i < lines.size(); i++) {
             String currentLine = lines.get(i);
-            String[] parts = currentLine.split(";", -1); // -1 para no descartar valores vacíos
+            String[] parts = currentLine.split(";", -1);
 
-            // Verificamos que sea una línea de datos y que la ID_glucosa coincida
             if (parts.length == 7 && !currentLine.startsWith("ID_usuario")) {
                 try {
-                    long currentId = Long.parseLong(parts[1]);
-                    if (currentId == id) {
-                        // Reconstruimos la línea cambiando el último campo (estado) a 'true'
-                        parts[6] = "true";
+                    long currentId = Long.parseLong(parts[1]); // ID_presion es índice 1
+                    if (currentId == idPresion) {
+                        parts[6] = "true"; // Estado es índice 6
                         lines.set(i, String.join(";", parts));
                         recordModified = true;
-                        Log.d(TAG, "Línea para ID_presion " + id + " modificada en memoria.");
                         break;
                     }
                 } catch (NumberFormatException e) {
-                    // Ignorar líneas con formato incorrecto
+                    // Ignorar líneas corruptas
                 }
             }
         }
 
         if (recordModified) {
             escribirLineasEnArchivo(file, lines);
-            Log.d(TAG, "Archivo " + FILE_NAME + " actualizado para ID_presion " + id);
-        } else {
-            Log.w(TAG, "No se encontró el registro con ID_presion " + id + " en el archivo.");
+            return true;
         }
+        return false;
     }
 
+    /**
+     * Actualiza una línea completa.
+     * Aquí SÍ tenemos el ID de usuario en la entidad, así que vamos directo a su archivo.
+     */
     public static void ActualizarPresionTxt(PresionEntity entidad) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "Almacenamiento no disponible.");
             return;
         }
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FILE_NAME);
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+
+        // Vamos directo al archivo del usuario
+        String fileName = getFileNameForUser(entidad.getId_usuario());
+        File file = new File(dir, fileName);
+
         if (!file.exists()) {
-            Log.e(TAG, "El archivo " + FILE_NAME + " no existe. No se puede actualizar.");
+            Log.e(TAG, "El archivo " + fileName + " no existe. No se puede actualizar.");
             return;
         }
 
@@ -151,25 +188,45 @@ public class TxtSrvicioPresion {
         }
         if (recordModified) {
             escribirLineasEnArchivo(file, lines);
-            Log.d(TAG, "Archivo CSV actualizado para ID_presion " + entidad.getId_presion());
+            Log.d(TAG, "Archivo actualizado para ID_presion " + entidad.getId_presion());
         } else {
             Log.w(TAG, "No se encontró el registro con ID_presion " + entidad.getId_presion() + " para actualizar.");
         }
     }
 
+    /**
+     * Lee todos los registros de TODOS los archivos txt de PRESIÓN disponibles.
+     * Usado para poblar la BD inicial.
+     */
     public static List<PresionEntity> leerTodosLosRegistrosTxt() {
-        List<PresionEntity> registros = new ArrayList<>();
+        List<PresionEntity> registrosTotales = new ArrayList<>();
         if (!isExternalStorageReadable()) {
             Log.w(TAG, "El almacenamiento no está disponible para lectura.");
-            return registros;
+            return registrosTotales;
         }
 
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FILE_NAME);
-        if (!file.exists()) {
-            return registros;
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        if (!dir.exists()) return registrosTotales;
+
+        // Buscamos todos los archivos que coincidan con el patrón de presión
+        File[] files = dir.listFiles((d, name) -> name.startsWith(FILE_PREFIX) && name.endsWith(FILE_EXTENSION));
+
+        if (files != null) {
+            for (File file : files) {
+                Log.d(TAG, "Leyendo archivo de presión: " + file.getName());
+                registrosTotales.addAll(leerRegistrosDeUnArchivo(file));
+            }
         }
 
+        Log.d(TAG, "Total de registros de presión leídos: " + registrosTotales.size());
+        return registrosTotales;
+    }
+
+    // Método auxiliar para leer un solo archivo
+    private static List<PresionEntity> leerRegistrosDeUnArchivo(File file) {
+        List<PresionEntity> registros = new ArrayList<>();
         List<String> lines = leerLineasDeArchivo(file);
+
         if (lines == null) return registros;
 
         for (String line : lines) {
@@ -189,21 +246,18 @@ public class TxtSrvicioPresion {
                     String fecha = parts[5];
                     boolean estado = Boolean.parseBoolean(parts[6]);
 
-                    // Usa el constructor que NO genera fecha automáticamente
-                    // para respetar la fecha guardada en el CSV.
-                    // Necesitarás un constructor que acepte todos estos parámetros.
-                    PresionEntity entidad = new PresionEntity(id_usuario, sys, dia, pul,fecha , estado);
+                    PresionEntity entidad = new PresionEntity(id_usuario, sys, dia, pul, fecha, estado);
                     entidad.setId_presion(id_presion);
                     registros.add(entidad);
                 } catch (NumberFormatException e) {
-                    Log.e(TAG, "Error al parsear la línea de presión del CSV: '" + line + "'", e);
+                    Log.e(TAG, "Error al parsear línea en " + file.getName() + ": '" + line + "'", e);
                 }
             }
         }
-
-        Log.d(TAG, "Se leyeron " + registros.size() + " registros de presión del archivo " + FILE_NAME);
         return registros;
     }
+
+    // --- MÉTODOS DE AYUDA (Sin cambios lógicos) ---
 
     private static boolean isExternalStorageWritable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
@@ -230,12 +284,9 @@ public class TxtSrvicioPresion {
 
     private static void escribirLineasEnArchivo(File file, List<String> lines) {
         try (FileWriter writer = new FileWriter(file, false)) { // 'false' para sobrescribir
-            // Escribimos el encabezado primero si no está en la lista (o asegúrate de no borrarlo)
-            // Si tu lista 'lines' ya incluye el encabezado, ignora este comentario.
-
             for (String line : lines) {
                 writer.write(line);
-                writer.write("\r\n"); // Usar \r\n en lugar de System.lineSeparator()
+                writer.write("\r\n");
             }
             writer.flush();
         } catch (IOException e) {

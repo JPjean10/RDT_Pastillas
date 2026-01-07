@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public class TxtServicioGlucosa {
 
     private static final String TAG = "TxtServicioGlucosa";
     // Eliminamos FILE_NAME estático y usamos un prefijo
-    private static final String FILE_PREFIX = "registros_glucosa_user_";
+    private static final String FILE_PREFIX = "registros_glucosa_";
     private static final String FILE_EXTENSION = ".txt";
     private static final String HEADER = "ID_usuario;ID_glucosa;Nivel;fecha_hora;en_ayunas;Estado";
 
