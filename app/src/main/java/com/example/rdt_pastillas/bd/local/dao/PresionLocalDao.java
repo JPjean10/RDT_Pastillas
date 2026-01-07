@@ -20,8 +20,8 @@ public interface PresionLocalDao {
     @Query("UPDATE PresionEntity SET estado = 1 WHERE id_presion = :id")
     void actualizarEstado(long id);
 
-    @Query("SELECT * FROM PresionEntity WHERE fecha_hora_creacion LIKE :filtroFecha || '%' ORDER BY fecha_hora_creacion DESC")
-    LiveData<List<PresionEntity>> getPresionFiltradaPorMes(String filtroFecha);
+    @Query("SELECT * FROM PresionEntity WHERE id_usuario = :idUsuario AND fecha_hora_creacion LIKE :filtroFecha || '%' ORDER BY fecha_hora_creacion DESC")
+    LiveData<List<PresionEntity>> getPresionFiltradaPorMes(String filtroFecha, long idUsuario);
 
     @Update
     void editPresion(PresionEntity presion);

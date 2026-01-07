@@ -20,6 +20,7 @@ import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.compo
 import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.componentes.PresionInsertDailog;
 import com.example.rdt_pastillas.bd.repository.PresionRepository;
 import com.example.rdt_pastillas.util.dailog.AnioMesDialog;
+import com.example.rdt_pastillas.util.sesion.SessionManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -37,6 +38,7 @@ public class PresionFragment extends Fragment implements
     private RecyclerView recyclerView;
     private PresionRepository servicio;
     private PresionAdapter adapter;
+    SessionManager sessionManager;
 
 
     @Nullable
@@ -45,6 +47,7 @@ public class PresionFragment extends Fragment implements
         View view =  inflater.inflate(R.layout.fragment_presion, container, false);
 
         servicio = new PresionRepository(requireActivity().getApplication());
+        sessionManager = new SessionManager(requireContext());
 
         btn_fecha = view.findViewById(R.id.btn_seleccionar_fecha);
         btn_agregar = view.findViewById(R.id.btn_agregar);
@@ -90,7 +93,7 @@ public class PresionFragment extends Fragment implements
         // Observamos el LiveData del repositorio
         // Nota: El formato en BD es "yyyy-MM-dd...", así que filtramos por "yyyy-MM"
         // Asegúrate de que tu DAO usa LIKE :filtro || '%' correctamente
-        servicio.obtenerPresionPorMes(fechaFiltro).observe(getViewLifecycleOwner(), lista -> {
+        servicio.obtenerPresionPorMes(fechaFiltro, sessionManager.getUserId()).observe(getViewLifecycleOwner(), lista -> {
             adapter.setListaPresion(lista);
         });
     }

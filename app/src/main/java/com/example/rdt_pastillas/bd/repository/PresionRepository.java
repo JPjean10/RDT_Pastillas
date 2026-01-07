@@ -66,8 +66,8 @@ public class PresionRepository {
         });
     }
 
-    public LiveData<List<PresionEntity>> obtenerPresionPorMes(String filtroFecha) {
-        return interfaz.getPresionFiltradaPorMes(filtroFecha);
+    public LiveData<List<PresionEntity>> obtenerPresionPorMes(String filtroFecha, long idUsuario) {
+        return interfaz.getPresionFiltradaPorMes(filtroFecha, idUsuario);
     }
 
     public void edit(PresionEntity presion) {
