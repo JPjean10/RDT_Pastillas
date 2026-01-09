@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.rdt_pastillas.R;
+import com.example.rdt_pastillas.util.alert.AlertaAvertencia;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class UsuarioInsertDailog {
@@ -34,6 +35,9 @@ public class UsuarioInsertDailog {
         final TextInputEditText txtContrasena = view.findViewById(R.id.txt_contrasena);
         final TextInputEditText txtNombre = view.findViewById(R.id.txt_nombre);
 
+        txtUsuario.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(20)});
+        txtContrasena.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(20)});
+        txtNombre.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(50)});
 
         ImageView btnAceptar = view.findViewById(R.id.btnAceptar);
         ImageView btnCancelar = view.findViewById(R.id.btnCancelar);
@@ -57,20 +61,10 @@ public class UsuarioInsertDailog {
 
 
             // Validación simple
-            if (usuario.isEmpty()) {
-                txtUsuario.setError("El usuario es requerido");
+            if (usuario.isEmpty() && contrasena.isEmpty() && nombre.isEmpty()) {
+                AlertaAvertencia.show(context, "Por favor, complete todos los campos");
                 return;
             }
-            if (contrasena.isEmpty()) {
-                txtContrasena.setError("La contraseña es requerida");
-                return;
-            }
-
-            if (nombre.isEmpty()) {
-                txtNombre.setError("El nombre es requerido");
-                return;
-            }
-
 
             // Llamar al listener con los datos
             if (listener != null) {

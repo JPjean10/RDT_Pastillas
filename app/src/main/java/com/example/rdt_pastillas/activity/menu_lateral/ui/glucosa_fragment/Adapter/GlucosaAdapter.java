@@ -73,7 +73,6 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
 
         TextView tvFecha;
         ImageView ivEdit;
-        ImageButton btnToggleAyunas;
         View medicionView1, medicionView2;
         View divider1;
 
@@ -83,7 +82,6 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
             super(itemView);
             tvFecha = itemView.findViewById(R.id.tv_fecha);
             ivEdit = itemView.findViewById(R.id.iv_edit);
-            btnToggleAyunas = itemView.findViewById(R.id.btn_toggle_ayunas);
 
             medicionView1 = itemView.findViewById(R.id.medicion1);
             medicionView2 = itemView.findViewById(R.id.medicion2);
@@ -110,18 +108,6 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
                 ivEdit.setVisibility(View.INVISIBLE);
                 ivEdit.setOnClickListener(null);
             }
-
-
-            // --- Lógica del botón de Visibilidad ---
-            btnToggleAyunas.setOnClickListener(v -> {
-                mostrarAyunas = !mostrarAyunas; // Cambia el estado de visibilidad
-                // Vuelve a aplicar la configuración a las vistas para reflejar el cambio
-                actualizarVistasMediciones(mediciones, mostrarAyunas);
-                // Cambia el ícono del botón
-                btnToggleAyunas.setImageResource(
-                        mostrarAyunas ? R.drawable.ic_ocultar : R.drawable.ic_mostrar
-                );
-            });
 
             // Configuración inicial de las vistas
             actualizarVistasMediciones(mediciones, mostrarAyunas);
@@ -159,13 +145,8 @@ public class GlucosaAdapter extends RecyclerView.Adapter<GlucosaAdapter.ViewHold
             ivSync.setImageResource(medicion.isEstado() ? R.drawable.ic_cloud_24 : R.drawable.ic_cloud_off_24);
 
             // Lógica de visibilidad y estado del CheckBox
-            cbEnAyunas.setVisibility(mostrarAyunas ? View.VISIBLE : View.GONE);
-            if (medicion.getEn_ayunas() != null) {
-                cbEnAyunas.setChecked(medicion.getEn_ayunas());
-            } else {
-                cbEnAyunas.setChecked(false);
-            }
-            cbEnAyunas.setEnabled(false); // No se puede editar desde la lista
+            cbEnAyunas.setChecked(medicion.getEn_ayunas() != null && medicion.getEn_ayunas());
+            cbEnAyunas.setEnabled(false);
         }
 
         // --- Métodos para formatear fecha y hora (sin cambios) ---

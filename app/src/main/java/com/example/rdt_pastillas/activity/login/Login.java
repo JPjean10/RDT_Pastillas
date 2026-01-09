@@ -119,6 +119,10 @@ public class Login extends AppCompatActivity implements
         btnIniciarSesion = findViewById(R.id.btn_iniciar_sesion);
         btnRegistrar = findViewById(R.id.btn_registrar);
 
+        txtUsuario.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(20)});
+        txtContrasena.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(20)});
+
+
         // 🔹 LEER SharedPreferences AL INICIAR
         ocultarRegistro = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
                 .getBoolean(KEY_OCULTAR, false);

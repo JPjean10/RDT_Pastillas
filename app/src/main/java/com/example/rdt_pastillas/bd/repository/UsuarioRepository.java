@@ -29,7 +29,6 @@ public class UsuarioRepository {
     private final UsuarioRemoteDataSource remote;
 
     private ExecutorService databaseWriteExecutor;
-    private Context context;
 
     private final SessionManager sessionManager;
     String tag = "UsuarioRepository";
@@ -37,7 +36,6 @@ public class UsuarioRepository {
 
     public UsuarioRepository(Application application) {
         AppDataBaseControl db = AppDataBaseControl.getDatabase(application);
-        this.context = application.getApplicationContext();
         localDao = db.usuario_interfaz();
         databaseWriteExecutor = AppDataBaseControl.databaseWriteExecutor;
         remote = new UsuarioRemoteDataSource();
@@ -48,10 +46,6 @@ public class UsuarioRepository {
     public interface LoginCallback {
         void onLoginSuccess(int userId);
         void onLoginFailed(String error);
-    }
-
-    public interface UserCountCallback {
-        void onResult(int count);
     }
     public void insertar_usuario(Context context, UsuarioEntity usuario_entity, Runnable onSuccess){
         // 1. Crear y mostrar el ProgressDialog
@@ -103,70 +97,64 @@ public class UsuarioRepository {
                     progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
                 } else {
                     new Handler(Looper.getMainLooper()).post(() -> {
-
-                        remote.login(context, usuario, contrasena, new ApiCallback<com.example.rdt_pastillas.Modelo.response.LoginResponse>() {
-                            @Override
-                            public void onSuccess(com.example.rdt_pastillas.Modelo.response.LoginResponse response) {
-                                if (response.isStatus() && response.getData() != null && !response.getData().isEmpty()) {
-
-                                    // Obtenemos el usuario que vino del servidor
-                                    UsuarioEntity remoteUser = response.getData().get(0);
-                                    // Aseguramos que la contraseña esté seteada (por si el server no la devuelve por seguridad, aunque en tu postman si sale)
-                                    remoteUser.setContrasena(contrasena);
-
-                                    // Insertamos en la BD Local en un hilo secundario
-                                    databaseWriteExecutor.execute(() -> {
-                                        try {
-                                            long idLocal = localDao.insertUsuario(remoteUser);
-
-                                            // Si el insert devolvió -1, quizás ya existía con otro ID, intentamos buscarlo de nuevo
-                                            if (idLocal <= 0) {
-                                                UsuarioEntity existing = localDao.findUsuarioByCredentials(usuario, contrasena);
-                                                if (existing != null) idLocal = existing.getId_usuario();
-                                            }
-
-                                            int finalId = (int) idLocal;
-
-                                            // Regresamos al hilo principal para notificar éxito
-                                            new Handler(Looper.getMainLooper()).post(() -> {
-                                                // Guardamos sesión siempre
-                                                sessionManager.saveUserSession(finalId, recordar);
-                                                callback.onLoginSuccess(finalId);
-                                                AlertaExitoso.show(context, "Sincronizado y Logueado correctamente");
-                                                progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
-                                            });
-
-                                        } catch (Exception e) {
-                                            Log.e(tag, "Error guardando usuario remoto en local", e);
-                                            new Handler(Looper.getMainLooper()).post(() ->
-                                                    callback.onLoginFailed("Error al guardar datos del usuario")
-                                                     // Ocultar siempre al recibir respuesta
-                                            );
-                                            progressDialog.dismiss();
-                                        }
-                                    });
-
-                                } else {
-                                    callback.onLoginFailed(response.getUserMsg() != null ? response.getUserMsg() : "Usuario no encontrado .");
-                                    progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
-                                }
-                            }
-
-                            @Override
-                            public void onError(String errorMessage) {
-                                callback.onLoginFailed(errorMessage);
-                                progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
-                            }
-
-                            @Override
-                            public void onFailure(String failureMessage) {
-                                AlertaError.show(context,"Es nesesario loquear con internet la primera vez o usuario invalido");
-                                progressDialog.dismiss(); // Ocultar siempre al recibir respuesta
-                            }
-                        });
+                        loginRemoto(context, usuario, contrasena, recordar, callback, () -> {progressDialog.dismiss();});
                     });
                 }
             });
+        });
+    }
+
+    private void loginRemoto(Context context, String usuario, String contrasena, boolean recordar, LoginCallback callback, Runnable onSuccess){
+        remote.login(context, usuario, contrasena, new ApiCallback<com.example.rdt_pastillas.Modelo.response.LoginResponse>() {
+            @Override
+            public void onSuccess(com.example.rdt_pastillas.Modelo.response.LoginResponse response) {
+                if (response.isStatus() && response.getData() != null && !response.getData().isEmpty()) {
+
+                    // Obtenemos el usuario que vino del servidor
+                    UsuarioEntity remoteUser = response.getData().get(0);
+
+                    // Insertamos en la BD Local en un hilo secundario
+                    databaseWriteExecutor.execute(() -> {
+                        try {
+                            long idLocal = localDao.insertUsuario(remoteUser);
+
+                            int finalId = (int) idLocal;
+
+                            // Regresamos al hilo principal para notificar éxito
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                // Guardamos sesión siempre
+                                sessionManager.saveUserSession(finalId, recordar);
+                                callback.onLoginSuccess(finalId);
+                                onSuccess.run(); // Ocultar siempre al recibir respuesta
+                            });
+
+                        } catch (Exception e) {
+                            Log.e(tag, "Error guardando usuario remoto en local", e);
+                            new Handler(Looper.getMainLooper()).post(() ->
+                                            callback.onLoginFailed("Error al guardar datos del usuario")
+                                    // Ocultar siempre al recibir respuesta
+                            );
+                            onSuccess.run();
+                        }
+                    });
+
+                } else {
+                    callback.onLoginFailed(response.getUserMsg() != null ? response.getUserMsg() : "Usuario no encontrado .");
+                    onSuccess.run();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                callback.onLoginFailed(errorMessage);
+                onSuccess.run();
+            }
+
+            @Override
+            public void onFailure(String failureMessage) {
+                AlertaError.show(context,"No hay conexión a internet.");
+                onSuccess.run();
+            }
         });
     }
 }
