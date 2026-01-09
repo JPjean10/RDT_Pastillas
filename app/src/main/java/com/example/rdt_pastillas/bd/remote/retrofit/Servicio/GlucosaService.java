@@ -35,13 +35,9 @@ public class GlucosaService {
                     Log.d(TAG, "Sincronización exitosa con el servidor remoto");
                 });
             }
-            public void onError(String errorMessage) {
-                Log.d(TAG, errorMessage);
-            }
+            public void onError(String errorMessage) {Log.d(TAG, "insertar glucosa: " + errorMessage);}
             @Override
-            public void onFailure(String failureMessage) {
-                Log.d(TAG, failureMessage);
-            }
+            public void onFailure(String failureMessage) {Log.d(TAG, failureMessage);}
         });
     }
 
@@ -66,12 +62,12 @@ public class GlucosaService {
 
             @Override
             public void onError(String errorMessage) {
-                Log.e("GlucosaRepository", "Error de API al editar glucosa: " + errorMessage);
+                Log.e(TAG, "editar glucosa: " + errorMessage);
             }
 
             @Override
             public void onFailure(String failureMessage) {
-                Log.e("GlucosaRepository", "Fallo de red al editar glucosa: " + failureMessage);
+                Log.e(TAG, failureMessage);
             }
         });
     }

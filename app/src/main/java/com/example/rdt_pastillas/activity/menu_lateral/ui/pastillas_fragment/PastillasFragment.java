@@ -38,6 +38,8 @@ public class PastillasFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private PastillasAdapter adapter;
+    private static final String TAG = "PastillasFragment";
+
 
     @Nullable
     @Override
@@ -101,7 +103,7 @@ public class PastillasFragment extends Fragment {
                 }
 
             } catch (ParseException e) {
-                Log.e("FiltradoPastillas", "Formato de hora inválido: " + pastilla.getHora(), e);
+                Log.e(TAG, "Formato de hora inválido: " + pastilla.getHora(), e);
             }
         }
 
@@ -122,15 +124,10 @@ public class PastillasFragment extends Fragment {
     }
     private void ProgramarOActualizarAlarmas() {
         List<PastillasModel> pastillas = ListaPastilla.getPastillas();
-        if (pastillas.isEmpty()) {
-            Toast.makeText(getContext(), "No hay pastillas para programar.", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         for (PastillasModel pastilla : pastillas) {
             programarAlarma(requireContext(), pastilla, false);
         }
-        Toast.makeText(getContext(), "Alarmas programadas/actualizadas.", Toast.LENGTH_SHORT).show();
     }
 
     public static void programarAlarma(Context context, PastillasModel pastilla, boolean isSnooze) {
@@ -141,7 +138,7 @@ public class PastillasFragment extends Fragment {
         intent.putExtra("PILL_NAME", pastilla.getNombre());
         intent.putExtra("PILL_HOUR", pastilla.getHora()); // Crucial para que el Receiver pueda reprogramar
 
-        Log.d("AlarmScheduling", "Alarma SUSPENDIDA para '" + pastilla.getNombre() + "' a las: " + pastilla.getHora() + " (Snooze)");
+        Log.d(TAG, "Alarma SUSPENDIDA para '" + pastilla.getNombre() + "' a las: " + pastilla.getHora() + " (Snooze)");
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -155,7 +152,7 @@ public class PastillasFragment extends Fragment {
         if (isSnooze) {
             // Lógica para suspender: programar para X minutos en el futuro.
             calendar.add(Calendar.MINUTE, 30); // Puedes cambiar a 30 min.
-            Log.d("AlarmScheduling", "Alarma SUSPENDIDA para '" + pastilla.getNombre() + "' en 1 minuto.");
+            Log.d(TAG, "Alarma SUSPENDIDA para '" + pastilla.getNombre() + "' en 1 minuto.");
         } else {
             // Lógica para programar una alarma normal.
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.US);
@@ -163,7 +160,7 @@ public class PastillasFragment extends Fragment {
             try {
                 alarmDate = sdf.parse(pastilla.getHora());
             } catch (ParseException e) {
-                Log.e("AlarmScheduling", "Formato de hora inválido: " + pastilla.getHora());
+                Log.e(TAG, "Formato de hora inválido: " + pastilla.getHora());
                 return; // No se puede programar si la hora es incorrecta.
             }
 
@@ -182,12 +179,12 @@ public class PastillasFragment extends Fragment {
 
         // Comprobación de permiso para Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-            Log.w("AlarmScheduling", "La app no tiene permiso para programar alarmas exactas. La alarma podría no ser precisa.");
+            Log.w(TAG, "La app no tiene permiso para programar alarmas exactas. La alarma podría no ser precisa.");
         }
 
         // LA LÍNEA MÁS IMPORTANTE: Usamos setExactAndAllowWhileIdle para la máxima precisión.
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
 
-Log.d("AlarmScheduling", "Alarma programada para '" + pastilla.getNombre() + "' a las: " + calendar.getTime());
+Log.d(TAG, "Alarma programada para '" + pastilla.getNombre() + "' a las: " + calendar.getTime());
     }
 }

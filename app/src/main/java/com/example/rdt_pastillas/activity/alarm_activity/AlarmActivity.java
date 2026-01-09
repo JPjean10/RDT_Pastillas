@@ -27,6 +27,8 @@ public class AlarmActivity extends AppCompatActivity {
     private String pillName;
     private String pillHour;
     private int notificationId;
+    private String TAG = "AlarmActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,10 +84,9 @@ public class AlarmActivity extends AppCompatActivity {
         // 1. Detener el sonido
         detener_alarma();
 
-        Log.d("DEBUG_SNOOZE", "Recibido ->id: " + pillId + " | Nombre: " + pillName + " | Hora: " + pillHour);
-
         if (pillHour == null || pillHour.isEmpty()) {
             Toast.makeText(this, "Error: No se pudo identificar la hora de la alarma", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Error: No se pudo identificar la hora de la alarma");
             finish();
             return;
         }

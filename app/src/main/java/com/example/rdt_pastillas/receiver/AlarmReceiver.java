@@ -26,6 +26,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "alarm_channel_group"; // Cambiamos el ID para evitar conflictos
     public static final String NOTIFICATION = "NOTIFICATION";
     public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
+    private String TAG = "AlarmReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -36,14 +37,14 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // Si no hay datos, no podemos continuar.
         if (pillId == -1 || pillName == null || pillHour == null) {
-            Log.e("AlarmReceiver", "Faltan datos en el Intent. No se puede procesar la alarma.");
+            Log.e(TAG, "Faltan datos en el Intent. No se puede procesar la alarma.");
             return;
         }
 
         // --- PASO 1: REPROGRAMAR LA ALARMA PARA EL PRÓXIMO DÍA ---
         PastillasModel pastillaActual = new PastillasModel(pillId, pillName, pillHour);
         PastillasFragment.programarAlarma(context, pastillaActual, false); // false = no es snooze
-        Log.d("AlarmReceiver", "Alarma para '" + pillName + "' reprogramada para el próximo día.");
+        Log.d(TAG, "Alarma para '" + pillName + "' reprogramada para el próximo día.");
 
         // --- PASO 2: CREAR UN IDENTIFICADOR ÚNICO PARA EL GRUPO DE HORA ---
         // Convertimos la hora (ej. "07:40 PM") en un número entero.

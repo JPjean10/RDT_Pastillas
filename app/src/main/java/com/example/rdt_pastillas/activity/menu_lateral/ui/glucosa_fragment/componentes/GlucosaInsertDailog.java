@@ -34,6 +34,8 @@ public class GlucosaInsertDailog {
         final TextInputEditText txt_nivel_glucosa = view.findViewById(R.id.txt_nivel_glucosa);
         final CheckBox cbEnAyunas = view.findViewById(R.id.cb_en_ayunas);
 
+        txt_nivel_glucosa.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(3)});
+
         ImageView btnAceptar = view.findViewById(R.id.btnAceptar);
         ImageView btnCancelar = view.findViewById(R.id.btnCancelar);
         // Construir el AlertDialog

@@ -22,6 +22,7 @@ public class GlucosaRepository {
     private GlucosaLocalDao interfaz;
     private ExecutorService databaseWriteExecutor;
     private Context context;
+    private String TAG = "GlucosaRepository";
 
     SessionManager sessionManager;
 
@@ -45,16 +46,14 @@ public class GlucosaRepository {
                 if (idGenerado > 0) {
                     TxtServicioGlucosa.InsertarGlucosaTxt(context,sessionManager.getUserId(),idGenerado,nuevoGlucosa);
                     GlucosaService.insertarGlucosa(context,idGenerado,sessionManager.getUserId(),nuevoGlucosa);
-                    Log.d("GlucosaDao", "Registro guardado en BD con exito:");
-                    Log.d("GlucosaDao", "Registro guardado en BD local con ID: " + idGenerado);
+                    Log.d(TAG, "Registro guardado en BD con exito:");
+                    Log.d(TAG, "Registro guardado en BD local con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
-                            AlertaExitoso.show(context, "Registro exitoso")
+                            AlertaExitoso.show(context, "Glucosa insertada correctamente.")
                     );
                 } else {
-                    AlertaError.show(context, "La inserción en la base de datos devolvió un ID no válido");
-                    Log.e("GlucosaDao", "La inserción en la base de datos devolvió un ID no válido.");
-                    // Esto ocurre si la inserción en la BD falla por alguna razón
-                    throw new Exception("La inserción en la base de datos devolvió un ID no válido.");
+                    AlertaError.show(context, "Error al procesar la solicitud.");
+                    Log.e(TAG, "Error al procesar la solicitud.");
                 }
             } catch (Exception e) {
                 Log.e("GastoDao", "Error al guardar el gasto", e);
@@ -70,8 +69,9 @@ public class GlucosaRepository {
                 interfaz.editGlucosa(glucosa);
                 TxtServicioGlucosa.ActualizarGlucosaTxt(glucosa);
                 GlucosaService.editarGlucosa(context,glucosa);
+                AlertaExitoso.show(context,"Glucosa actulizada correctamente.");
             } catch (Exception e) {
-                Log.e("GlucosaDao", "Error al actualizar la glucosa", e);
+                Log.e(TAG, "Error al actualizar la glucosa", e);
                 // Considera mostrar una alerta de error si es necesario.
             }
         });
