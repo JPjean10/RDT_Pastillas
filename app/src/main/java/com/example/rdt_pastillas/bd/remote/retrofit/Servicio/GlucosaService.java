@@ -35,9 +35,9 @@ public class GlucosaService {
                     Log.d(TAG, "Sincronización exitosa con el servidor remoto");
                 });
             }
-            public void onError(String errorMessage) {Log.d(TAG, "insertar glucosa: " + errorMessage);}
+            public void onError(String errorMessage) {Log.d(TAG,"insertar glucosa: " + errorMessage);}
             @Override
-            public void onFailure(String failureMessage) {Log.d(TAG, failureMessage);}
+            public void onFailure(String failureMessage) {Log.d(TAG,"insertar glucosa: " + failureMessage);}
         });
     }
 

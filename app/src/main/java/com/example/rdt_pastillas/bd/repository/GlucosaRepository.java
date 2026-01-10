@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
 import com.example.rdt_pastillas.bd.remote.retrofit.Servicio.GlucosaService;
 import com.example.rdt_pastillas.bd.local.dao.GlucosaLocalDao;
@@ -15,6 +17,7 @@ import com.example.rdt_pastillas.util.alert.AlertaError;
 import com.example.rdt_pastillas.util.alert.AlertaExitoso;
 import com.example.rdt_pastillas.util.sesion.SessionManager;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class GlucosaRepository {
@@ -75,6 +78,10 @@ public class GlucosaRepository {
                 // Considera mostrar una alerta de error si es necesario.
             }
         });
+    }
+
+    public LiveData<List<GlucosaEntity>> obtenerGlucosaPorMes(String filtroFecha, long idUsuario) {
+        return interfaz.getGlucosaFiltradaPorMes(idUsuario,filtroFecha);
     }
 
 }

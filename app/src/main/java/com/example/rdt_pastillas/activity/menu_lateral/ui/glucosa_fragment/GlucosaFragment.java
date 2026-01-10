@@ -11,13 +11,11 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.Adapter.GlucosaAdapter;
-import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.ViewModel.GlucosaViewModel;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.GlucosaEditDailog;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.componentes.GlucosaInsertDailog;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
@@ -39,8 +37,6 @@ public class GlucosaFragment extends Fragment implements
     private String fechaGuardada; // Formato "yyyy/MM"
     private EditText btn_fecha;
     private Button btn_agregar;
-
-    private GlucosaViewModel glucosaViewModel;
     private GlucosaAdapter adapter;
     private RecyclerView recyclerView;
 
@@ -64,12 +60,6 @@ public class GlucosaFragment extends Fragment implements
         // 1. Configurar el RecyclerView y su adaptador
         setupRecyclerView();
 
-        // 2. Inicializar el ViewModel
-        glucosaViewModel = new ViewModelProvider(this).get(GlucosaViewModel.class);
-
-        // 3. Observar los datos del ViewModel
-        observarDatos();
-
         // 4. DESCOMENTAR ESTA LÍNEA: Es crucial para el funcionamiento inicial
         establecerFechaInicial();
 
@@ -82,6 +72,7 @@ public class GlucosaFragment extends Fragment implements
             dialog.show();
         });
 
+
         return view;
     }
     // MÉTODO_______________________________________________________________________________________
@@ -89,18 +80,12 @@ public class GlucosaFragment extends Fragment implements
         adapter = new GlucosaAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        /*adapter.setOnItemClickListener(this);*/
     }
 
-    private void observarDatos() {
-        glucosaViewModel.getListaGlucosaAgrupada().observe(getViewLifecycleOwner(), listaAgrupada -> {
-            // Este bloque ahora maneja todos los casos
-            if (listaAgrupada != null && !listaAgrupada.isEmpty()) {
-                adapter.submitList(listaAgrupada);
-            } else {
-                // ¡AQUÍ ESTÁ LA CORRECCIÓN CLAVE!
-                // Si la lista es nula o vacía, le pasamos una lista vacía al adaptador para que se limpie.
-                adapter.submitList(new ArrayList<>());
-            }
+    private void cargarDatos(String fechaFiltro){
+        servicio.obtenerGlucosaPorMes(fechaFiltro, sessionManager.getUserId()).observe(getViewLifecycleOwner(), lista -> {
+            adapter.submitList(lista);
         });
     }
 
@@ -117,11 +102,7 @@ public class GlucosaFragment extends Fragment implements
             fechaMostrada = fechaMostrada.substring(0, 1).toUpperCase() + fechaMostrada.substring(1);
         }
 
-        btn_fecha.setText(fechaMostrada);
-        glucosaViewModel.setUsuario(sessionManager.getUserId());
-
-        // Llama al método del ViewModel para aplicar el filtro inicial
-        glucosaViewModel.setFiltroFecha(fechaGuardada);
+      cargarDatos(fechaGuardada);
     }
    //_______________________________________________________________________________________________
    // dailog________________________________________________________________________________________
@@ -163,9 +144,7 @@ public class GlucosaFragment extends Fragment implements
             this.fechaGuardada = fechaSeleccionada;
             this.btn_fecha.setText(fechaMostrada);
 
-            // 2. Notificar al ViewModel el nuevo filtro
-            glucosaViewModel.setFiltroFecha(fechaSeleccionada);
-            glucosaViewModel.setUsuario(sessionManager.getUserId());
+            cargarDatos(fechaSeleccionada);
 
         }, initialYear);
 

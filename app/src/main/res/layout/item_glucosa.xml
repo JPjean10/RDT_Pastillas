@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- CAMBIO AQUÍ: Debe ser MaterialCardView para que el cast en Java funcione -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,7 +9,8 @@
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp"> <!-- Necesario para manipular el borde en el Adapter -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,11 +24,11 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/iv_edit"
+                android:id="@+id/iv_Caloendario"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="Editar"
-                android:src="@drawable/ic_edit_24"
+                android:src="@drawable/ic_calendar_clock_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -36,48 +39,64 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:paddingStart="10dp"
                 android:textSize="19dp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/iv_edit"
+                app:layout_constraintStart_toEndOf="@+id/iv_Caloendario"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="19/11/2025" />
+                tools:text="19/11/2025 08:40 am" />
+
+            <ImageView
+                android:id="@+id/iv_edit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Editar"
+                android:src="@drawable/ic_edit_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/colorOnSurface" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Fila inferior con las 3 mediciones -->
+        <!-- Fila inferior -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:baselineAligned="false"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Contenedor Medición 1 (Izquierda) -->
-            <include
-                android:id="@+id/medicion1"
-                layout="@layout/subitem_glucosa"
-                android:layout_width="0dp"
+            <ImageView
+                android:id="@+id/iv_icon_glucosa"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Icono"
+                android:src="@drawable/ic_glucose_24"
+                app:tint="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/tv_glucosa"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:paddingStart="10dp"
+                tools:text="120" />
 
             <View
-                android:id="@+id/divider1"
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="4dp"
-                android:background="?android:attr/listDivider" />
-
-            <!-- Contenedor Medición 2 (Centro) -->
-            <include
-                android:id="@+id/medicion2"
-                layout="@layout/subitem_glucosa"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="1" />
 
-        </LinearLayout>
+            <CheckBox
+                android:id="@+id/cb_en_ayunas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="en ayunas"
+                style="@style/Widget.AppCompat.CompoundButton.CheckBox" />
 
+        </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
