@@ -20,7 +20,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="sys"
+        android:hint="Sistólica(sys)"
         app:startIconDrawable="@drawable/ic_grid_3x3_24"
         style="@style/textfield_TextInputLayout">
 
@@ -34,7 +34,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="dia"
+        android:hint="Diastólica(dia)"
         app:startIconDrawable="@drawable/ic_grid_3x3_24"
         style="@style/textfield_TextInputLayout">
 
@@ -48,7 +48,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="pul"
+        android:hint="Pulso(pul)"
         app:startIconDrawable="@drawable/ic_grid_3x3_24"
         style="@style/textfield_TextInputLayout">
 

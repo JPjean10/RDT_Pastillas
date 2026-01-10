@@ -37,6 +37,10 @@ public class PresionEditDailog {
         final TextInputEditText txt_dia = view.findViewById(R.id.txt_dia);
         final TextInputEditText txt_pul = view.findViewById(R.id.txt_pul);
 
+        txt_sys.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(3)});
+        txt_dia.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(3)});
+        txt_pul.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(3)});
+
         txt_sys.setText(String.valueOf(presion.getSys()));
         txt_dia.setText(String.valueOf(presion.getDia()));
         txt_pul.setText(String.valueOf(presion.getPul()));

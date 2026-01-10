@@ -148,6 +148,13 @@ public class Login extends AppCompatActivity implements
             servicio.login(this,usuario, contrasena, recordar, new UsuarioRepository.LoginCallback() {
                 @Override
                 public void onLoginSuccess(int userId) {
+                    // 🔹 Guardar bandera
+                    getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+                            .edit()
+                            .putBoolean(KEY_OCULTAR, true)
+                            .apply();
+
+                    ocultarRegistro = true;
                     iniciarMainActivity();
                 }
 
@@ -179,6 +186,18 @@ public class Login extends AppCompatActivity implements
         });
     }
 //______________________________________________________________________________________________
+// MÉTODOS______________________________________________________________________________________
+
+    private void iniciarMainActivity() {
+        Intent intent = new Intent(Login.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void ocultarBotonRegistroSiEsNecesario() {
+        btnRegistrar.setVisibility(ocultarRegistro ? View.GONE : View.VISIBLE);
+    }
+// _____________________________________________________________________________________________
 // MÉTODOS DE PERMISOS AQUÍ_____________________________________________________________________
 
     private void checkAndRequestStoragePermission() {
@@ -208,15 +227,6 @@ public class Login extends AppCompatActivity implements
         }
     }
 
-    private void iniciarMainActivity() {
-        Intent intent = new Intent(Login.this, MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    private void ocultarBotonRegistroSiEsNecesario() {
-        btnRegistrar.setVisibility(ocultarRegistro ? View.GONE : View.VISIBLE);
-    }
 // ________________________________________________________________________________
 //______________no tocar___________________________________________________________
 }
