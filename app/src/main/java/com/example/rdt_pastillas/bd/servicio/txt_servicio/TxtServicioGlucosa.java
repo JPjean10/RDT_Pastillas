@@ -17,35 +17,29 @@ import java.util.List;
 public class TxtServicioGlucosa {
 
     private static final String TAG = "TxtServicioGlucosa";
-    // Eliminamos FILE_NAME estático y usamos un prefijo
     private static final String FILE_PREFIX = "registros_glucosa_";
     private static final String FILE_EXTENSION = ".txt";
     private static final String HEADER = "ID_usuario;ID_glucosa;Nivel;fecha_hora;en_ayunas;Estado";
 
-    /**
-     * Genera el nombre del archivo basado en el ID del usuario.
-     * Ejemplo: registros_glucosa_user_10.txt
-     */
-    private static String getFileNameForUser(long idUsuario) {
-        return FILE_PREFIX + idUsuario + FILE_EXTENSION;
-    }
+    // Nombre de la carpeta personalizada
+    private static final String FOLDER_NAME = "MiSalud";
 
-    /**
-     * Inserta un registro de glucosa en el archivo txt específico del usuario.
-     */
     public static void InsertarGlucosaTxt(Context context, long id_usuario, long id, GlucosaEntity entity) {
         if (!isExternalStorageWritable()) {
             Log.e(TAG, "El almacenamiento externo no está disponible para escritura.");
             return;
         }
 
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-        if (!dir.exists() && !dir.mkdirs()) {
-            Log.e(TAG, "No se pudo crear el directorio de Documentos.");
-            return;
+        File dir = getAppDirectory();
+        if (!dir.exists()) {
+            if (dir.mkdirs()) {
+                Log.d(TAG, "Carpeta creada: " + dir.getAbsolutePath());
+            } else {
+                Log.e(TAG, "No se pudo crear el directorio: " + dir.getAbsolutePath());
+                return;
+            }
         }
 
-        // Usamos el nombre dinámico basado en el ID del usuario
         String fileName = getFileNameForUser(id_usuario);
         File file = new File(dir, fileName);
         boolean fileExists = file.exists();
@@ -73,33 +67,24 @@ public class TxtServicioGlucosa {
         }
     }
 
-    /**
-     * Actualiza el estado de un registro.
-     * IMPORTANTE: Como no recibimos el ID de usuario aquí en tu código original,
-     * tenemos que buscar en TODOS los archivos de glucosa hasta encontrar el ID de registro.
-     */
     public static void ActualizarEstadoEnTxt(long idGlucosa) {
         if (!isExternalStorageWritable()) return;
 
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File dir = getAppDirectory();
         if (!dir.exists()) return;
 
-        // Filtramos todos los archivos que comiencen con el prefijo
         File[] files = dir.listFiles((d, name) -> name.startsWith(FILE_PREFIX) && name.endsWith(FILE_EXTENSION));
 
         if (files == null) return;
 
         for (File file : files) {
             if (procesarActualizacionArchivo(file, idGlucosa)) {
-                // Si encontramos el registro y lo actualizamos, detenemos la búsqueda
                 Log.d(TAG, "Registro encontrado y actualizado en: " + file.getName());
                 return;
             }
         }
-        Log.w(TAG, "No se encontró el registro con ID_glucosa " + idGlucosa + " en ningún archivo.");
     }
 
-    // Método auxiliar para no repetir código en ActualizarEstadoEnTxt
     private static boolean procesarActualizacionArchivo(File file, long idGlucosa) {
         List<String> lines = leerLineasDeArchivo(file);
         if (lines == null) return false;
@@ -111,9 +96,9 @@ public class TxtServicioGlucosa {
 
             if (parts.length == 6 && !currentLine.startsWith("ID_usuario")) {
                 try {
-                    long currentId = Long.parseLong(parts[1]); // ID_glucosa es la posición 1
+                    long currentId = Long.parseLong(parts[1]);
                     if (currentId == idGlucosa) {
-                        parts[5] = "true"; // Actualizar estado
+                        parts[5] = "true";
                         lines.set(i, String.join(";", parts));
                         recordModified = true;
                         break;
@@ -129,23 +114,15 @@ public class TxtServicioGlucosa {
         return false;
     }
 
-    /**
-     * Actualiza una línea completa.
-     * Aquí SI tenemos la entidad, por lo que sabemos el ID de usuario y podemos ir directo al archivo correcto.
-     */
     public static void ActualizarGlucosaTxt(GlucosaEntity glucosaActualizada) {
         if (!isExternalStorageWritable()) return;
 
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File dir = getAppDirectory(); // Usar la subcarpeta
         String fileName = getFileNameForUser(glucosaActualizada.getId_usuario());
         File file = new File(dir, fileName);
 
-        if (!file.exists()) {
-            Log.e(TAG, "El archivo " + fileName + " no existe.");
-            return;
-        }
+        if (!file.exists()) return;
 
-        // Reutilizamos la lógica de lectura y escritura
         List<String> lines = leerLineasDeArchivo(file);
         if (lines == null) return;
 
@@ -177,66 +154,58 @@ public class TxtServicioGlucosa {
         }
     }
 
-    /**
-     * Lee todos los registros de TODOS los archivos txt de glucosa disponibles.
-     */
     public static List<GlucosaEntity> leerTodosLosRegistrosTxt() {
         List<GlucosaEntity> registrosTotales = new ArrayList<>();
-        if (!isExternalStorageReadable()) {
-            Log.w(TAG, "El almacenamiento no está disponible para lectura.");
-            return registrosTotales;
-        }
+        if (!isExternalStorageReadable()) return registrosTotales;
 
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File dir = getAppDirectory(); // Usar la subcarpeta
         if (!dir.exists()) return registrosTotales;
 
-        // Buscar todos los archivos que coincidan con el patrón "registros_glucosa_user_*.txt"
         File[] files = dir.listFiles((d, name) -> name.startsWith(FILE_PREFIX) && name.endsWith(FILE_EXTENSION));
 
         if (files != null) {
             for (File file : files) {
-                Log.d(TAG, "Leyendo archivo: " + file.getName());
                 registrosTotales.addAll(leerRegistrosDeUnArchivo(file));
             }
         }
-
-        Log.d(TAG, "Total de registros leídos de todos los archivos: " + registrosTotales.size());
         return registrosTotales;
     }
 
-    // Método privado para leer un solo archivo
     private static List<GlucosaEntity> leerRegistrosDeUnArchivo(File file) {
         List<GlucosaEntity> registros = new ArrayList<>();
         List<String> lines = leerLineasDeArchivo(file);
-
         if (lines == null) return registros;
 
         for (String line : lines) {
             if (line.trim().isEmpty() || line.startsWith("ID_usuario")) continue;
-
             String[] parts = line.split(";", -1);
             if (parts.length == 6) {
                 try {
-                    long id_usuario = Long.parseLong(parts[0]);
-                    long id_glucosa = Long.parseLong(parts[1]);
-                    int nivelGlucosa = Integer.parseInt(parts[2]);
-                    String fecha = parts[3];
-                    boolean enAyunas = Boolean.parseBoolean(parts[4]);
-                    boolean estado = Boolean.parseBoolean(parts[5]);
-
-                    GlucosaEntity entidad = new GlucosaEntity(id_usuario, nivelGlucosa, fecha, enAyunas, estado);
-                    entidad.setId_glucosa(id_glucosa);
+                    GlucosaEntity entidad = new GlucosaEntity(
+                            Long.parseLong(parts[0]),
+                            Integer.parseInt(parts[2]),
+                            parts[3],
+                            Boolean.parseBoolean(parts[4]),
+                            Boolean.parseBoolean(parts[5])
+                    );
+                    entidad.setId_glucosa(Long.parseLong(parts[1]));
                     registros.add(entidad);
-                } catch (NumberFormatException e) {
-                    Log.e(TAG, "Error parseando línea en " + file.getName(), e);
-                }
+                } catch (NumberFormatException e) { }
             }
         }
         return registros;
     }
 
-
     // --- MÉTODOS DE AYUDA (Sin cambios mayores, solo copiarlos tal cual estaban o dejarlos igual) ---
+    private static File getAppDirectory() {
+        File publicDocDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        return new File(publicDocDir, FOLDER_NAME);
+    }
+
+    private static String getFileNameForUser(long idUsuario) {
+        return FILE_PREFIX + idUsuario + FILE_EXTENSION;
+    }
+
     private static boolean isExternalStorageWritable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
@@ -255,7 +224,6 @@ public class TxtServicioGlucosa {
             }
             return lines;
         } catch (IOException e) {
-            Log.e(TAG, "Error al leer el archivo: " + file.getName(), e);
             return null;
         }
     }
@@ -264,11 +232,11 @@ public class TxtServicioGlucosa {
         try (FileWriter writer = new FileWriter(file, false)) {
             for (String line : lines) {
                 writer.write(line);
-                writer.write("\r\n");
+                writer.write(System.lineSeparator());
             }
             writer.flush();
         } catch (IOException e) {
-            Log.e(TAG, "Error al reescribir el archivo: " + file.getName(), e);
+            Log.e(TAG, "Error al reescribir el archivo", e);
         }
     }
 }

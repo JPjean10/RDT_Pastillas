@@ -43,6 +43,7 @@ public class GlucosaEntity {
         this.id_usuario = id_usuario;
         this.nivel_glucosa = nivel_glucosa;
         this.fecha_hora_creacion = fecha_hora_creacion;
+        this.en_ayunas = en_ayunas;
         this.estado = estado;
     }
 
