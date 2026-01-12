@@ -31,23 +31,20 @@ import javax.mail.internet.MimeMultipart;
 public class EmailWorker extends Worker {
 
     private static final String TAG = "EmailWorker";
-    private final Context context;
+    private static final String FOLDER_NAME = "MiSalud";
 
     public EmailWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
-        this.context = context;
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        Log.d(TAG, "Iniciando tarea de envío de correo.");
+        Log.d(TAG, "Iniciando tarea de envío de correo de reportes médicos.");
 
-        // 1. Ajusta tu cuenta y contraseña de aplicación
         final String username = "jeanpauldc90@gmail.com";
-        final String appPassword = "vdxf plht jpvx qzdf"; // 16 dígitos
+        final String appPassword = "vdxf plht jpvx qzdf";
 
-        // 2. Configuración SMTP
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -69,38 +66,53 @@ public class EmailWorker extends Worker {
                     InternetAddress.parse("jeanpauldc80@gmail.com")
             );
 
-            // Asunto con fecha
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String fechaHoy = sdf.format(new Date());
-            message.setSubject("Reporte de Glucosa - " + fechaHoy);
-
-            // Cuerpo del correo
-            MimeBodyPart textPart = new MimeBodyPart();
-            textPart.setText("Hola,\n\nAdjunto el reporte de registros de glucosa.\n\nSaludos.");
-
-            // Adjuntar archivo
-            MimeBodyPart attachmentPart = new MimeBodyPart();
-            File documentsDir = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOCUMENTS);
-            File file = new File(documentsDir, "registros_glucosa.txt");
-            if (!file.exists()) {
-                Log.e(TAG, "El archivo no existe: " + file.getAbsolutePath());
-                return Result.failure();
-            }
-            DataSource source = new FileDataSource(file);
-            attachmentPart.setDataHandler(new DataHandler(source));
-            attachmentPart.setFileName(file.getName());
+            message.setSubject("Reporte Médico (Glucosa y Presión) - " + fechaHoy);
 
             Multipart multipart = new MimeMultipart();
+
+            // 1. Cuerpo del correo
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText("Hola,\n\nSe adjuntan los reportes de registros de glucosa y presión arterial encontrados en la carpeta MiSalud.\n\nSaludos.");
             multipart.addBodyPart(textPart);
-            multipart.addBodyPart(attachmentPart);
+
+            // 2. Localizar carpeta MiSalud en Documentos
+            File documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            File miSaludDir = new File(documentsDir, FOLDER_NAME);
+
+            if (!miSaludDir.exists() || !miSaludDir.isDirectory()) {
+                Log.e(TAG, "La carpeta MiSalud no existe.");
+                return Result.failure();
+            }
+
+            // 3. Obtener todos los archivos de glucosa y presión (ej: registros_glucosa_1, registros_glucosa_2, etc.)
+            File[] files = miSaludDir.listFiles((dir, name) ->
+                    (name.startsWith("registros_glucosa_") || name.startsWith("registros_presion_"))
+                            && name.endsWith(".txt")
+            );
+
+            if (files != null && files.length > 0) {
+                // Recorremos todos los archivos encontrados y los adjuntamos uno por uno
+                for (File file : files) {
+                    MimeBodyPart attachmentPart = new MimeBodyPart();
+                    DataSource source = new FileDataSource(file);
+                    attachmentPart.setDataHandler(new DataHandler(source));
+                    attachmentPart.setFileName(file.getName());
+                    multipart.addBodyPart(attachmentPart);
+                    Log.d(TAG, "Archivo adjuntado con éxito: " + file.getName());
+                }
+            } else {
+                Log.w(TAG, "No se encontraron archivos para adjuntar.");
+                return Result.failure();
+            }
 
             message.setContent(multipart);
 
-            // Enviar
+            // 4. Enviar
             Transport.send(message);
 
-            Log.d(TAG, "Correo enviado exitosamente.");
+            Log.d(TAG, "Correo enviado exitosamente con todos los adjuntos.");
             return Result.success();
 
         } catch (MessagingException e) {
