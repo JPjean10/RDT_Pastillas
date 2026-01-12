@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.glucosa_entity.GlucosaEntity;
+import com.example.rdt_pastillas.util.DateUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,8 +21,6 @@ public class TxtServicioGlucosa {
     private static final String FILE_PREFIX = "registros_glucosa_";
     private static final String FILE_EXTENSION = ".txt";
     private static final String HEADER = "ID_usuario;ID_glucosa;Nivel;fecha_hora;en_ayunas;Estado";
-
-    // Nombre de la carpeta personalizada
     private static final String FOLDER_NAME = "MiSalud";
 
     public static void InsertarGlucosaTxt(Context context, long id_usuario, long id, GlucosaEntity entity) {
@@ -53,7 +52,7 @@ public class TxtServicioGlucosa {
             String registro = id_usuario + ";" +
                     id + ";" +
                     entity.getNivel_glucosa() + ";" +
-                    entity.getFecha_hora_creacion() + ";" +
+                    DateUtil.formatearFechaParaTxt(entity.getFecha_hora_creacion()) + ";" +
                     entity.getEn_ayunas() + ";" +
                     entity.isEstado();
 
@@ -138,7 +137,7 @@ public class TxtServicioGlucosa {
                         String lineaActualizada = glucosaActualizada.getId_usuario() + ";" +
                                 glucosaActualizada.getId_glucosa() + ";" +
                                 glucosaActualizada.getNivel_glucosa() + ";" +
-                                glucosaActualizada.getFecha_hora_creacion() + ";" +
+                                DateUtil.formatearFechaParaTxt(glucosaActualizada.getFecha_hora_creacion()) + ";" +
                                 glucosaActualizada.getEn_ayunas() + ";" +
                                 glucosaActualizada.isEstado();
                         lines.set(i, lineaActualizada);
@@ -181,10 +180,13 @@ public class TxtServicioGlucosa {
             String[] parts = line.split(";", -1);
             if (parts.length == 6) {
                 try {
+
+                    String fechaRestaurada = DateUtil.restaurarFechaDesdeTxt(parts[3].trim());
+
                     GlucosaEntity entidad = new GlucosaEntity(
                             Long.parseLong(parts[0]),
                             Integer.parseInt(parts[2]),
-                            parts[3],
+                            fechaRestaurada,
                             Boolean.parseBoolean(parts[4]),
                             Boolean.parseBoolean(parts[5])
                     );
