@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
+import com.example.rdt_pastillas.util.DateUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,13 +47,15 @@ public class TxtSrvicioPresion {
                 writer.append(System.lineSeparator());
             }
 
+            String estado = entidad.isEstado() ? "1" : "0";
+
             String registro = id_usuario + ";" +
                     id + ";" +
                     entidad.getSys() + ";" +
                     entidad.getDia() + ";" +
                     entidad.getPul() + ";" +
-                    entidad.getFecha_hora_creacion() + ";" +
-                    entidad.isEstado();
+                    DateUtil.formatearFechaParaTxt(entidad.getFecha_hora_creacion()) + ";" +
+                    estado;
 
             writer.append(registro);
             writer.append(System.lineSeparator());
@@ -95,16 +98,18 @@ public class TxtSrvicioPresion {
 
             if (parts.length == 7 && !currentLine.startsWith("ID_usuario")) {
                 try {
-                    long currentId = Long.parseLong(parts[1].trim());
-                    if (currentId == entidad.getId_presion()) {
+                    if (Long.parseLong(parts[1].trim()) == entidad.getId_presion()) {
+
+                        String estado = entidad.isEstado() ? "1" : "0";
+
                         // Construimos la nueva línea con los datos actualizados
                         String lineaActualizada = entidad.getId_usuario() + ";" +
                                 entidad.getId_presion() + ";" +
                                 entidad.getSys() + ";" +
                                 entidad.getDia() + ";" +
                                 entidad.getPul() + ";" +
-                                entidad.getFecha_hora_creacion() + ";" +
-                                entidad.isEstado();
+                                DateUtil.formatearFechaParaTxt(entidad.getFecha_hora_creacion()) + ";" +
+                                estado;
 
                         lines.set(i, lineaActualizada);
                         recordModified = true;
@@ -134,7 +139,7 @@ public class TxtSrvicioPresion {
                     // Usamos trim() para mayor seguridad
                     long currentId = Long.parseLong(parts[1].trim());
                     if (currentId == idPresion) {
-                        parts[6] = "true";
+                        parts[6] = "1";
                         lines.set(i, String.join(";", parts));
                         recordModified = true;
                         break;
@@ -177,14 +182,15 @@ public class TxtSrvicioPresion {
             String[] parts = line.split(";", -1);
             if (parts.length == 7) {
                 try {
+
                     // AGREGADO .trim() en todos los campos para evitar errores de lectura
                     long id_usuario = Long.parseLong(parts[0].trim());
                     long id_presion = Long.parseLong(parts[1].trim());
                     int sys = Integer.parseInt(parts[2].trim());
                     int dia = Integer.parseInt(parts[3].trim());
                     int pul = Integer.parseInt(parts[4].trim());
-                    String fecha = parts[5].trim();
-                    boolean estado = Boolean.parseBoolean(parts[6].trim());
+                    String fecha = DateUtil.restaurarFechaDesdeTxt(parts[5].trim());
+                    boolean estado = parts[6].trim().equals("1");
 
                     PresionEntity entidad = new PresionEntity(id_usuario, sys, dia, pul, fecha, estado);
                     entidad.setId_presion(id_presion);
