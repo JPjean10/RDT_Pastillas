@@ -49,12 +49,15 @@ public class TxtServicioGlucosa {
                 writer.append(System.lineSeparator());
             }
 
+            String ayunas = entity.getEn_ayunas() ? "1" : "0";
+            String estado = entity.isEstado() ? "1" : "0";
+
             String registro = id_usuario + ";" +
                     id + ";" +
                     entity.getNivel_glucosa() + ";" +
                     DateUtil.formatearFechaParaTxt(entity.getFecha_hora_creacion()) + ";" +
-                    entity.getEn_ayunas() + ";" +
-                    entity.isEstado();
+                    ayunas + ";" +
+                    estado;
 
             writer.append(registro);
             writer.append(System.lineSeparator());
@@ -90,14 +93,11 @@ public class TxtServicioGlucosa {
 
         boolean recordModified = false;
         for (int i = 0; i < lines.size(); i++) {
-            String currentLine = lines.get(i);
-            String[] parts = currentLine.split(";", -1);
-
-            if (parts.length == 6 && !currentLine.startsWith("ID_usuario")) {
+            String[] parts = lines.get(i).split(";", -1);
+            if (parts.length == 6 && !lines.get(i).startsWith("ID_usuario")) {
                 try {
-                    long currentId = Long.parseLong(parts[1]);
-                    if (currentId == idGlucosa) {
-                        parts[5] = "true";
+                    if (Long.parseLong(parts[1].trim()) == idGlucosa) {
+                        parts[5] = "1"; // Estado a 1 (true)
                         lines.set(i, String.join(";", parts));
                         recordModified = true;
                         break;
@@ -105,12 +105,8 @@ public class TxtServicioGlucosa {
                 } catch (NumberFormatException e) { }
             }
         }
-
-        if (recordModified) {
-            escribirLineasEnArchivo(file, lines);
-            return true;
-        }
-        return false;
+        if (recordModified) escribirLineasEnArchivo(file, lines);
+        return recordModified;
     }
 
     public static void ActualizarGlucosaTxt(GlucosaEntity glucosaActualizada) {
@@ -132,14 +128,17 @@ public class TxtServicioGlucosa {
 
             if (parts.length == 6 && !currentLine.startsWith("ID_usuario")) {
                 try {
-                    long currentId = Long.parseLong(parts[1]);
-                    if (currentId == glucosaActualizada.getId_glucosa()) {
+                    if (Long.parseLong(parts[1]) == glucosaActualizada.getId_glucosa()) {
+
+                        String ayunas = glucosaActualizada.getEn_ayunas() ? "1" : "0";
+                        String estado = glucosaActualizada.isEstado() ? "1" : "0";
+
                         String lineaActualizada = glucosaActualizada.getId_usuario() + ";" +
                                 glucosaActualizada.getId_glucosa() + ";" +
                                 glucosaActualizada.getNivel_glucosa() + ";" +
                                 DateUtil.formatearFechaParaTxt(glucosaActualizada.getFecha_hora_creacion()) + ";" +
-                                glucosaActualizada.getEn_ayunas() + ";" +
-                                glucosaActualizada.isEstado();
+                                ayunas + ";" +
+                                estado;
                         lines.set(i, lineaActualizada);
                         recordModified = true;
                         break;
@@ -182,13 +181,15 @@ public class TxtServicioGlucosa {
                 try {
 
                     String fechaRestaurada = DateUtil.restaurarFechaDesdeTxt(parts[3].trim());
+                    boolean enAyunas = parts[4].trim().equals("1");
+                    boolean estado = parts[5].trim().equals("1");
 
                     GlucosaEntity entidad = new GlucosaEntity(
                             Long.parseLong(parts[0]),
                             Integer.parseInt(parts[2]),
                             fechaRestaurada,
-                            Boolean.parseBoolean(parts[4]),
-                            Boolean.parseBoolean(parts[5])
+                            enAyunas,
+                            estado
                     );
                     entidad.setId_glucosa(Long.parseLong(parts[1]));
                     registros.add(entidad);
