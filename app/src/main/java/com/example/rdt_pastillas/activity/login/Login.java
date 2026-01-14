@@ -276,23 +276,6 @@ public class Login extends AppCompatActivity implements
     }
 // _____________________________________________________________________________________________
 // MÉTODOS DE PERMISOS AQUÍ_____________________________________________________________________
-
-/*    private void checkAndRequestStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                try {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                    intent.setData(uri);
-                    storageActivityResultLauncher.launch(intent);
-                } catch (Exception e) {
-                    Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                    storageActivityResultLauncher.launch(intent);
-                }
-            }
-        }
-    }*/
 private void checkAndRequestStoragePermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         if (Environment.isExternalStorageManager()) {
@@ -300,9 +283,6 @@ private void checkAndRequestStoragePermission() {
             // El permiso fue concedido.
             SyncManager syncManager = new SyncManager(this);
             syncManager.iniciarSincronizacionCompleta();
-
-            AlertaError.show(this,"fdefew");
-            Log.d("Loginff", "ffff");
         } else {
             // Solicitar permiso
             try {

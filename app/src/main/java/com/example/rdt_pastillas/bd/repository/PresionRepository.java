@@ -49,7 +49,7 @@ public class PresionRepository {
                     Log.d(TAG, "Registro guardado en BD con exito:");
                     Log.d(TAG, "Registro guardado en BD local con ID: " + idGenerado);
                     new Handler(Looper.getMainLooper()).post(() ->
-                            AlertaExitoso.show(context, "Registro exitoso")
+                            AlertaExitoso.show(context, "Presion insertada correctamente")
                     );
                 } else {
                     AlertaError.show(context, "error al registrar");
@@ -76,6 +76,7 @@ public class PresionRepository {
                 interfaz.editPresion(presion);
                 TxtSrvicioPresion.ActualizarPresionTxt(presion);
                 PresionServicio.editarPresion(context,presion);
+                AlertaExitoso.show(context, "Presion actualizada correctamente");
             } catch (Exception e) {
                 Log.e(TAG, "Error al actualizar la presión", e);
                 // Considera mostrar una alerta de error si es necesario.

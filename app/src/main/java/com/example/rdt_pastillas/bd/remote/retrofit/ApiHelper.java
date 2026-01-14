@@ -33,7 +33,7 @@ public class ApiHelper {
                     try {
                         String errorBody = response.errorBody().string();
                         JSONObject jsonObject = new JSONObject(errorBody);
-                        String mensajeError = jsonObject.optString("userMssg", "Error desconocido del servidor.");
+                        String mensajeError = jsonObject.optString("userMssg", "Error al procesar la solicitud.");
                         // Llamar al callback onError
                         callback.onError(mensajeError);
                     } catch (Exception e) {
