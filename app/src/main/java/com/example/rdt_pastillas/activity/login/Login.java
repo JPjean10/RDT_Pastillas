@@ -66,11 +66,7 @@ public class Login extends AppCompatActivity implements
                     result -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                             if (Environment.isExternalStorageManager()) {
-                                SyncManager syncManager = new SyncManager(this);
-                                syncManager.iniciarSincronizacionCompleta();
 
-                                programarEnvioDeCorreo();
-                                programarSincronizacionPC();
                             } else {
                                 // El usuario no concedió el permiso.
                                 Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
@@ -212,77 +208,11 @@ public class Login extends AppCompatActivity implements
     private void ocultarBotonRegistroSiEsNecesario() {
         btnRegistrar.setVisibility(ocultarRegistro ? View.GONE : View.VISIBLE);
     }
-
-    private void programarEnvioDeCorreo() {
-        // TAREA PERIÓDICA (CADA 15 DÍAS)
-        // Se crea la solicitud de trabajo periódico para que se repita cada 15 días.
-        PeriodicWorkRequest periodicWorkRequest =
-                new PeriodicWorkRequest.Builder(EmailWorker.class, 15, TimeUnit.DAYS)
-                        .build();
-
-        // Se encola la tarea periódica.
-        // La política "KEEP" asegura que si la tarea ya está programada, no se reinicie ni se duplique.
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "envioCorreoPeriodico", // Nombre único para la tarea periódica
-                ExistingPeriodicWorkPolicy.KEEP,
-                periodicWorkRequest
-        );
-
-        Log.i("MainApplication", "Tarea de envío de correo periódico (cada 15 días) programada.");
-    }
-
-    private void programarSincronizacionPC() {
-        // 1. Calcular cuánto tiempo falta para la próxima 1:00 AM
-        java.util.Calendar calendar = java.util.Calendar.getInstance();
-        long ahora = calendar.getTimeInMillis();
-
-        // Configurar calendario para hoy a la 1:00 AM
-        calendar.set(java.util.Calendar.HOUR_OF_DAY, 1);
-        calendar.set(java.util.Calendar.MINUTE, 0);
-        calendar.set(java.util.Calendar.SECOND, 0);
-        calendar.set(java.util.Calendar.MILLISECOND, 0);
-
-        // Si ya pasó la 1:00 AM de hoy, programamos para la 1:00 AM de MAÑANA
-        if (calendar.getTimeInMillis() <= ahora) {
-            calendar.add(java.util.Calendar.DAY_OF_YEAR, 1);
-        }
-
-        long tiempoHastaLaUnaAM = calendar.getTimeInMillis() - ahora;
-
-        // 2. Definir restricciones
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.UNMETERED) // Solo WiFi
-                .build();
-
-        // 3. Crear la solicitud periódica
-        PeriodicWorkRequest pcSyncRequest = new PeriodicWorkRequest.Builder(
-                PcSyncWorker.class,
-                24, TimeUnit.HOURS) // Se repite cada 24 horas después de la primera ejecución
-                .setConstraints(constraints)
-                .setInitialDelay(tiempoHastaLaUnaAM, TimeUnit.MILLISECONDS) // Espera hasta la 1:00 AM para empezar
-                .setBackoffCriteria(
-                        BackoffPolicy.LINEAR,
-                        1, TimeUnit.HOURS) // REINTENTO: Si falla (PC apagada), reintenta cada hora
-                .build();
-
-        // 4. Encolar la tarea única
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "SyncMiSaludPC",
-                ExistingPeriodicWorkPolicy.KEEP, // Mantiene la programación existente
-                pcSyncRequest
-        );
-
-        Log.i("Login", "Sincronización PC programada para las 1:00 AM. Retraso inicial: " + (tiempoHastaLaUnaAM / 1000 / 60) + " minutos.");
-    }
 // _____________________________________________________________________________________________
 // MÉTODOS DE PERMISOS AQUÍ_____________________________________________________________________
-private void checkAndRequestStoragePermission() {
+    private void checkAndRequestStoragePermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         if (Environment.isExternalStorageManager()) {
-            // Ya tiene permiso
-            // El permiso fue concedido.
-            SyncManager syncManager = new SyncManager(this);
-            syncManager.iniciarSincronizacionCompleta();
         } else {
             // Solicitar permiso
             try {
