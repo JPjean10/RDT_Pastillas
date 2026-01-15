@@ -31,6 +31,7 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import com.example.rdt_pastillas.MainApplication;
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.login.componentes.UsuarioInsertDailog;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.usuario_entity.UsuarioEntity;
@@ -66,7 +67,8 @@ public class Login extends AppCompatActivity implements
                     result -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                             if (Environment.isExternalStorageManager()) {
-
+                                // ESTO ES LO QUE "RETORNA" LA LÓGICA A LA APLICACIÓN
+                                ((MainApplication) getApplication()).intentarInicializacionGlobal();
                             } else {
                                 // El usuario no concedió el permiso.
                                 Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
