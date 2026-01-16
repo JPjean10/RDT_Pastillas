@@ -72,7 +72,10 @@ public class GlucosaRepository {
                 interfaz.editGlucosa(glucosa);
                 TxtServicioGlucosa.ActualizarGlucosaTxt(glucosa);
                 GlucosaService.editarGlucosa(context,glucosa);
-                AlertaExitoso.show(context,"Glucosa actulizada correctamente.");
+
+                new Handler(Looper.getMainLooper()).post(() ->
+                        AlertaExitoso.show(context, "Glucosa actualizada correctamente.")
+                );
             } catch (Exception e) {
                 Log.e(TAG, "Error al actualizar la glucosa", e);
                 // Considera mostrar una alerta de error si es necesario.

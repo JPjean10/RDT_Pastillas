@@ -76,7 +76,10 @@ public class PresionRepository {
                 interfaz.editPresion(presion);
                 TxtSrvicioPresion.ActualizarPresionTxt(presion);
                 PresionServicio.editarPresion(context,presion);
-                AlertaExitoso.show(context, "Presion actualizada correctamente");
+
+                new Handler(Looper.getMainLooper()).post(() ->
+                        AlertaExitoso.show(context, "Presion actualizada correctamente")
+                );
             } catch (Exception e) {
                 Log.e(TAG, "Error al actualizar la presión", e);
                 // Considera mostrar una alerta de error si es necesario.

@@ -102,7 +102,10 @@ public class GlucosaFragment extends Fragment implements
             fechaMostrada = fechaMostrada.substring(0, 1).toUpperCase() + fechaMostrada.substring(1);
         }
 
-      cargarDatos(fechaGuardada);
+        btn_fecha.setText(fechaMostrada);
+
+        // Llama al método del ViewModel para aplicar el filtro inicial
+        cargarDatos(fechaGuardada);
     }
    //_______________________________________________________________________________________________
    // dailog________________________________________________________________________________________

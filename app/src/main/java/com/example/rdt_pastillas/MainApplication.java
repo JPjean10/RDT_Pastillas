@@ -111,7 +111,7 @@ public class MainApplication extends Application {
         // 4. Encolar la tarea única
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 "SyncMiSaludPC",
-                ExistingPeriodicWorkPolicy.KEEP, // Mantiene la programación existente
+                ExistingPeriodicWorkPolicy.REPLACE, // Mantiene la programación existente
                 pcSyncRequest
         );
 
