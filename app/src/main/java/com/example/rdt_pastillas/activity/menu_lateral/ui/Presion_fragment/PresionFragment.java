@@ -89,9 +89,6 @@ public class PresionFragment extends Fragment implements
     }
 
     private void cargarDatos(String fechaFiltro) {
-        // Observamos el LiveData del repositorio
-        // Nota: El formato en BD es "yyyy-MM-dd...", así que filtramos por "yyyy-MM"
-        // Asegúrate de que tu DAO usa LIKE :filtro || '%' correctamente
         servicio.obtenerPresionPorMes(fechaFiltro, sessionManager.getUserId()).observe(getViewLifecycleOwner(), lista -> {
             adapter.setListaPresion(lista);
         });

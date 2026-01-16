@@ -11,6 +11,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +26,7 @@ import com.example.rdt_pastillas.util.sesion.SessionManager;
 
 import java.util.ArrayList; // Asegúrate de tener este import  OnEditClickLister,
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -43,6 +45,8 @@ public class GlucosaFragment extends Fragment implements
     private GlucosaRepository servicio;
 
     SessionManager sessionManager;
+    private LiveData<List<GlucosaEntity>> glucosaLiveData;
+
 
     @Nullable
     @Override
@@ -83,8 +87,19 @@ public class GlucosaFragment extends Fragment implements
     }
 
     private void cargarDatos(String fechaFiltro){
-        servicio.obtenerGlucosaPorMes(fechaFiltro, sessionManager.getUserId()).observe(getViewLifecycleOwner(), lista -> {
-            adapter.submitList(lista);
+        // Si ya existía un LiveData observando, dejamos de observar
+        if (glucosaLiveData != null) {
+            glucosaLiveData.removeObservers(getViewLifecycleOwner());
+        }
+
+        // Obtenemos el nuevo LiveData filtrado
+        glucosaLiveData = servicio.obtenerGlucosaPorMes(fechaFiltro, sessionManager.getUserId());
+
+        // Observamos el nuevo
+        glucosaLiveData.observe(getViewLifecycleOwner(), lista -> {
+            if (lista != null) {
+                adapter.submitList(lista);
+            }
         });
     }
 
@@ -110,8 +125,6 @@ public class GlucosaFragment extends Fragment implements
    // dailog________________________________________________________________________________________
     @Override
     public void insertOnClickedDailog(int nivel_glucosa, boolean enAyunas) {
-        Log.d("GlucosaFragment", "Nivel: " + nivel_glucosa + ", En Ayunas: " + enAyunas);
-
         servicio.insert(nivel_glucosa, enAyunas);
     }
 
