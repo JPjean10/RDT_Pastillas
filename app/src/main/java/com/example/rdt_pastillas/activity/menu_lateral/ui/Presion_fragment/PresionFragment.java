@@ -10,6 +10,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
@@ -24,6 +25,7 @@ import com.example.rdt_pastillas.util.sesion.SessionManager;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class PresionFragment extends Fragment implements
@@ -38,6 +40,7 @@ public class PresionFragment extends Fragment implements
     private PresionRepository servicio;
     private PresionAdapter adapter;
     SessionManager sessionManager;
+    private LiveData<List<PresionEntity>> presionLiveData;
 
 
     @Nullable
@@ -89,8 +92,18 @@ public class PresionFragment extends Fragment implements
     }
 
     private void cargarDatos(String fechaFiltro) {
-        servicio.obtenerPresionPorMes(fechaFiltro, sessionManager.getUserId()).observe(getViewLifecycleOwner(), lista -> {
-            adapter.setListaPresion(lista);
+        if (presionLiveData != null) {
+            presionLiveData.removeObservers(getViewLifecycleOwner());
+        }
+
+        // 3. Obtenemos el nuevo LiveData filtrado del repositorio
+        presionLiveData = servicio.obtenerPresionPorMes(fechaFiltro, sessionManager.getUserId());
+
+        // 4. Observamos el nuevo LiveData
+        presionLiveData.observe(getViewLifecycleOwner(), lista -> {
+            if (lista != null) {
+                adapter.setListaPresion(lista);
+            }
         });
     }
 
