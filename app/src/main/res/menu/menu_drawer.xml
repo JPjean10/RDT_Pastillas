@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_menu_presion"
         android:title="presión" />
 
+    <item
+        android:id="@+id/nav_reporte"
+        android:icon="@drawable/ic_analytics_24"
+        android:title="reporte" />
+
 </menu>

@@ -80,7 +80,6 @@ public class GlucosaFragment extends Fragment implements
         adapter = new GlucosaAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-        /*adapter.setOnItemClickListener(this);*/
     }
 
     private void cargarDatos(String fechaFiltro){

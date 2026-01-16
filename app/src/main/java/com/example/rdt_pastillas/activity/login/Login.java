@@ -67,6 +67,8 @@ public class Login extends AppCompatActivity implements
                     result -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                             if (Environment.isExternalStorageManager()) {
+                                Toast.makeText(this, "Permiso de almacenamiento concedido.", Toast.LENGTH_SHORT).show();
+                                Log.i("login", "Permiso de almacenamiento concedido.");
                                 // ESTO ES LO QUE "RETORNA" LA LÓGICA A LA APLICACIÓN
                                 ((MainApplication) getApplication()).intentarInicializacionGlobal();
                             } else {

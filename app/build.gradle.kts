@@ -69,6 +69,9 @@ dependencies {
     annotationProcessor ("androidx.room:room-compiler:2.6.1")
     implementation("androidx.work:work-runtime:2.9.0")
 
+    // El formato debe ser Grupo:Nombre:Versión
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
     // SMTP
     implementation("com.sun.mail:android-mail:1.6.7")
     implementation("com.sun.mail:android-activation:1.6.7")

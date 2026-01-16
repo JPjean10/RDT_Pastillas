@@ -16,6 +16,7 @@ import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.PresionFragment;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.GlucosaFragment;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ReporteFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -82,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GlucosaFragment()).commit();
         } else if (itemId == R.id.nav_presion) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PresionFragment()).commit();
+        } else if (itemId == R.id.nav_reporte) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ReporteFragment()).commit();
         }
 
         getSupportActionBar().setTitle(item.getTitle());

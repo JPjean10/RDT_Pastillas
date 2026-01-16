@@ -66,6 +66,7 @@ public class SyncManager {
         if (IGlucosa.countGlucosa() == 0) {
             List<GlucosaEntity> registrosGlucosa = TxtServicioGlucosa.leerTodosLosRegistrosTxt();
             if (registrosGlucosa != null && !registrosGlucosa.isEmpty()) {
+                Log.d(TAG, "Insertando glucosa " + registrosGlucosa.size() + " registros desde TXT");
                 IGlucosa.insertAll(registrosGlucosa);
             } else {
                 Log.w(TAG, "AVISO: No se encontraron registros en el archivo de glucosa.");
@@ -79,6 +80,7 @@ public class SyncManager {
         if (IPresion.countPresion() == 0) {
             List<PresionEntity> registrosPresion = TxtSrvicioPresion.leerTodosLosRegistrosTxt();
             if (registrosPresion != null && !registrosPresion.isEmpty()) {
+                Log.d(TAG, "Insertando presion " + registrosPresion.size() + " registros desde TXT");
                 IPresion.insertAll(registrosPresion);
             } else {
                 Log.w(TAG, "AVISO: No se encontraron registros en el archivo de presión.");
