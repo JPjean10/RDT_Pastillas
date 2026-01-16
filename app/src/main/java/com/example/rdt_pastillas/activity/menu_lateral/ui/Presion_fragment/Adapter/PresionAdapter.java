@@ -74,15 +74,16 @@ public class PresionAdapter extends RecyclerView.Adapter<PresionAdapter.PresionV
 
         holder.tvFecha.setText(fechaFormateada);
 
-        // Configurar estado (sincronizado o no)
+        // 4. Configurar ÚNICAMENTE la tarjeta según el estado de sincronización
         if (presion.isEstado()) {
-            // Sincronizado (verde o ícono check, o nube normal)
-            holder.imgEstado.setImageResource(R.drawable.ic_cloud_24); // Asegúrate de tener este icono
-            holder.imgEstado.setColorFilter(ContextCompat.getColor(holder.itemView.getContext(), R.color.neon_green));
+            // ESTADO SINCRONIZADO: Tarjeta limpia y normal
+            holder.cardView.setStrokeWidth(0); // Sin borde
+            holder.cardView.setCardElevation(4f); // Elevación estándar
         } else {
-            // No sincronizado (rojo o nube tachada como la imagen)
-            holder.imgEstado.setImageResource(R.drawable.ic_cloud_off_24);
-            holder.imgEstado.setColorFilter(ContextCompat.getColor(holder.itemView.getContext(), R.color.pure_red));
+            // ESTADO NO SINCRONIZADO: Borde rojo y sombra pronunciada
+            holder.cardView.setStrokeColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.pure_red));
+            holder.cardView.setStrokeWidth(4); // Grosor del borde
+            holder.cardView.setCardElevation(12f); // Sombra más intensa para resaltar
         }
 
         holder.btnEditar.setOnClickListener(v -> {
@@ -106,7 +107,9 @@ public class PresionAdapter extends RecyclerView.Adapter<PresionAdapter.PresionV
 
     static class PresionViewHolder extends RecyclerView.ViewHolder {
         TextView tvSys, tvDia, tvPul, tvFecha;
-        ImageView btnEditar, imgEstado;
+        ImageView btnEditar;
+        // Referencia a MaterialCardView
+        com.google.android.material.card.MaterialCardView cardView;
 
         public PresionViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -115,7 +118,9 @@ public class PresionAdapter extends RecyclerView.Adapter<PresionAdapter.PresionV
             tvDia = itemView.findViewById(R.id.tv_dia_valor);
             tvPul = itemView.findViewById(R.id.tv_pul_valor);
             btnEditar = itemView.findViewById(R.id.btn_editar);
-            imgEstado = itemView.findViewById(R.id.img_estado);
+
+            // Ahora el cast funcionará porque el XML ya tiene MaterialCardView
+            cardView = (com.google.android.material.card.MaterialCardView) itemView;
         }
     }
 }
