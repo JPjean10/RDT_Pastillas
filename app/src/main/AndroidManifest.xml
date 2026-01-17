@@ -43,6 +43,7 @@
 
         <activity
             android:name=".activity.menu_lateral.MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout"
             android:screenOrientation="portrait"
             android:exported="true"/>
 

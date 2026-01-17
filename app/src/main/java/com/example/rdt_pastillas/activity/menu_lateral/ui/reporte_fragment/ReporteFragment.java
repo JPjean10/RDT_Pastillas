@@ -1,5 +1,6 @@
 package com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.Color; // Importación correcta para los colores
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
 import com.example.rdt_pastillas.util.sesion.SessionManager;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -84,12 +86,25 @@ public class ReporteFragment extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
         lineChart.setExtraBottomOffset(20f);
+
+        // --- CONFIGURACIÓN EJE Y (Rango 0 - 300 de 50 en 50) ---
+        YAxis leftAxis = lineChart.getAxisLeft();
+        leftAxis.setAxisMinimum(0f);      // Valor mínimo
+        leftAxis.setAxisMaximum(300f);    // Valor máximo
+        leftAxis.setLabelCount(7, true);  // 7 etiquetas: 0, 50, 100, 150, 200, 250, 300
+        leftAxis.setGranularity(50f);     // Intervalo fijo de 50
+
+        YAxis rightAxis = lineChart.getAxisRight();
+        rightAxis.setAxisMinimum(0f);
+        rightAxis.setAxisMaximum(300f);
+        rightAxis.setLabelCount(7, true);
+        rightAxis.setGranularity(50f);
     }
 
     private void cargarDatos() {
         AppDataBaseControl.databaseWriteExecutor.execute(() -> {
             long idUser = sessionManager.getUserId();
-            // Cambiamos a las últimas 7 tomas para asegurar que siempre haya datos en el gráfico
+            // Cambiamos a las últimas 15 tomas para asegurar que siempre haya datos en el gráfico
             totalRegistros = AppDataBaseControl.getDatabase(getContext()).glucosa_interfaz().getTotalRegistros(idUser);
 
             List<GlucosaEntity> lista = AppDataBaseControl.getDatabase(getContext())
@@ -137,20 +152,27 @@ public class ReporteFragment extends Fragment {
         dataSet.setFillAlpha(40);
         dataSet.setValueTextSize(10f);
 
+        XAxis xAxis = lineChart.getXAxis();
+
         // Eje X con las fechas de la semana
-        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+        xAxis.setLabelCount(fechasX.size(), true);
+
+        xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 int index = (int) value;
-                return (index >= 0 && index < fechasX.size()) ? fechasX.get(index) : "";
+                if (index >= 0 && index < fechasX.size()) {
+                    return fechasX.get(index);
+                }
+                return "";
             }
         });
+
 
         LineData data = new LineData(dataSet);
         lineChart.setData(data);
         lineChart.animateY(1000);
         lineChart.invalidate();
-        XAxis xAxis = lineChart.getXAxis();
         xAxis.setLabelRotationAngle(0f);
     }
 
@@ -177,6 +199,26 @@ public class ReporteFragment extends Fragment {
             tvRangoFechas.setText(f1 + " - " + f2);
         } catch (Exception e) {
             tvRangoFechas.setText("---");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Permitir que el sensor gire la pantalla o forzar horizontal al entrar
+        // ActivityInfo.SCREEN_ORIENTATION_SENSOR permite que gire según el sensor
+        // ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE la fuerza a horizontal siempre
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Bloquear de nuevo a vertical al salir del fragmento
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
 }
