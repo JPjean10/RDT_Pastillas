@@ -1,5 +1,6 @@
 package com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,5 +60,25 @@ public class ReporteFragment extends Fragment {
 
         transaction.replace(R.id.contenedor_reportes, fragmentoHijo);
         transaction.commit();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Permitir que el sensor gire la pantalla o forzar horizontal al entrar
+        // ActivityInfo.SCREEN_ORIENTATION_SENSOR permite que gire según el sensor
+        // ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE la fuerza a horizontal siempre
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Bloquear de nuevo a vertical al salir del fragmento
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
     }
 }

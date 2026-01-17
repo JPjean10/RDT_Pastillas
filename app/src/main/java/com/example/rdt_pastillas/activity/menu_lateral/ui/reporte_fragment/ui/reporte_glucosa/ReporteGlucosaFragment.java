@@ -42,7 +42,7 @@ public class ReporteGlucosaFragment extends Fragment {
 
     private int currentOffset = 0; // Controla la página actual
     private int totalRegistros = 0;
-    private final int LIMIT = 7;
+    private final int LIMIT = 15;
 
 
     @Override
@@ -105,7 +105,7 @@ public class ReporteGlucosaFragment extends Fragment {
             totalRegistros = AppDataBaseControl.getDatabase(getContext()).glucosa_interfaz().getTotalRegistros(idUser);
 
             List<GlucosaEntity> lista = AppDataBaseControl.getDatabase(getContext())
-                    .glucosa_interfaz().getGlucosaPaginadaGraficos(idUser, currentOffset);
+                    .glucosa_interfaz().getGlucosaPaginadaGraficos(idUser,LIMIT,currentOffset);
 
             getActivity().runOnUiThread(() -> {
                 actualizarBotones();
@@ -196,26 +196,6 @@ public class ReporteGlucosaFragment extends Fragment {
             tvRangoFechas.setText(f1 + " - " + f2);
         } catch (Exception e) {
             tvRangoFechas.setText("---");
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Permitir que el sensor gire la pantalla o forzar horizontal al entrar
-        // ActivityInfo.SCREEN_ORIENTATION_SENSOR permite que gire según el sensor
-        // ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE la fuerza a horizontal siempre
-        if (getActivity() != null) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Bloquear de nuevo a vertical al salir del fragmento
-        if (getActivity() != null) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
 }

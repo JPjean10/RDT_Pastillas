@@ -39,8 +39,8 @@ public interface GlucosaLocalDao {
     @Query("SELECT * FROM GlucosaEntity WHERE estado = 0")
     List<GlucosaEntity> getRegistrosNoSincronizados();
 
-    @Query("SELECT * FROM (SELECT * FROM GlucosaEntity WHERE id_usuario = :idUsuario ORDER BY fecha_hora_creacion DESC LIMIT 15 OFFSET :offset) ORDER BY fecha_hora_creacion ASC")
-    List<GlucosaEntity> getGlucosaPaginadaGraficos(long idUsuario, int offset);
+    @Query("SELECT * FROM (SELECT * FROM GlucosaEntity WHERE id_usuario = :idUsuario ORDER BY fecha_hora_creacion DESC LIMIT :limit OFFSET :offset) ORDER BY fecha_hora_creacion ASC")
+    List<GlucosaEntity> getGlucosaPaginadaGraficos(long idUsuario,int limit,int offset);
     @Query("SELECT COUNT(*) FROM GlucosaEntity WHERE id_usuario = :idUsuario")
     int getTotalRegistros(long idUsuario);
 
