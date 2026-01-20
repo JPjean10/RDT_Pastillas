@@ -5,16 +5,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.rdt_pastillas.R;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ui.exportar_pdf_fragment.ExportarPdfFragment;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ui.reporte_glucosa.ReporteGlucosaFragment;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ui.reporte_presion.ReportePresionFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 
 public class ReporteFragment extends Fragment {
 
@@ -38,6 +36,9 @@ public class ReporteFragment extends Fragment {
             } else if (id == R.id.nav_presion) {
                 // Suponiendo que tienes un ReportePresionFragment
                 reemplazarFragmento(new ReportePresionFragment());
+                return true;
+            }else if (id == R.id.nav_exportar) { // <--- Nueva condición
+                reemplazarFragmento(new ExportarPdfFragment());
                 return true;
             }
             return false;

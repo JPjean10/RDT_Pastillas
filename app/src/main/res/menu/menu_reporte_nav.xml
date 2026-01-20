@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_menu_presion"
         android:title="presión" />
 
+    <item
+        android:id="@+id/nav_exportar"
+        android:icon="@drawable/ic_pdf_24"
+        android:title="Exportar PDF" />
+
 </menu>

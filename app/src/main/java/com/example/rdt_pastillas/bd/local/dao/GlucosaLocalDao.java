@@ -44,5 +44,15 @@ public interface GlucosaLocalDao {
     @Query("SELECT COUNT(*) FROM GlucosaEntity WHERE id_usuario = :idUsuario")
     int getTotalRegistros(long idUsuario);
 
+    @Query("SELECT MIN(fecha_hora_creacion) FROM GlucosaEntity WHERE id_usuario = :userId")
+    String getFechaMinima(long userId);
 
+    @Query("SELECT MAX(fecha_hora_creacion) FROM GlucosaEntity WHERE id_usuario = :userId")
+    String getFechaMaxima(long userId);
+
+    @Query("SELECT * FROM GlucosaEntity WHERE id_usuario = :userId " +
+            "AND fecha_hora_creacion >= :inicio " +
+            "AND fecha_hora_creacion <= :fin " +
+            "ORDER BY fecha_hora_creacion ASC")
+    List<GlucosaEntity> obtenerPorRango(long userId, String inicio, String fin);
 }
