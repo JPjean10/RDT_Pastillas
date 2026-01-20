@@ -37,4 +37,10 @@ public interface PresionLocalDao {
     /** 2. Inserta una lista completa de registros. */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<PresionEntity> presiones);
+
+    // 1. Obtener el total de registros para calcular la paginación
+    @Query("SELECT COUNT(*) FROM PresionEntity WHERE id_usuario = :idUsuario")
+    int getTotalRegistros(long idUsuario);
+    @Query("SELECT * FROM (SELECT * FROM PresionEntity WHERE id_usuario = :idUsuario ORDER BY fecha_hora_creacion DESC LIMIT :limit OFFSET :offset) ORDER BY fecha_hora_creacion ASC")
+    List<PresionEntity> getPresionPaginadaGraficosBase(long idUsuario, int limit, int offset);
 }
