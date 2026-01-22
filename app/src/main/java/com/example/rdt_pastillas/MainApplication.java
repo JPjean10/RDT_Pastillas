@@ -13,7 +13,10 @@ import androidx.work.WorkManager;
 
 import com.example.rdt_pastillas.bd.SyncService.SyncManager;
 import com.example.rdt_pastillas.workers.EmailWorker;
+import com.example.rdt_pastillas.workers.PcSyncTriggerWorker;
 import com.example.rdt_pastillas.workers.PcSyncWorker;
+
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 public class MainApplication extends Application {
@@ -41,8 +44,8 @@ public class MainApplication extends Application {
             // 2. Programar Reporte por Correo (15 días)
             programarEnvioDeCorreo();
 
-            // 3. Programar Sincronización con PC (1:00 AM + Reintentos)
-            programarSincronizacionPC();
+            // 1. Programar que se active todos los días a la 1:00 AM
+            programarDespertadorPC();
         } else {
             Log.w(TAG, "Servicios en espera: No se detectó permiso MANAGE_EXTERNAL_STORAGE.");
         }
@@ -74,47 +77,53 @@ public class MainApplication extends Application {
         Log.i("MainApplication", "Tarea de envío de correo periódico (cada 15 días) programada.");
     }
 
-    private void programarSincronizacionPC() {
-        // 1. Calcular cuánto tiempo falta para la próxima 1:00 AM
-        java.util.Calendar calendar = java.util.Calendar.getInstance();
+    public void ejecutarSincronizacionAhora() {
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.UNMETERED)
+                .build();
+
+        androidx.work.OneTimeWorkRequest workRequest =
+                new androidx.work.OneTimeWorkRequest.Builder(PcSyncWorker.class)
+                        .setConstraints(constraints)
+                        .setBackoffCriteria(
+                                BackoffPolicy.LINEAR,
+                                1, TimeUnit.HOURS) // Si la PC está apagada, reintenta cada hora
+                        .build();
+
+        // Usamos enqueueUniqueWork con KEEP para que si ya está reintentando, no cree otra fila
+        WorkManager.getInstance(this).enqueueUniqueWork(
+                "SyncManualPC",
+                androidx.work.ExistingWorkPolicy.KEEP,
+                workRequest
+        );
+    }
+
+    private void programarDespertadorPC() {
+        Calendar calendar = java.util.Calendar.getInstance();
         long ahora = calendar.getTimeInMillis();
 
-        // Configurar calendario para hoy a la 1:00 AM
         calendar.set(java.util.Calendar.HOUR_OF_DAY, 1);
         calendar.set(java.util.Calendar.MINUTE, 0);
         calendar.set(java.util.Calendar.SECOND, 0);
-        calendar.set(java.util.Calendar.MILLISECOND, 0);
 
-        // Si ya pasó la 1:00 AM de hoy, programamos para la 1:00 AM de MAÑANA
         if (calendar.getTimeInMillis() <= ahora) {
             calendar.add(java.util.Calendar.DAY_OF_YEAR, 1);
         }
 
-        long tiempoHastaLaUnaAM = calendar.getTimeInMillis() - ahora;
+        long delay = calendar.getTimeInMillis() - ahora;
 
-        // 2. Definir restricciones
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.UNMETERED) // Solo WiFi
+        // Esta tarea periódica NO reintenta. Su único trabajo es
+        // lanzar la tarea "ejecutarSincronizacionAhora" cada 24 horas.
+        PeriodicWorkRequest triggerRequest = new PeriodicWorkRequest.Builder(
+                PcSyncTriggerWorker.class, // Necesitamos un Worker nuevo "disparador"
+                24, TimeUnit.HOURS)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build();
 
-        // 3. Crear la solicitud periódica
-        PeriodicWorkRequest pcSyncRequest = new PeriodicWorkRequest.Builder(
-                PcSyncWorker.class,
-                24, TimeUnit.HOURS) // Se repite cada 24 horas después de la primera ejecución
-                .setConstraints(constraints)
-                .setInitialDelay(tiempoHastaLaUnaAM, TimeUnit.MILLISECONDS) // Espera hasta la 1:00 AM para empezar
-                .setBackoffCriteria(
-                        BackoffPolicy.LINEAR,
-                        1, TimeUnit.HOURS) // REINTENTO: Si falla (PC apagada), reintenta cada hora
-                .build();
-
-        // 4. Encolar la tarea única
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "SyncMiSaludPC",
-                ExistingPeriodicWorkPolicy.REPLACE, // Mantiene la programación existente
-                pcSyncRequest
+                "TriggerSyncPC",
+                ExistingPeriodicWorkPolicy.KEEP,
+                triggerRequest
         );
-
-        Log.i("Login", "Sincronización PC programada para las 1:00 AM. Retraso inicial: " + (tiempoHastaLaUnaAM / 1000 / 60) + " minutos.");
     }
 }
