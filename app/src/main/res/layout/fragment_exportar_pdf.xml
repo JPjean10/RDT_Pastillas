@@ -38,6 +38,43 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Tipo de Reporte"
+                android:textColor="@color/purple_500"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioGroup
+                android:id="@+id/rgTipoReporte"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/rbGlucosa"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Glucosa"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/rbPresion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Presión" />
+            </RadioGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="Rango de Fechas"
                 android:textColor="@color/purple_500"
@@ -56,7 +93,9 @@
                     android:id="@+id/btn_FechaInicio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/textfield_TextInputEditTextFecha"/>
+                    style="@style/textfield_TextInputEditTextFecha"
+                    android:focusable="false"
+                    android:clickable="true"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Selector Fecha Fin -->
@@ -71,14 +110,16 @@
                     android:id="@+id/btn_FechaFin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/textfield_TextInputEditTextFecha"/>
+                    style="@style/textfield_TextInputEditTextFecha"
+                    android:focusable="false"
+                    android:clickable="true"/>
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnExportar"
+        android:id="@+id/btn_exportar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="32dp"
@@ -96,6 +137,6 @@
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnExportar" />
+        app:layout_constraintTop_toBottomOf="@id/btn_exportar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

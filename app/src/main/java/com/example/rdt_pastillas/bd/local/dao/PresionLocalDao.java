@@ -43,4 +43,16 @@ public interface PresionLocalDao {
     int getTotalRegistros(long idUsuario);
     @Query("SELECT * FROM (SELECT * FROM PresionEntity WHERE id_usuario = :idUsuario ORDER BY fecha_hora_creacion DESC LIMIT :limit OFFSET :offset) ORDER BY fecha_hora_creacion ASC")
     List<PresionEntity> getPresionPaginadaGraficosBase(long idUsuario, int limit, int offset);
+
+    @Query("SELECT MIN(fecha_hora_creacion) FROM PresionEntity WHERE id_usuario = :userId")
+    String getFechaMinima(long userId);
+
+    @Query("SELECT MAX(fecha_hora_creacion) FROM PresionEntity WHERE id_usuario = :userId")
+    String getFechaMaxima(long userId);
+
+    @Query("SELECT * FROM PresionEntity WHERE id_usuario = :userId " +
+            "AND fecha_hora_creacion >= :inicio " +
+            "AND fecha_hora_creacion <= :fin " +
+            "ORDER BY fecha_hora_creacion ASC")
+    List<PresionEntity> obtenerPorRango(long userId, String inicio, String fin);
 }

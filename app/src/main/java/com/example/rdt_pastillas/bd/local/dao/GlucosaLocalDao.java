@@ -46,7 +46,6 @@ public interface GlucosaLocalDao {
 
     @Query("SELECT MIN(fecha_hora_creacion) FROM GlucosaEntity WHERE id_usuario = :userId")
     String getFechaMinima(long userId);
-
     @Query("SELECT MAX(fecha_hora_creacion) FROM GlucosaEntity WHERE id_usuario = :userId")
     String getFechaMaxima(long userId);
 
