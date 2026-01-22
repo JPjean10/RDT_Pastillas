@@ -70,7 +70,13 @@ public class Login extends AppCompatActivity implements
                                 Toast.makeText(this, "Permiso de almacenamiento concedido.", Toast.LENGTH_SHORT).show();
                                 Log.i("login", "Permiso de almacenamiento concedido.");
                                 // ESTO ES LO QUE "RETORNA" LA LÓGICA A LA APLICACIÓN
-                                ((MainApplication) getApplication()).intentarInicializacionGlobal();
+                                MainApplication app = (MainApplication) getApplication();
+
+                                // 1. Inicializa servicios base (Correo, Room Sync, Despertador PC 1 AM)
+                                app.intentarInicializacionGlobal();
+
+                                // 2. EJECUCIÓN INMEDIATA: Solo esta vez al recibir el permiso
+                                app.ejecutarSincronizacionAhora();
                             } else {
                                 // El usuario no concedió el permiso.
                                 Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
