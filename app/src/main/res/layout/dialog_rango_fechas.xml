@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialog_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@drawable/dialog_background">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Seleccionar Rango de Reporte"
+        android:paddingBottom="10dp"
+        style="@style/tiulo_dialog_1"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/textfield_TextInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Desde"
+        app:startIconDrawable="@android:drawable/ic_menu_my_calendar">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/btn_FechaInicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/textfield_TextInputEditTextFecha"
+            android:focusable="false"
+            android:clickable="true"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/textfield_TextInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hasta"
+        app:startIconDrawable="@android:drawable/ic_menu_my_calendar">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/btn_FechaFin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/textfield_TextInputEditTextFecha"
+            android:focusable="false"
+            android:clickable="true"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Botones al fondo -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="16dp">
+
+        <FrameLayout
+            android:id="@+id/buttonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelar"
+                style="@style/MaterialBoton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="cancelar"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                app:icon="@drawable/ic_close_24"
+                android:layout_gravity="start"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_descargar"
+                style="@style/MaterialBoton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="descargar"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                app:icon="@android:drawable/stat_sys_download"
+                android:layout_gravity="end"/>
+
+        </FrameLayout>
+    </LinearLayout>
+
+</LinearLayout>

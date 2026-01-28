@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true">
 
     <LinearLayout
@@ -52,6 +53,16 @@
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_marginBottom="32dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_exportar"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:text="DESCARGAR REPORTE"
+            app:icon="@drawable/ic_pdf_24"
+            style="@style/MaterialBoton"
+            app:layout_constraintTop_toBottomOf="@id/cardSeleccion" />
+
 
     </LinearLayout>
 </ScrollView>

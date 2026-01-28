@@ -1,12 +1,18 @@
 package com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ui.reporte_presion;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.example.rdt_pastillas.Modelo.ModeloBD.entity.ControlBD.presion_entity.PresionEntity;
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.bd.local.database.AppDataBaseControl;
+import com.example.rdt_pastillas.util.dailog.RangoFechasDialog;
 import com.example.rdt_pastillas.util.sesion.SessionManager;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -24,13 +31,21 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.google.android.material.button.MaterialButton;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
-public class ReportePresionFragment extends Fragment implements OnChartValueSelectedListener {
+public class ReportePresionFragment extends Fragment implements OnChartValueSelectedListener,
+        RangoFechasDialog.OnRangoSeleccionadoListener{
 
     private LineChart lineChart;
     private TextView tvRangoFechas;
@@ -41,15 +56,28 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
     private int totalRegistros = 0;
     private final int LIMIT = 15;
 
+    private MaterialButton btnExportarPDF;
+
+    // Formatos de fecha necesarios
+    private SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+    private SimpleDateFormat sdfShort = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private SimpleDateFormat sdfVisual = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reporte_presion, container, false);
+
+        // Configurar TimeZones para evitar desfases en cálculos de calendario
+        sdfFull.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdfShort.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdfVisual.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         lineChart = view.findViewById(R.id.chartPresion);
         tvRangoFechas = view.findViewById(R.id.tvRangoFechas);
         btnRetroceder = view.findViewById(R.id.btnRetroceder);
         btnAdelantar = view.findViewById(R.id.btnAdelantar);
         sessionManager = new SessionManager(requireContext());
+        btnExportarPDF = view.findViewById(R.id.btn_exportar);
 
         // Configurar listener de selección
         lineChart.setOnChartValueSelectedListener(this);
@@ -62,6 +90,25 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
 
         btnRetroceder.setOnClickListener(v -> { currentOffset += LIMIT; cargarDatos(); });
         btnAdelantar.setOnClickListener(v -> { if (currentOffset >= LIMIT) { currentOffset -= LIMIT; cargarDatos(); } });
+
+        btnExportarPDF.setOnClickListener(v -> {
+            new RangoFechasDialog(
+                    requireContext(),
+                    getChildFragmentManager(),
+                    new RangoFechasDialog.DaoProvider() {
+                        @Override
+                        public String getMin(long userId) {
+                            return AppDataBaseControl.getDatabase(getContext()).presion_interfaz().getFechaMinima(userId);
+                        }
+
+                        @Override
+                        public String getMax(long userId) {
+                            return AppDataBaseControl.getDatabase(getContext()).presion_interfaz().getFechaMaxima(userId);
+                        }
+                    },
+                    this
+            ).show();
+        });
 
         return view;
     }
@@ -230,5 +277,124 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
             String f2 = display.format(parser.parse(lista.get(lista.size()-1).getFecha_hora_creacion()));
             tvRangoFechas.setText(f1 + " - " + f2);
         } catch (Exception e) { tvRangoFechas.setText("---"); }
+    }
+
+    @Override
+    public void onRangoAceptado(String inicioDB, String finDB) {
+        generarPDFPresion(inicioDB, finDB);
+    }
+
+    private void generarPDFPresion(String fechaInicio, String fechaFin) {
+        new Thread(() -> {
+            try {
+                // 1. Obtener datos de la base de datos
+                List<PresionEntity> lista = AppDataBaseControl.getDatabase(getContext())
+                        .presion_interfaz().obtenerPorRango(
+                                sessionManager.getUserId(),
+                                fechaInicio.trim() + " 00:00:00",
+                                fechaFin.trim() + " 23:59:59"
+                        );
+
+                if (lista == null || lista.isEmpty()) {
+                    mostrarToast("No hay datos de Presión en este rango");
+                    return;
+                }
+
+                // 2. Configuración del Documento PDF
+                PdfDocument document = new PdfDocument();
+                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
+                PdfDocument.Page page = document.startPage(pageInfo);
+                Canvas canvas = page.getCanvas();
+                Paint paint = new Paint();
+
+                // --- ENCABEZADOS ---
+                paint.setTextSize(18f);
+                paint.setFakeBoldText(true);
+                canvas.drawText("REPORTE DE PRESIÓN ARTERIAL", 50, 50, paint);
+
+                String periodoFormateado = "Periodo: ";
+                try {
+                    Date dIni = sdfShort.parse(fechaInicio);
+                    Date dFin = sdfShort.parse(fechaFin);
+                    periodoFormateado += sdfVisual.format(dIni) + " al " + sdfVisual.format(dFin);
+                } catch (ParseException e) {
+                    periodoFormateado += fechaInicio + " al " + fechaFin; // Respaldo por si falla
+                }
+
+                paint.setTextSize(12f);
+                paint.setFakeBoldText(false);
+                canvas.drawText(periodoFormateado, 50, 80, paint);
+                canvas.drawLine(50, 95, 545, 95, paint);
+
+                int yPos = 130;
+                paint.setFakeBoldText(true);
+                canvas.drawText("FECHA / HORA", 50, yPos, paint);
+                canvas.drawText("SYS/DIA (mmHg)", 250, yPos, paint);
+                canvas.drawText("PULSO (lpm)", 450, yPos, paint);
+
+                // --- CUERPO DEL REPORTE ---
+                paint.setFakeBoldText(false);
+                yPos += 30;
+
+                // Definimos formatos locales para evitar el desfase de horas (No forzar UTC)
+                SimpleDateFormat sdfEntrada = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                SimpleDateFormat sdfSalida = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
+
+                for (PresionEntity p : lista) {
+                    // Control de salto de página
+                    if (yPos > 800) {
+                        document.finishPage(page);
+                        pageInfo = new PdfDocument.PageInfo.Builder(595, 842, document.getPages().size() + 1).create();
+                        page = document.startPage(pageInfo);
+                        canvas = page.getCanvas();
+                        yPos = 50;
+                    }
+
+                    String fechaHoraOriginal = p.getFecha_hora_creacion();
+                    String fechaParaMostrar = fechaHoraOriginal;
+
+                    try {
+                        // Parsear y formatear para que coincida con la hora del celular
+                        Date dateObj = sdfEntrada.parse(fechaHoraOriginal);
+                        if (dateObj != null) {
+                            fechaParaMostrar = sdfSalida.format(dateObj)
+                                    .replace("AM", "a.m.")
+                                    .replace("PM", "p.m.");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    canvas.drawText(fechaParaMostrar, 50, yPos, paint);
+                    canvas.drawText(p.getSys() + "/" + p.getDia(), 250, yPos, paint);
+                    canvas.drawText(p.getPul() + "", 450, yPos, paint);
+
+                    yPos += 25; // Espacio entre filas
+                }
+
+                document.finishPage(page);
+
+                // 3. Guardar el archivo
+                String fileName = "Reporte_Presion.pdf";
+                guardarArchivo(document, "Reporte_Presion");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                mostrarToast("Error al generar PDF de Presión");
+            }
+        }).start();
+    }
+
+    private void guardarArchivo(PdfDocument doc, String prefix) throws IOException {
+        String fileName = prefix + ".pdf";
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
+        FileOutputStream fos = new FileOutputStream(file);
+        doc.writeTo(fos);
+        fos.flush(); fos.close(); doc.close();
+        mostrarToast("Archivo guardado: " + fileName);
+    }
+
+    private void mostrarToast(String msg) {
+        if(getActivity() != null) getActivity().runOnUiThread(() -> Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show());
     }
 }
