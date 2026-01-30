@@ -1,5 +1,8 @@
 package com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ui.reporte_presion;
 
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -46,6 +49,9 @@ import java.util.TimeZone;
 
 public class ReportePresionFragment extends Fragment implements OnChartValueSelectedListener,
         RangoFechasDialog.OnRangoSeleccionadoListener{
+
+    // VARIABLE AÑADIDA PARA CORREGIR EL ERROR
+    private int orientacionOriginal = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
 
     private LineChart lineChart;
     private TextView tvRangoFechas;
@@ -396,5 +402,32 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
 
     private void mostrarToast(String msg) {
         if(getActivity() != null) getActivity().runOnUiThread(() -> Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Guardar la orientación que tenía la actividad antes de entrar
+        if (getActivity() != null) {
+            orientacionOriginal = getActivity().getRequestedOrientation();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Forzar horizontal
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(SCREEN_ORIENTATION_LANDSCAPE);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Al salir, volver a la orientación que tenía antes (o forzar vertical)
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(orientacionOriginal);
+        }
     }
 }

@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/nav_pastilla"
         android:icon="@drawable/ic_menu_pastilla"
-        android:title="pastillla" />
+        android:title="Pastillas" />
+
     <item
         android:id="@+id/nav_glucosa"
         android:icon="@drawable/ic_menu_glucosa"
-        android:title="glucosa" />
+        android:title="Glucosa" />
 
     <item
         android:id="@+id/nav_presion"
         android:icon="@drawable/ic_menu_presion"
-        android:title="presión" />
+        android:title="Presión" />
 
+    <!-- 🔽 SUBMENÚ REAL -->
     <item
-        android:id="@+id/nav_reporte"
-        android:icon="@drawable/ic_analytics_24"
-        android:title="reporte" />
+        android:id="@+id/nav_reportes"
+        android:title="Reportes"
+        android:icon="@drawable/ic_analytics_24">
+
+        <menu>
+            <item
+                android:id="@+id/nav_reporte_glucosa"
+                android:title="Reporte Glucosa"
+                android:icon="@drawable/ic_analytics_24" />
+
+            <item
+                android:id="@+id/nav_reporte_presion"
+                android:title="Reporte Presión"
+                android:icon="@drawable/ic_analytics_24" />
+        </menu>
+    </item>
 
 </menu>

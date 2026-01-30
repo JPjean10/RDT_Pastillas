@@ -11,12 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import com.example.rdt_pastillas.R;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.Presion_fragment.PresionFragment;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.glucosa_fragment.GlucosaFragment;
 import com.example.rdt_pastillas.activity.menu_lateral.ui.pastillas_fragment.PastillasFragment;
-import com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ReporteFragment;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ui.reporte_glucosa.ReporteGlucosaFragment;
+import com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ui.reporte_presion.ReportePresionFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -76,20 +78,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == R.id.nav_pastilla) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PastillasFragment()).commit();
-        } else if (itemId == R.id.nav_glucosa) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GlucosaFragment()).commit();
-        } else if (itemId == R.id.nav_presion) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PresionFragment()).commit();
-        } else if (itemId == R.id.nav_reporte) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ReporteFragment()).commit();
+
+        int id = item.getItemId();
+
+        if (id == R.id.nav_pastilla) {
+            replaceFragment(new PastillasFragment());
+        }
+        else if (id == R.id.nav_glucosa) {
+            replaceFragment(new GlucosaFragment());
+        }
+        else if (id == R.id.nav_presion) {
+            replaceFragment(new PresionFragment());
+        }
+        else if (id == R.id.nav_reporte_glucosa) {
+            replaceFragment(new ReporteGlucosaFragment());
+        }
+        else if (id == R.id.nav_reporte_presion) {
+            replaceFragment(new ReportePresionFragment());
         }
 
-        getSupportActionBar().setTitle(item.getTitle());
         drawerLayout.closeDrawer(GravityCompat.START);
+        getSupportActionBar().setTitle(item.getTitle());
         return true;
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
     }
 
 }

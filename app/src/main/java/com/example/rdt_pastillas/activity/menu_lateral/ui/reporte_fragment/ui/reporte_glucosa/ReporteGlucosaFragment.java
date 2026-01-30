@@ -1,5 +1,8 @@
 package com.example.rdt_pastillas.activity.menu_lateral.ui.reporte_fragment.ui.reporte_glucosa;
 
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color; // Importación correcta para los colores
 import android.graphics.Paint;
@@ -13,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
@@ -48,6 +52,9 @@ import java.util.TimeZone;
 
 public class ReporteGlucosaFragment extends Fragment implements
      RangoFechasDialog.OnRangoSeleccionadoListener {
+
+    // VARIABLE AÑADIDA PARA CORREGIR EL ERROR
+    private int orientacionOriginal = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
 
     private LineChart lineChart;
     private TextView tvRangoFechas;
@@ -393,5 +400,32 @@ public class ReporteGlucosaFragment extends Fragment implements
 
     private void mostrarToast(String msg) {
         if(getActivity() != null) getActivity().runOnUiThread(() -> Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Guardar la orientación que tenía la actividad antes de entrar
+        if (getActivity() != null) {
+            orientacionOriginal = getActivity().getRequestedOrientation();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Forzar horizontal
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(SCREEN_ORIENTATION_LANDSCAPE);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Al salir, volver a la orientación que tenía antes (o forzar vertical)
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(orientacionOriginal);
+        }
     }
 }
