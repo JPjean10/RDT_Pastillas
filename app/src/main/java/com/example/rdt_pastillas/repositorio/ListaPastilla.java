@@ -19,28 +19,28 @@ public class ListaPastilla {
                 "06:30 AM"));
         pastillas.add(new PastillasModel(
                 2,
-                "alprasolan",
+                "Alprazolam",
                 "07:40 AM"));
         pastillas.add(new PastillasModel(
                 3,
-                "carrelidol 1/2 pastillas",
+                "Carvedilol 1/2",
                 "07:40 AM"));
         pastillas.add(new PastillasModel(
                 4,
-                "gabapentina",
+                "Gabapentina",
                 "07:40 AM"));
         pastillas.add(new PastillasModel(
                 5,
-                "meformina",
+                "Metformina",
                 "07:40 AM"));
         // en tarde
         pastillas.add(new PastillasModel(
                 6,
-                "meformina",
+                "Metformina",
                 "01:30 PM"));
         pastillas.add(new PastillasModel(
                 7,
-                "dapaglifozina",
+                "Dapagliflozina",
                 "01:30 PM"));
         // en la noche
         pastillas.add(new PastillasModel(
@@ -49,27 +49,27 @@ public class ListaPastilla {
                 "06:30 PM"));
         pastillas.add(new PastillasModel(
                 9,
-                "aprasolan",
+                "Alprazolam",
                 "07:40 PM"));
         pastillas.add(new PastillasModel(
                 10,
-                "carrelidol 1/2 pastillas",
+                "Carvedilol 1/2 pastillas",
                 "07:40 PM"));
         pastillas.add(new PastillasModel(
                 11,
-                "gabapentina",
+                "Gabapentina",
                 "07:40 PM"));
         pastillas.add(new PastillasModel(
                 12,
-                "almiodipilina",
+                "Amlodipina",
                 "07:40 PM"));
         pastillas.add(new PastillasModel(
                 13,
-                "atorrastatina",
+                "Atorvastatina",
                 "07:40 PM"));
         pastillas.add(new PastillasModel(
                 14,
-                "meformina",
+                "Metformina",
                 "07:40 PM"));
         // pruevas
 
