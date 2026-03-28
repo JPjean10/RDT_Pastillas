@@ -16,7 +16,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import androidx.annotation.NonNull;
@@ -314,7 +313,7 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
 
     @Override
     public void onRangoAceptado(String inicioDB, String finDB) {
-        generarPDFConGraficoCompleto(inicioDB, finDB);
+        generarPDFGrafico(inicioDB, finDB);
         generarPDFPresion(inicioDB, finDB);
     }
 
@@ -419,7 +418,7 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
         }).start();
     }
 
-    private void generarPDFConGraficoCompleto(String fechaInicio, String fechaFin) {
+    private void generarPDFGrafico(String fechaInicio, String fechaFin) {
         new Thread(() -> {
             try {
                 // 1. Obtener TODOS los datos
@@ -444,7 +443,7 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
                     // Generar el Bitmap para esta página (en hilo UI)
                     final Bitmap[] finalBitmap = new Bitmap[1];
                     getActivity().runOnUiThread(() -> {
-                        finalBitmap[0] = crearBitmapGraficoCompleto(subLista);
+                        finalBitmap[0] = crearBitmapGrafico(subLista);
                     });
 
                     while (finalBitmap[0] == null) { Thread.sleep(150); }
@@ -491,7 +490,7 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
             }
         }).start();
     }
-    private Bitmap crearBitmapGraficoCompleto(List<PresionEntity> lista) {
+    private Bitmap crearBitmapGrafico(List<PresionEntity> lista) {
         LineChart chartBuffer = new LineChart(getContext());
         int width = 2500; // Alta resolución
         int height = 1200;

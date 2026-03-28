@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.Bitmap;
+import android.graphics.RectF;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -259,8 +261,33 @@ public class ReporteGlucosaFragment extends Fragment implements
         }
     }
 
+    private String formatearFechaEjeXPDF(String raw) {
+        try {
+            SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM\nyyyy", Locale.getDefault());
+            return formatter.format(parser.parse(raw));
+        } catch (Exception e) { return ""; }
+    }
+
+    // Clase para permitir el salto de línea \n en el eje X
+    private class CustomXAxisRenderer extends com.github.mikephil.charting.renderer.XAxisRenderer {
+        public CustomXAxisRenderer(com.github.mikephil.charting.utils.ViewPortHandler viewPortHandler, XAxis xAxis, com.github.mikephil.charting.utils.Transformer trans) {
+            super(viewPortHandler, xAxis, trans);
+        }
+
+        @Override
+        protected void drawLabel(Canvas c, String formattedLabel, float x, float y, com.github.mikephil.charting.utils.MPPointF anchor, float angleDegrees) {
+            String[] lines = formattedLabel.split("\n");
+            for (int i = 0; i < lines.length; i++) {
+                float vOffset = i * mAxisLabelPaint.getTextSize() * 1.1f;
+                com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, lines[i], x, y + vOffset, mAxisLabelPaint, anchor, angleDegrees);
+            }
+        }
+    }
+
     @Override
     public void onRangoAceptado(String inicioDB, String finDB) {
+        generarPDFGraficoGlucosa(inicioDB, finDB);
         generarPDFGlucosa(inicioDB, finDB);
     }
 
@@ -389,6 +416,118 @@ public class ReporteGlucosaFragment extends Fragment implements
         }).start();
     }
 
+    private void generarPDFGraficoGlucosa(String fechaInicio, String fechaFin) {
+        new Thread(() -> {
+            try {
+                List<GlucosaEntity> listaTotal = AppDataBaseControl.getDatabase(getContext())
+                        .glucosa_interfaz().obtenerPorRango(sessionManager.getUserId(),
+                                fechaInicio.trim() + " 00:00:00", fechaFin.trim() + " 23:59:59");
+
+                if (listaTotal == null || listaTotal.isEmpty()) return;
+
+                PdfDocument document = new PdfDocument();
+                int puntosPorPagina = 30;
+                int totalPaginas = (int) Math.ceil((double) listaTotal.size() / puntosPorPagina);
+
+                for (int i = 0; i < totalPaginas; i++) {
+                    int inicio = i * puntosPorPagina;
+                    int fin = Math.min(inicio + puntosPorPagina, listaTotal.size());
+                    List<GlucosaEntity> subLista = listaTotal.subList(inicio, fin);
+
+                    final Bitmap[] finalBitmap = new Bitmap[1];
+                    getActivity().runOnUiThread(() -> finalBitmap[0] = crearBitmapGrafico(subLista));
+
+                    while (finalBitmap[0] == null) { Thread.sleep(150); }
+
+                    PdfDocument.Page page = document.startPage(new PdfDocument.PageInfo.Builder(595, 842, i + 1).create());
+                    Canvas canvas = page.getCanvas();
+                    Paint paint = new Paint();
+
+                    // Encabezado Lateral Rotado (Punto A)
+                    canvas.save();
+                    canvas.translate(560, 40); canvas.rotate(90);
+                    paint.setTextSize(14f); paint.setFakeBoldText(true);
+                    canvas.drawText("REPORTE GRÁFICO DE GLUCOSA - PÁG " + (i + 1), 0, 0, paint);
+                    paint.setTextSize(10f); paint.setFakeBoldText(false);
+                    canvas.drawText("Periodo: " + fechaInicio + " al " + fechaFin, 0, 18, paint);
+                    canvas.drawLine(0, 25, 760, 25, paint);
+                    canvas.restore();
+
+                    // Dibujar Gráfico
+                    canvas.save();
+                    float margenIzquierdo = 50, margenSuperior = 50;
+                    float anchoGraficoPapel = 440, altoGraficoPapel = 740;
+                    canvas.translate(margenIzquierdo + anchoGraficoPapel / 2, margenSuperior + altoGraficoPapel / 2);
+                    canvas.rotate(90);
+                    RectF rectDestino = new RectF(-altoGraficoPapel / 2, -anchoGraficoPapel / 2, altoGraficoPapel / 2, anchoGraficoPapel / 2);
+                    canvas.drawBitmap(finalBitmap[0], null, rectDestino, paint);
+                    canvas.restore();
+
+                    document.finishPage(page);
+                }
+                guardarArchivo(document, "Reporte_Glucosa_Grafico");
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
+    }
+    private Bitmap crearBitmapGrafico(List<GlucosaEntity> lista) {
+        LineChart chartBuffer = new LineChart(getContext());
+        int width = 2500, height = 1200;
+        chartBuffer.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));
+        chartBuffer.layout(0, 0, width, height);
+
+        // Renderizador especial para el \n
+        chartBuffer.setXAxisRenderer(new CustomXAxisRenderer(chartBuffer.getViewPortHandler(), chartBuffer.getXAxis(), chartBuffer.getTransformer(YAxis.AxisDependency.LEFT)));
+
+        chartBuffer.setExtraOffsets(30, 30, 30, 120);
+        chartBuffer.setBackgroundColor(Color.WHITE);
+        chartBuffer.getDescription().setEnabled(false);
+
+        XAxis xAxis = chartBuffer.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setLabelCount(lista.size(), false);
+        xAxis.setTextSize(12f);
+
+        YAxis leftAxis = chartBuffer.getAxisLeft();
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setAxisMaximum(300f); // Rango glucosa
+        leftAxis.setLabelCount(7, true);
+
+        chartBuffer.getAxisRight().setEnabled(false);
+
+        ArrayList<Entry> entries = new ArrayList<>();
+        ArrayList<String> fechasX = new ArrayList<>();
+
+        for (int i = 0; i < lista.size(); i++) {
+            GlucosaEntity g = lista.get(i);
+            entries.add(new Entry(i, (float) g.getNivel_glucosa()));
+            fechasX.add(formatearFechaEjeXPDF(g.getFecha_hora_creacion()));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Glucosa (mg/dL)");
+        dataSet.setColor(Color.parseColor("#6200EE"));
+        dataSet.setCircleColor(Color.parseColor("#6200EE"));
+        dataSet.setLineWidth(4f);
+        dataSet.setCircleRadius(5f);
+        dataSet.setDrawValues(true); // <--- VALORES VISIBLES SOBRE PUNTOS
+        dataSet.setValueTextSize(11f);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+        chartBuffer.setData(new LineData(dataSet));
+
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int idx = (int) value;
+                return (idx >= 0 && idx < fechasX.size()) ? fechasX.get(idx) : "";
+            }
+        });
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        chartBuffer.draw(new Canvas(bitmap));
+        return bitmap;
+    }
     private void guardarArchivo(PdfDocument doc, String prefix) throws IOException {
         String fileName = prefix + ".pdf";
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
