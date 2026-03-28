@@ -15,6 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -270,6 +273,30 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
         } catch (Exception e) { return ""; }
     }
 
+    private String formatearFechaEjeXPDF(String raw) {
+        try {
+            SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            // \n genera el salto de línea
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM\nyyyy", Locale.getDefault());
+            return formatter.format(parser.parse(raw));
+        } catch (Exception e) { return ""; }
+    }
+
+    private class CustomXAxisRenderer extends com.github.mikephil.charting.renderer.XAxisRenderer {
+        public CustomXAxisRenderer(com.github.mikephil.charting.utils.ViewPortHandler viewPortHandler, XAxis xAxis, com.github.mikephil.charting.utils.Transformer trans) {
+            super(viewPortHandler, xAxis, trans);
+        }
+
+        @Override
+        protected void drawLabel(Canvas c, String formattedLabel, float x, float y, com.github.mikephil.charting.utils.MPPointF anchor, float angleDegrees) {
+            String[] lines = formattedLabel.split("\n");
+            for (int i = 0; i < lines.length; i++) {
+                float vOffset = i * mAxisLabelPaint.getTextSize() * 1.1f;
+                com.github.mikephil.charting.utils.Utils.drawXAxisValue(c, lines[i], x, y + vOffset, mAxisLabelPaint, anchor, angleDegrees);
+            }
+        }
+    }
+
     private void actualizarBotones() {
         btnAdelantar.setVisibility(currentOffset > 0 ? View.VISIBLE : View.INVISIBLE);
         btnRetroceder.setVisibility((currentOffset + LIMIT) < totalRegistros ? View.VISIBLE : View.INVISIBLE);
@@ -287,6 +314,7 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
 
     @Override
     public void onRangoAceptado(String inicioDB, String finDB) {
+        generarPDFConGraficoCompleto(inicioDB, finDB);
         generarPDFPresion(inicioDB, finDB);
     }
 
@@ -391,6 +419,151 @@ public class ReportePresionFragment extends Fragment implements OnChartValueSele
         }).start();
     }
 
+    private void generarPDFConGraficoCompleto(String fechaInicio, String fechaFin) {
+        new Thread(() -> {
+            try {
+                // 1. Obtener TODOS los datos
+                List<PresionEntity> listaTotal = AppDataBaseControl.getDatabase(getContext())
+                        .presion_interfaz().obtenerPorRango(sessionManager.getUserId(),
+                                fechaInicio.trim() + " 00:00:00", fechaFin.trim() + " 23:59:59");
+
+                if (listaTotal == null || listaTotal.isEmpty()) {
+                    mostrarToast("No hay datos en este rango");
+                    return;
+                }
+
+                PdfDocument document = new PdfDocument();
+                int puntosPorPagina = 30; // Cantidad de puntos para que se vea claro y no amontonado
+                int totalPaginas = (int) Math.ceil((double) listaTotal.size() / puntosPorPagina);
+
+                for (int i = 0; i < totalPaginas; i++) {
+                    int inicio = i * puntosPorPagina;
+                    int fin = Math.min(inicio + puntosPorPagina, listaTotal.size());
+                    List<PresionEntity> subLista = listaTotal.subList(inicio, fin);
+
+                    // Generar el Bitmap para esta página (en hilo UI)
+                    final Bitmap[] finalBitmap = new Bitmap[1];
+                    getActivity().runOnUiThread(() -> {
+                        finalBitmap[0] = crearBitmapGraficoCompleto(subLista);
+                    });
+
+                    while (finalBitmap[0] == null) { Thread.sleep(150); }
+                    Bitmap chartBitmap = finalBitmap[0];
+
+                    // Crear página PDF (A4)
+                    PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, i + 1).create();
+                    PdfDocument.Page page = document.startPage(pageInfo);
+                    Canvas canvas = page.getCanvas();
+                    Paint paint = new Paint();
+
+                    // --- ENCABEZADO ROTADO (Lateral Derecho - Punto A) ---
+                    canvas.save();
+                    canvas.translate(560, 40);
+                    canvas.rotate(90);
+                    paint.setTextSize(14f);
+                    paint.setFakeBoldText(true);
+                    canvas.drawText("REPORTE GRÁFICO DE PRESIÓN - PÁG " + (i + 1), 0, 0, paint);
+                    paint.setTextSize(10f);
+                    paint.setFakeBoldText(false);
+                    canvas.drawText("Periodo: " + fechaInicio + " al " + fechaFin, 0, 18, paint);
+                    canvas.drawLine(0, 25, 760, 25, paint);
+                    canvas.restore();
+
+                    // --- DIBUJAR GRÁFICO ---
+                    canvas.save();
+                    float margenIzquierdo = 50, margenSuperior = 50;
+                    float anchoGraficoPapel = 440, altoGraficoPapel = 740;
+
+                    canvas.translate(margenIzquierdo + anchoGraficoPapel / 2, margenSuperior + altoGraficoPapel / 2);
+                    canvas.rotate(90);
+
+                    RectF rectDestino = new RectF(-altoGraficoPapel / 2, -anchoGraficoPapel / 2, altoGraficoPapel / 2, anchoGraficoPapel / 2);
+                    canvas.drawBitmap(chartBitmap, null, rectDestino, paint);
+                    canvas.restore();
+
+                    document.finishPage(page);
+                }
+
+                guardarArchivo(document, "Reporte_Presion_Grafico");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+    private Bitmap crearBitmapGraficoCompleto(List<PresionEntity> lista) {
+        LineChart chartBuffer = new LineChart(getContext());
+        int width = 2500; // Alta resolución
+        int height = 1200;
+
+        chartBuffer.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));
+        chartBuffer.layout(0, 0, width, height);
+
+        // Renderizador para soportar el \n en las fechas
+        chartBuffer.setXAxisRenderer(new CustomXAxisRenderer(chartBuffer.getViewPortHandler(), chartBuffer.getXAxis(), chartBuffer.getTransformer(YAxis.AxisDependency.LEFT)));
+
+        chartBuffer.setExtraOffsets(30, 30, 30, 120); // Espacio para fecha doble línea
+        chartBuffer.setBackgroundColor(Color.WHITE);
+        chartBuffer.getDescription().setEnabled(false);
+
+        XAxis xAxis = chartBuffer.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setGranularityEnabled(true);
+        xAxis.setLabelCount(lista.size(), false); // Un label por cada punto (Alineación perfecta)
+        xAxis.setTextSize(12f);
+
+        YAxis leftAxis = chartBuffer.getAxisLeft();
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setAxisMaximum(300f);
+        leftAxis.setLabelCount(12, true);
+
+        chartBuffer.getAxisRight().setEnabled(false);
+
+        ArrayList<Entry> entriesSys = new ArrayList<>();
+        ArrayList<Entry> entriesDia = new ArrayList<>();
+        ArrayList<Entry> entriesPul = new ArrayList<>();
+        ArrayList<String> fechasX = new ArrayList<>();
+
+        for (int i = 0; i < lista.size(); i++) {
+            PresionEntity p = lista.get(i);
+            entriesSys.add(new Entry(i, (float) p.getSys()));
+            entriesDia.add(new Entry(i, (float) p.getDia()));
+            entriesPul.add(new Entry(i, (float) p.getPul()));
+            fechasX.add(formatearFechaEjeXPDF(p.getFecha_hora_creacion()));
+        }
+
+        // Configurar Datasets con valores visibles
+        LineDataSet setSys = crearDataSet(entriesSys, "SYS", Color.RED);
+        setSys.setDrawValues(true); // <--- VALORES VISIBLES
+        setSys.setValueTextSize(10f);
+        setSys.setLineWidth(4f);
+
+        LineDataSet setDia = crearDataSet(entriesDia, "DIA", Color.BLUE);
+        setDia.setDrawValues(true); // <--- VALORES VISIBLES
+        setDia.setValueTextSize(10f);
+        setDia.setLineWidth(4f);
+
+        LineDataSet setPul = crearDataSet(entriesPul, "PUL", Color.parseColor("#2E7D32"));
+        setPul.setDrawValues(true); // <--- VALORES VISIBLES
+        setPul.setValueTextSize(10f);
+        setPul.setLineWidth(4f);
+
+        chartBuffer.setData(new LineData(setSys, setDia, setPul));
+
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int idx = (int) value;
+                return (idx >= 0 && idx < fechasX.size()) ? fechasX.get(idx) : "";
+            }
+        });
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        chartBuffer.draw(new Canvas(bitmap));
+        return bitmap;
+    }
     private void guardarArchivo(PdfDocument doc, String prefix) throws IOException {
         String fileName = prefix + ".pdf";
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
